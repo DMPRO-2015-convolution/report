@@ -1,1 +1,26 @@
 \chapter{Description \& Methodology}
+
+\section{FPGA}
+
+The very heart of our computer is our custom made architecture implemented on our FPGA.
+In this section we will first describe the overall architecture of our convolution engine before we will examine our implementation.
+
+\section{Data in}
+
+We used an EBI bus!
+
+\section{Convolver}
+
+The focal point of the convolver is the data delivery conveyor belt. This belt is a set of rows containing data, each row corresponding to a row in a convolution kernel.
+Each cycle the convolver expects a datum from a FIFO queue which will be inserted into the input feeder tree. Each row has a feeder tree, however the lower rows is fed by the output of the row above.
+In our figure we show a feeder belt for a kernel of size 3*3 using nine columns. The green registers correspond to the register that is currently being extracted.
+Each timestep the requested data is the register to the right of the previously requested register, wrapping around in a toroid fashion when the rightmost register was previously registered.
+In order to explain the purpose of our request pattern we will focus on the middle row, specifically the elements in this row that is surrounded by as many elements required by the convolution kernel.
+In fig TODO these pixels are colored purple, and the surrounding pixels required to convolute the three first pixels are drawn with arrows pointing to the middle pixel.
+By following this pattern, we ensure that in context of some register in the middle row, as soon as the requests in the lowest row goes out of range, the requests in the second lowest row comes in range, and so on.
+In addition, we also achieve the effect that each 
+
+\section{Data out}
+
+We used HDMI!
+

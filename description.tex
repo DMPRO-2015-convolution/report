@@ -1,43 +1,65 @@
 \chapter{Description \& Methodology}
 
+\section{Convolution}
+Some words on convolution. Background-ish
+
 \section{FPGA}
 
 The very heart of our computer is our custom made architecture implemented on our FPGA.
-In this section we will first describe the overall architecture of our convolution engine before we will examine our implementation.
+In this section we will first describe the overall architecture of our convolution engine, and then we will drill down and examine the core modules.
+Modularity and extendibility is a core principle in our design, however in this section we will describe the processor as if only being able to do 3x3 convolutions.
 
 \subsection{Overall design}
 
 Convolution is a very regular task where data flows only forward. This means that our processor can be simplified, removing the need for a central control module.
 Instead each module simply operates under the assumption that all data inputs are correctly formatted and ordered and does its operations accordingly.
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/DataPath.png}
+    \caption{The data path for our processor, named daisy after the way it daisy chains control}
+    \label{fig:Convolution}
+\end{figure}
+In the figure we see this design principle reflected, no data ever flows backwards, only forwards. 
+Breaking up the individual steps we get the typical flow of data.
+\begin{enumerate}
+  \item Data from the bus is read by the bus controller. This controller serves as a clock domain crossover and is responsible for delivering data to the input handler in a clock domain crossing FIFO queue.
+  \item The input handler recieves data from the queue and does magic
+  \item After magic is performed the conveyor recieves the data. This unit is responsible for buffering pixel data, and deliver data to the accumulator in a set pattern to ensure a pixel is used in all its 9 contexts.
+  \item The Kernel buffer collects kernel data at program start from the input handler. After recieving 9 kernel values it will only deliver kernel data to the Accumulator
+  \item The accumulator recieves kernel data from the kernel buffer and performs its mapping function on the kernel value and the pixel from the conveyor belt. 
+When an accumulator has accumulated all its pixels it flushes its value, resetting the accumulator register and writing the old data to the memory control unit.
+  \item Accumulated pixels are reassembled in the mem ctrl unit and written to one of the two SRAM banks, allowing us to double buffer. 
+  \item After being buffered in SRAM pixel data is read by the video ctrl module which outputs video to an HDMI cable, ensuring crisp image quality served in a modern fashion.
+\end{enumerate}
 
 \section{Data in}
 
 We used an EBI bus!
+We handled data in an input buffer!
 
 \section{Convolver}
-In this section we will first focus on an idealized design to show the intent of our design without the added clutter introduced by implementation details before explaining our final design.
-The two major parts of the convolution engine is the data feeder and the executing unit. By decoupling these we ensure a modular design allowing us to try a range of different approaches in our executing unit.
-First we will give a brief description of the convolution process, this will also help us establish the necessary vocabulary. 
-While our architecture aims to tackle many different kernel sizes we will use a 3 by 3 pixel convolution kernel and treat pixels as a single value rather than being composite of different colors like red green and blue.
-In fig:Convolution the necessary operations for outputting a single pixel is shown. In each step each kernel is mapped according to some mapping function 
+This section encompasses the four modules forming the heart of the convolution engine. In the order they are covered, they are:
+\begin{enumerate}
+    \item the conveyor belt 
+    \item the kernel buffer 
+    \item the accumulator.
+    \item the control unit
+\end{enumerate}
+In order to not bog down the report with unescessary implementation detail we will cover an idealized implementation leaving the final implementation to the appendix.
+The two major parts of the convolution engine is the conveyor belt and the accumultion unit. By decoupling these we ensure a modular design allowing us to try a range of different approaches in our accumultion unit.
+
+\subsection{The conveyor belt}
+In order to convolute an image we make several sweeps over the image as shown in fig:Sweeps. 
+fig:SweepFrontier TODO
 \begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/Convolution.png}
-    \caption{The process of convoluting a single pixel}
-    \label{fig:Convolution}
+    \includegraphics[width=\linewidth]{img/Sweeps.png}
+    \caption{The sweep pattern used to collect data for convolution}
+    \label{fig:Sweeps}
 \end{figure}
-
-On a larger scale, when we investigate the pixels of some image we see how each pixel is needed in several context. Fig:ContextsX shows three of the nine contexts in which the purple pixels is needed.
-The concept of a context will be used to explain the data feeding operation, so readers should make themselves familiar with the terminology. 
-In the figure the purple pixel is read in context of the convolution performed on the neighbourhood denoted by a gray background. 
-When we write that some pixel A is read in the context of some other pixel B we mean that the pixel A is read in context of the convolution in which B is the center pixel. 
 \begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/Contexts5.png}
-    \caption{Three of the nine contexts a pixel is used}
-    \label{fig:ConvolutionContexts}
+    \includegraphics[width=\linewidth]{img/FeedPattern.png}
+    \caption{The image three greyed out pixels in the source image represent the three pixels which the neighbourhoods in grey boxes help calculate. The window is three pixels deep and nine pixels wide}
+    \label{fig:SweepFrontier}
 \end{figure}
-
-
-\subsection{Datafeeder}
 
 \subsubsection{An ideal design}
 The focal point of the convolver is the data delivery conveyor belt. This belt is a set of rows containing data, each row corresponding to a row in a convolution kernel.

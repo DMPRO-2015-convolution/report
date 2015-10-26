@@ -87,15 +87,25 @@ The other job of the conveyor is to feed new data onto the belt, and to propogat
 In order to propagate data downward, whenever a register is read the register directly below it will also read, allowing data to transefer laterally.
 We have seen that both the accumulator and the conveyor works in a wave pattern, which has a very powerful implication.
 Since every accumulator and register will perform the same operation as its left neighbour offset by one cycle we can let each element be responsible for controlling the element to its right!
-This gives rise to the name Daisy, as we daisychain the instructions rather than using a central control module.
+This gives rise to the name Daisy, as we daisy chain the instructions rather than using a central control module.
 An analogy to the read signals is a key. At time T0 the control element gives the leftmost register the read key. 
 The register does as it is told and reads its new value from the register above, and hands the key over to its neighbour. 
 At T1 the neighbour recieves the key, and reads from the register above it and sends the key further on.
 
 \subsection{The controller}
-
+We have established how control flows throughout the system, but we still need a module to give out keys to the leftmost accumulators and registers.
+The controller is responsible for sending out the keys in the correct order and at the correct time.
+Timing is everything, if we misalign read signals and write signals we may end up in a situation where a register fails to read when the register above it writes.
+For example, if the controller sends each read signal one cycle too late each register will read when the register to the right side of the one directly above it, causing the data to be sheared as it moves laterally!
+Other than issuing read and write keys to the registers, the controller also issues a flush key for the accumulators which tells accumulators to drive DATA\_OUT with its contents, and to reset.
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/FeederTimeAnnotated.png}
     \caption{The timestep in which each register is read.}
     \label{fig:FeedTime}
 \end{figure}
+
+\subsection{The kernel buffer}
+In our schematic we present the kernel buffer as a separate submodule. 
+However, having already introduced how instructions are daisy chained it makes sense to do the same with kernels since seven different kernel values are in use at all times.
+Thus the kernel values are kept in a shift register queue living as close to the accumulators as possible, needing only two registers to hold the currently unused kernel values.
+The responsibilities of the kernel unit is thus to collect the first data values into the kernel buffer chain and to buffer the two kernel values which are not currently in use.

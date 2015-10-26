@@ -82,9 +82,17 @@ In fact, every accumulator starts one cycle later than its left neighbour, meani
 \subsection{The conveyor belt}
 In fig:FeedTime we show the time each register is read, giving a clearer view of how the accumulators can obtain the pixels it needs by offsetting its read time.
 In context of an accumulator, as soon as the reads from one row goes out of range, the reads from the row above comes in range. In a conveyor working on 5 by 5 kernels each read would have to be spaced five registers rather than three.
-We have seen that both the accumulator and the conveyor works in a sort of wave pattern, which has a very important TODO WORD BETTER.
+Of course, simply feeding data to the accumulator would leave us with a pretty uninteresting final picture. 
+The other job of the conveyor is to feed new data onto the belt, and to propogate that data downward, giving rise to its name. 
+In order to propagate data downward, whenever a register is read the register directly below it will also read, allowing data to transefer laterally.
+We have seen that both the accumulator and the conveyor works in a wave pattern, which has a very powerful implication.
+Since every accumulator and register will perform the same operation as its left neighbour offset by one cycle we can let each element be responsible for controlling the element to its right!
+This gives rise to the name Daisy, as we daisychain the instructions rather than using a central control module.
+An analogy to the read signals is a key. At time T0 the control element gives the leftmost register the read key. 
+The register does as it is told and reads its new value from the register above, and hands the key over to its neighbour. 
+At T1 the neighbour recieves the key, and reads from the register above it and sends the key further on.
 
-
+\subsection{The controller}
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/FeederTimeAnnotated.png}

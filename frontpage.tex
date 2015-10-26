@@ -1,33 +1,42 @@
-% Upper part of the page. The '~' is needed because \\
-% only works if a paragraph has started.
-\begin{titlepage}
-\begin{center}
-\includegraphics[width=0.15\textwidth]{img/NTNU.png}~\\[1cm]
+\pretitle{
+    \centering{
+        \includegraphics[width=0.15\textwidth]{img/NTNU.pdf}~\\[1cm]
+        \HRule
+    }
+    ~\\[0.4cm]
+}
 
-\textsc{\LARGE NTNU}\\[1.5cm]
+\title{
+    \textsc{\Large TDT4295 - Computer Design Project}\\[0.5cm]
+    {\huge \bfseries Camvolution}
+}
 
-\textsc{\Large TDT4295 - Computer Design Project}\\[0.5cm]
+\posttitle{
+    ~\\[0.4cm]
+    \HRule \\[0.4cm]
+}
 
-% Title
-\HRule \\[0.4cm]
-{ \huge \bfseries Project Report}\\[0.5cm]
-{\Large \textit{Convolution team}}\\[0.3cm]
-{\large \textit{
-Peter Aaser\\
-Mattis Spieler Asp\\
-Truls Fossum\\
-Fredrik Haave\\
-Øyvind Kjerland\\
-Arnstein Kleven\\
-Mathias Ose
-}}\\[0.2cm]
-\HRule \\[1.5cm]
+\author{
+    Peter Aaser\\
+    Mattis Spieler Asp\\
+    Truls Fossum\\
+    Fredrik Haave\\
+    Øyvind Kjerland\\
+    Arnstein Kleven\\
+    Mathias Ose
+}
 
+\predate{
+    \vspace{\fill}
+}
 
+\date{
+    \centering{
+        \large{
+            \today
+        }
+    }
+}
 
-\vfill
+\maketitle
 
-% Bottom of the page
-{\large \today}
-\end{center}
-\end{titlepage}

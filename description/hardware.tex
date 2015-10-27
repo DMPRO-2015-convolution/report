@@ -1,0 +1,197 @@
+\section{Hardware}
+\begin{figure}
+    \includegraphics[width=\linewidth]{img/"Overview of Camvolution kit header".jpg}
+    \caption{Camvolution board layout}
+    \label{fig:board_layout}
+\end{figure}
+
+\subsection{Features}
+\begin{itemize}
+\item Xilinx Spartan 6 FPGA
+    \begin{itemize}
+    \item Target control
+    \end{itemize}
+\item Giant Gecko 990 EFM
+    \begin{itemize}
+    \item Board Controller
+    \end{itemize}
+\item Connectors
+    \begin{itemize}
+    \item HDMI I/O
+    \item FPC Camera
+    \item MicroSD
+    \end{itemize}
+\item 120Mhz Oscillator for FPGA
+\item 48Mhz Crystal for EFM
+\item Digital I/O
+    \begin{itemize}
+    \item 7 Mechanical Buttons
+    \item 7 Expansion Headers
+    \item 2 LED's
+    \end{itemize}
+\item External memory
+    \begin{itemize}
+    \item 2 AS7C38098A SRAM
+    \end{itemize}
+
+\end{itemize}
+
+
+\begin{figure}
+    \includegraphics[width=\linewidth]{img/"Overview of Camvolution kit".jpg}
+    \caption{Overview of Camvolution board}
+    \label{fig:board_layout}
+\end{figure}
+
+\subsubsection{General information}
+This Document targets the 1 revision of Camvolution board layout. The board is intended for use of camera input and to display a convoluted output to one of the HDMI connectors. It has several reduntant headers, in case the 1 revision should have any faults. The hardware that relates to the Xilinx Spartan 6 FPGA, and Giant Gecko 990 EFM is not covered here.
+
+\subsection{Power Supply}
+The board is powered by a MiniUSB connector, with two possible options for powering it. Either connect it to the pc, or use an 5v usb power supply.
+
+The 5V is regulated with a 3.3V LDO regulator, which gives power to most of the board. This 3.3v is also connected to a 1.2V LDO regulator, that powers a minimum required powerpins on the Xilinx Spartan 6 FPGA. 
+
+\subsection{Measuring the current consumption}
+There is no onboard solutions for measuring the current consumption, this must be done externally if required. 
+
+\subsection{Clock Generation}
+\subsubsection{FPGA Oscillator}The oscillator is connectet to an enable signal on the EFM32 pin PF12. To enable the 120Mhz oscillator PF12 must be set to output and driven high. The oscillator enable pin is also connected to an external input and can be set high by connecting this pin to VCC. The easiest way of enabling the oscillator is to add a jumper on the FPGA\_OSC\_EN header.
+\newline
+\subsubsection{EFM External Crystal}
+The EFM has internal and one external clock. The external clock source is 48MHz and can be set by using the guide from the EFM, on how to enable external clock source. 
+
+\subsection{Digital I/O}
+\subsubsection{Buttons}
+The board contains 7 buttons, and are all connected to pull-up resistors. When the button is pushed down the input pin will be grounded. 
+
+The FPGA has 2 buttons for controll. These are connected to bank 1 on the P15, and P16 pin.
+The MCU has 4 buttons for controll. These are connected to PD8, PD7, PD6 and PD5. Se table [buttons] for info.
+The last buttons is connected to reset on EFM. 
+
+\begin{table}[]
+\centering
+\caption{I/O Buttons}
+\label{buttons}
+\begin{tabular}{llll}
+Button & Connection & Pullup/pulldown & Name     \\
+SW6    & FPGA P15   & Pullup          &          \\
+SW7    & FPGA P16   & Pullup          &          \\
+SW1    & EFM PD8    & Pullup          & BTN OK   \\
+SW2    & EFM PD7    & Pullup          & BTN Back \\
+SW3    & EFM PD6    & Pullup          & BTN Down \\
+SW4    & EFM PD5    & Pullup          & BTN Up   \\
+SW5    & EFM K6     & Pullup          & Reset   
+\end{tabular}
+\end{table}
+
+\subsubsection{Header output}
+The EFM has spare pins that all are availiable on the P15 header pins. Pin 28 on P15 header is 3.3V vcc. The rest is pinouts from the EFM. Se table [header\_out] for location of pins.
+\begin{table}[]
+\centering
+\caption{Header Output}
+\label{header_out}
+\begin{tabular}{llll}
+PIN NUM & EFM PIN & USAGE & Shared with \\
+1       & PB4     & I/O   &             \\
+2       & PA7     & I/O   &             \\
+3       & PB5     & I/O   &             \\
+4       & PA8     & I/O   &             \\
+5       & PB6     & I/O   &             \\
+6       & PA9     & I/O   &             \\
+7       & PB7     & I/O   &             \\
+8       & PA10    & I/O   &             \\
+9       & PB8     & I/O   & INIT\_B     \\
+10      & PA11    & I/O   &             \\
+11      & PB11    & I/O   & Program\_B  \\
+12      & PC0     & I/O   &             \\
+13      & PB12    & I/O   & Done        \\
+14      & PC1     & I/O   &             \\
+15      & PB15    & I/O   &             \\
+16      & PC9     & I/O   &             \\
+17      & PD4     & I/O   &             \\
+18      & PC10    & I/O   &             \\
+19      & PD11    & I/O   &             \\
+20      & PC11    & I/O   &             \\
+21      & PD12    & I/O   &             \\
+22      & PF11    & I/O   &             \\
+23      & PD13    & I/O   &             \\
+24      & PF10    & I/O   &             \\
+25      & PF5     & I/O   &             \\
+26      & PF7     & I/O   &             \\
+27      & PF6     & I/O   &             \\
+28      & 3.3V    &       &            
+\end{tabular}
+\end{table}
+
+\subsection{SRAM}
+The FPGA is connected to two SRAM, recognised as SRAM1 and SRAM2. These are connected to pins on the FPGA bank 1 and bank 2.  They are also in case of failure, or for any reason connected to output pins on the development board. We will not go through all the pins here. This can easily be seen from the figure in the schematics. The schematics will be availiable in the appendix. 
+
+\subsection{JTAG and Programmer}
+Both the FPGA and the EFM is connected with pinouts to a programmer. The EFM is connected to a 20 pin header that can be used with the generic programming pin from a EFM development kit. 
+The FPGA is connected to a 8 pin JTAG header, this can be routed to a debugger used for FPGA programming.  Se table 2 for EFM programmer pin, se figure 1 for FPGA programmer pin.
+
+Program\_B is connected to PB11, Done is connected to PB12.
+\begin{table}[]
+\centering
+\caption{Programming Output for EFM}
+\label{efmprogrammer}
+\begin{tabular}{ll}
+Pin                     & USAGE     \\
+1                       & VCC       \\
+3                       & N/C       \\
+5                       & N/C       \\
+7                       & CS / PF0  \\
+9                       & CLK / PF1 \\
+11                      & N/C       \\
+13                      & PF2       \\
+15                      & RESET     \\
+17                      & N/C       \\
+19                      & N/C       \\
+4,6,8,10,12,14,16,18,20 & GND       \\
+2                       & N/C      
+\end{tabular}
+\end{table}
+
+\begin{figure}
+    \includegraphics[width=\linewidth]{img/FPGA_Programmer.png}
+    \caption{Programming output for FPGA}
+    \label{fig:fpgaprogrammer}
+\end{figure}
+
+\subsection{Programming FPGA using EFM SPI}
+The FPGA can also be programmed from the EFM using the SPI on the EFM. 
+
+INIT\_B shares the the same pin as the SRAM2 data line, but when programming the FPGA the SRAM will not be active. Se table ref..
+
+\begin{table}[]
+\centering
+\caption{Programming FPGA using EFM SPI}
+\label{spiprogrammer}
+\begin{tabular}{lll}
+EFM PIN & FPGA & USAGE   \\
+PB8     & U3   & INIT\_B \\
+PD3     & U15  & CS      \\
+PD2     & R15  & CLK     \\
+PD1     & V16  & RX      \\
+PD0     & R13  & TX     
+\end{tabular}
+\end{table}
+\subsection{LED}
+There are 2 leds on the board. One is connected to power on the board and will light up if power is connected. The last led is programmable from the FPGA on pin N11. Set this pin high and the led wil light up.
+\subsection{EBI-BUS}
+THE FPGA and the EFM is connected with a high speed parallel bus. 20 adressable pins and 16 datalines.  Se figure 2 and 3 for EFM pins.
+
+
+\begin{figure}
+    \includegraphics[width=\linewidth]{img/EBI-bus.png}
+    \caption{EBI-Bus input}
+    \label{fig:ebibus}
+\end{figure}
+
+\begin{figure}
+    \includegraphics[width=\linewidth]{img/EBI-bus_2.png}
+    \caption{EBI-Bus controll signals}
+    \label{fig:ebicontroll}
+\end{figure}
+There has been a change in the layout, so the EBI\_WEn pin is connnected to U10 instead of J6.
+

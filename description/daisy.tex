@@ -1,13 +1,13 @@
-\section{Convolution}
+\subsection{Convolution}
 Some words on convolution. Background-ish
 
-\section{FPGA}
+\subsection{FPGA}
 
-The very heart of our computer is our custom made architecture implemented on our FPGA.
+The very heart of our computer is our custom made architecture implemented on an FPGA.
 In this section we will first describe the overall architecture of our convolution engine, and then we will drill down and examine the core modules.
 Modularity and extendibility is a core principle in our design, however in this section we will describe the processor as if only being able to do 3x3 convolutions.
 
-\subsection{Overall design}
+\subsubsection{Overall design}
 
 Convolution is a very regular task where data flows only forward. This means that our processor can be simplified, removing the need for a central control module.
 Instead each module simply operates under the assumption that all data inputs are correctly formatted and ordered and does its operations accordingly.
@@ -28,7 +28,7 @@ When an accumulator has accumulated all its pixels it flushes its value, resetti
   \item After being buffered in SRAM pixel data is read by the video ctrl module which outputs video to an HDMI cable, ensuring crisp image quality served in a modern fashion.
 \end{enumerate}
 
-\section{Data in}
+\subsection{Data in}
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/Sweeps.png}
     \caption{The sweep pattern used to collect data for convolution. The deep grey region indicates overlap, pixels which will be collected twice}
@@ -44,7 +44,7 @@ Our workarea, or sweep window, is nine pixels wide and three deep, and for each 
     \label{fig:SweepFrontier}
 \end{figure}
 
-\section{Convolver}
+\subsection{Convolver}
 This section encompasses the four modules forming the heart of the convolution engine as depicted in fig:DaisyView. In the order they are covered, they are:
 \begin{description}
     \item[the conveyor belt] \hfill\\ 
@@ -65,44 +65,58 @@ Lastly,
     \label{fig:DaisyView}
 \end{figure}
 
-\subsection{The accumulator}
+\subsubsection{The accumulator}
 Although the accumulator unit is the last unit in the datapath of daisy we will cover it first since it helps motivate the designs further up in the chain.
 The accumulator actually consists of seven accumulators, hereby referred to as pixel accumulators. Each pixel accumulator corresponds to a pixel in the middle row.
 The leftmost and the rightmost pixel in the middle row has no accumulator associated with it because it lacks three pixels necessary for a full convolution, necessetating the slight overlap in our feed pattern.
+In fig:DaisyView the input from the conveyor is shown as three wires, one from each row.  
+Each accumulator is responsible to read from the correct row at the correct time, such that it accumulates only the subpixels of the source pixel.\\ \\ \\
+\\
+\begin{tabular}{l*{16}{c}r}
+    Time (cycle)        & $T_{0}$ & $T_{1}$ & $T_{2}$ & $T_{2}$ & $T_{4}$  & $T_{5}$ & $T_{6}$ & $T_{7}$ & $T_{8}$ & $T_{9}$ & $T_{10}$ & $T_{11}$ & $T_{12}$ & $T_{13}$ & $T_{14}$\\
+\hline
+Row 1                   & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \\
+Row 2                   & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
+Row 3                   & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & \\
+\end{tabular}\\ \\ \\
 We will first focus on the leftmost accumulator starting at time T0 doing the following reads. 
-It first reads three values from DATA\_1 which corresponds to its southwestern subpixel at T0, its southern subpixel at T1 and its southeastern subpixel at T2. 
-At time T3 it starts reading from DATA\_2, reading its western, middle and eastern subpixels at respectively T3, T4 and T5. 
-Finally it reads its northwestern, northern and northwestern subpixel at time T6 to T8 from DATA\_3.
+It first reads three values from Row 3 which corresponds to its southwestern subpixel at $T_{0}$, its southern subpixel at $T_{1}$, and its southeastern subpixel at $T_{2}$, shown as the greyed out cells in row 3.
+At time $T_{3}$ it starts reading from Row 2, reading its western, middle and eastern subpixels at respectively $T_{3}$, $T_{4}$, and $T_{5}$, shown as the greyed out cells in row 2.
+Finally it reads its northwestern, northern and northwestern subpixel at time $T_{6}$ to $T_{8}$ from Row 1.
 What about the second leftmost accumulator then? By following the exact same read pattern, but waiting one cycle allows it to read all its values in the same manner as the leftmost accumulator!
-The second accumulator reads DATA\_1 at time T1, switches to DATA\_2 at T4 and reads from DATA\_3 from T6 to T9. 
+The second accumulator reads from Row 3 at time $T_{1}$, switches to Row 2 at $T_{4}$ and again to Row 1 from $T_{7}$ to $T_{9}$. 
 In fact, every accumulator starts one cycle later than its left neighbour, meaning every accumulator has accumulated its necessary pixels at different times.
+\\ \\
+\begin{tabular}{l*{16}{c}r}
+    Time (cycle)        & $T_{0}$ & $T_{1}$ & $T_{2}$ & $T_{2}$ & $T_{4}$  & $T_{5}$ & $T_{6}$ & $T_{7}$ & $T_{8}$ & $T_{9}$ & $T_{10}$ & $T_{11}$ & $T_{12}$ & $T_{13}$ & $T_{14}$\\
+\hline
+Row 1                   & \cellcolor{gray75} 4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & \\
+Row 2                   & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \cellcolor{gray75}4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
+Row 3                   & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & \\
+\end{tabular}\\ \\ \\
 
-\subsection{The conveyor belt}
-In fig:FeedTime we show the time each register is read, giving a clearer view of how the accumulators can obtain the pixels it needs by offsetting its read time.
-In context of an accumulator, as soon as the reads from one row goes out of range, the reads from the row above comes in range. In a conveyor working on 5 by 5 kernels each read would have to be spaced five registers rather than three.
-Of course, simply feeding data to the accumulator would leave us with a pretty uninteresting final picture. 
-The other job of the conveyor is to feed new data onto the belt, and to propogate that data downward, giving rise to its name. 
-In order to propagate data downward, whenever a register is read the register directly below it will also read, allowing data to transefer laterally.
-We have seen that both the accumulator and the conveyor works in a wave pattern, which has a very powerful implication.
-Since every accumulator and register will perform the same operation as its left neighbour offset by one cycle we can let each element be responsible for controlling the element to its right!
-This gives rise to the name Daisy, as we daisy chain the instructions rather than using a central control module.
-An analogy to the read signals is a key. At time T0 the control element gives the leftmost register the read key. 
+\subsubsection{The conveyor belt}
+As established last section, the job of the conveyor is to feed data from each of its rows to the accumulator.
+In addition to serving data to the accumulator the conveyor must also feed new data to the belt and propogate that data downward which gives rise to its name.
+In order to both propagate data downward and feed correct data to the accumulator as efficently as possible the conveyor will utilize the data from a read operation to both feed the accumulator and to transfer data laterally.
+When a register is read, it is therefore the job of the register directly beneath it to read, conveying data downwards.
+By studying the tables in the previous section we see that reads are done in a wave pattern, and consequentially so is the data conveying, which has a very powerful implication:
+Since every accumulator and register will perform the same operation as its left neighbour offset by one cycle we can let each element be responsible for controlling the element to its right.
+Rather than using a central control module we can instead simply daisy chain the control signals and interface only with the leftmost components, which also explains the name of the convolution core, Daisy.
+An analogy to the read signals is a key. At time $T_{0}$ the control element gives the leftmost register the read key. 
 The register does as it is told and reads its new value from the register above, and hands the key over to its neighbour. 
-At T1 the neighbour recieves the key, and reads from the register above it and sends the key further on.
+At $T_{1}$ the neighbour recieves the key, and reads from the register above it and sends the key further on.
 
-\subsection{The controller}
+TODO: Figure out a succint way to explain this part
+
+\subsubsection{The controller}
 We have established how control flows throughout the system, but we still need a module to give out keys to the leftmost accumulators and registers.
 The controller is responsible for sending out the keys in the correct order and at the correct time.
 Timing is everything, if we misalign read signals and write signals we may end up in a situation where a register fails to read when the register above it writes.
 For example, if the controller sends each read signal one cycle too late each register will read when the register to the right side of the one directly above it, causing the data to be sheared as it moves laterally!
 Other than issuing read and write keys to the registers, the controller also issues a flush key for the accumulators which tells accumulators to drive DATA\_OUT with its contents, and to reset.
-\begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/FeederTimeAnnotated.png}
-    \caption{The timestep in which each register is read.}
-    \label{fig:FeedTime}
-\end{figure}
 
-\subsection{The kernel buffer}
+\subsubsection{The kernel buffer}
 In our schematic we present the kernel buffer as a separate submodule. 
 However, having already introduced how instructions are daisy chained it makes sense to do the same with kernels since seven different kernel values are in use at all times.
 Thus the kernel values are kept in a shift register queue living as close to the accumulators as possible, needing only two registers to hold the currently unused kernel values.

@@ -17,7 +17,7 @@ An overview can be seen in figure \ref{fig:EbiAddressSpace}.
 \subsubsection{Daisy Configuration}
 Configuration values for Daisy have their own memory addresses so that configuring daisy is only a matter of saving the correct values to the correct addresses.
 
-\subsubsection{Streaming data}
+\subsubsection{Streaming Data}
 Some data is of unknown or unlimited length. This data is streamed to daisy by reusing the same addresses several times.
 By assigning a large block of the memory space to each data stream, we can utilize the DMA without having to worry about unintendedly overwriting configuration values.
 

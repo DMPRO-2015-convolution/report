@@ -1,0 +1,19 @@
+\section{Convolution}
+Mathematically, convolution is an operation that takes two input functions to create a third function.
+
+\[
+    (f * g)(t) = \int^{\infty}_{-\infty}{f(\tau)g(t-\tau) d\tau}
+\]
+
+or the discrete variant
+
+\[
+    (f * g)(n) = \sum^{\infty}_{m=-\infty}{f(m)g(n-m)}
+\]
+
+In computer graphics,
+a monochrome input image (as a 2D matrix) can take the role of $f$, and a 2D \textit{convolution kernel} takes the role of $g$.
+For a colored RGB image convolution is performed once per color channel.
+
+TODO: nice illustration of convolution
+

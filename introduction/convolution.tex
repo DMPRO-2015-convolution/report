@@ -1,19 +1,39 @@
 \section{Convolution}
-Mathematically, convolution is an operation that takes two input functions to create a third function.
+\subsection{Calculus}
+Mathematically, convolution is an operation that takes two input functions to create a third function:
 
 \[
     (f * g)(t) = \int^{\infty}_{-\infty}{f(\tau)g(t-\tau) d\tau}
 \]
 
-or the discrete variant
+There is also a discrete variant:
 
 \[
     (f * g)(n) = \sum^{\infty}_{m=-\infty}{f(m)g(n-m)}
 \]
 
-In computer graphics,
-a monochrome input image (as a 2D matrix) can take the role of $f$, and a 2D \textit{convolution kernel} takes the role of $g$.
+A monochrome image can be thought of as a 2D matrix with a width $W$ and height $H$.
+Let $I(x, y)$ be a function for accessing a specific value in the image matrix.
+Let $K(x, Y)$ be a function for accessing a specific value in a special matrix called the \textit{kernel},
+or $0$ if $x$ or $y$ is out of bounds for the matrix.
+
+The convolution of the image and the kernel is then:
+\[
+    C(x, y) = \sum^{H}_{h=0} \sum^{W}_{w=0}{I(w, h)K(w - x, h -y)}
+\]
+
+Depending on the kernel matrix,
+various effects like blurring or sharpening may be applied to the image with convolution.
 For a colored RGB image convolution is performed once per color channel.
+
+\subsection{Matrix Operation}
+As described above, an image and a kernel may be convolved with pure calculus by defining functions for accessing matrices.
+
+It is possible to take advantage of the matrix-nature of the image and kernel and conceptualize convolution in a different way.
+
+For each pixel in the image matrix, overlay the kernel with its center on the pixel.
+Multiply each pixel-kernel value that are overlayed and add these products together to get the new value for the center pixel.
+This is the method that is described in the task description.
 
 TODO: nice illustration of convolution
 

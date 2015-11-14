@@ -25,6 +25,5 @@ Some data is of unknown or unlimited length. This data is streamed to daisy by r
 By assigning a large block of the memory space to each data stream, we can utilize the DMA without having to worry about unintendedly overwriting configuration values.
 
 The reuse of addresses also provides a natural sync point for the video stream;
-each write to the first address of the address space reserved for streaming video is assumed to be a \textit{frame sync}.
-That is, it signals the start of a new frame.
+each write to the first address of the address space reserved for streaming video is assumed to be a \textit{frame sync}, which signals the start of a new frame.
 This makes the system less fragile as Daisy can catch up with the data stream should it ever end up being out of sync.

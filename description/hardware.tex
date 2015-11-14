@@ -64,7 +64,6 @@ There are two HDMI connectors on the board, both of them HDMI1 and HDMI 2 must a
 
 \begin{table}[]
     \centering
-    \caption{HDMI Connector}
     \label{HDMI Connector}
     \begin{tabular}{lllll}
         HDMI Pin Name            & Header Pin Nr & FPGA HDMI 1 & FPGA HDMI 2 & External \\
@@ -88,6 +87,7 @@ There are two HDMI connectors on the board, both of them HDMI1 and HDMI 2 must a
         GND & 1             &                 &                 & GND      \\
         VCC & 2             &                 &                 & VCC      \\
     \end{tabular}
+    \caption{HDMI Connector}
 \end{table}
 
 \subsubsection{FPC Raspberry Pi camera connector}
@@ -104,14 +104,13 @@ There is 1 Raspberry Pi camera connector on the board. It is also connected to h
 The board contains 7 buttons, and are all connected to pull-up resistors. When the button is pushed down the input pin will be grounded. 
 
 The FPGA has 2 buttons for control. These are connected to bank 1 on the P15, and P16 pin.
-The MCU has 4 buttons for control. These are connected to PD8, PD7, PD6 and PD5. Se table [buttons] for info.
+The MCU has 4 buttons for control. These are connected to PD8, PD7, PD6 and PD5. Se table \ref{tab:buttons} for info.
 The last buttons is connected to reset on EFM. 
 
 % Is the column with pull-up really necessary?
 \begin{table}[]
     \centering
-    \caption{I/O Buttons}
-    \label{buttons}
+    \label{tab:buttons}
     \begin{tabular}{llll}
         Button & Connection & Pull-up/pull-down & Name     \\
         \hline
@@ -123,14 +122,14 @@ The last buttons is connected to reset on EFM.
         SW4    & EFM PD5    & Pull-up          & BTN Up   \\
         SW5    & EFM K6     & Pull-up          & Reset
     \end{tabular}
+    \caption{I/O Buttons}
 \end{table}
 
 \subsubsection{Header output}
-The EFM has spare pins that all are available on the P15 header pins. Pin 28 on P15 header is 3.3V VCC. The rest is pinouts from the EFM. Se table [header\_out] for location of pins.
+The EFM has spare pins that all are available on the P15 header pins. Pin 28 on P15 header is 3.3V VCC. The rest is pinouts from the EFM. Se table \ref{tab:headerOut} for location of pins.
 \begin{table}[]
     \centering
-    \caption{Header Output}
-    \label{header_out}
+    \label{tab:headerOut}
     \begin{tabular}{llll}
         Pin number & EFM pin & Usage & Shared with \\
         \hline
@@ -163,6 +162,7 @@ The EFM has spare pins that all are available on the P15 header pins. Pin 28 on 
         27      & PF6     & I/O   &             \\
         28      & 3.3V    &       &
     \end{tabular}
+    \caption{Header Output}
 \end{table}
 
 \subsection{SRAM}
@@ -176,7 +176,6 @@ Program\_B is connected to PB11, Done is connected to PB12.
 \begin{table}[]
     \centering
     \caption{Programming Output for EFM}
-    \label{tab:efmprogrammer}
     \begin{tabular}{ll}
         Pin                     & USAGE     \\
         \hline
@@ -193,6 +192,7 @@ Program\_B is connected to PB11, Done is connected to PB12.
         4,6,8,10,12,14,16,18,20 & GND       \\
         2                       & N/C
     \end{tabular}
+    \label{tab:efmprogrammer}
 \end{table}
 
 \begin{figure}
@@ -208,7 +208,6 @@ INIT\_B shares the same pin as the SRAM2 data line, but when programming the FPG
 
 \begin{table}[]
     \centering
-    \caption{Programming FPGA using EFM SPI}
     \label{tab:spiprogrammer}
     \begin{tabular}{lll}
         EFM pin & FPGA & Usage   \\
@@ -219,6 +218,7 @@ INIT\_B shares the same pin as the SRAM2 data line, but when programming the FPG
         PD1     & V16  & RX      \\
         PD0     & R13  & TX
     \end{tabular}
+    \caption{Programming FPGA using EFM SPI}
 \end{table}
 \subsection{LED}
 There are 2 LEDs on the board. One is connected to power on the board and will light up if power is connected. The last LED is programmable from the FPGA on pin N11. Set this pin high and the LED wil light up.

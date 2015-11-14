@@ -1,4 +1,6 @@
 \section{Hardware}
+This chapter targets the 1\textsuperscript{st} revision of Camvolution board layout. The board is intended for use of camera input and to display a convoluted output to one of the HDMI connectors. It has several redundant headers, in case the 1\textsuperscript{st} revision should have any faults. The hardware that relates to the Xilinx Spartan 6 FPGA, and Giant Gecko 990 EFM is not covered here.
+
 \begin{figure}
     \includegraphics[width=\linewidth]{img/OverviewCamvolutionKit}
     \caption{Camvolution board layout}
@@ -21,8 +23,8 @@
             \item FPC Camera
             \item MicroSD
         \end{itemize}
-    \item 120Mhz Oscillator for FPGA
-    \item 48Mhz Crystal for EFM
+    \item 120MHz Oscillator for FPGA
+    \item 48MHz Crystal for EFM
     \item Digital I/O
         \begin{itemize}
             \item 7 Mechanical Buttons
@@ -43,33 +45,30 @@
     \label{fig:board_layout}
 \end{figure}
 
-\subsubsection{General information}
-This Document targets the 1 revision of Camvolution board layout. The board is intended for use of camera input and to display a convoluted output to one of the HDMI connectors. It has several reduntant headers, in case the 1 revision should have any faults. The hardware that relates to the Xilinx Spartan 6 FPGA, and Giant Gecko 990 EFM is not covered here.
-
 \subsection{Power Supply}
-The board is powered by a MiniUSB connector, with two possible options for powering it. Either connect it to the pc, or use an 5v usb power supply.
+The board is powered by a MiniUSB connector, with two possible options for powering it. Either connect it to the pc, or use an 5V USB power supply.
 
-The 5V is regulated with a 3.3V LDO regulator, which gives power to most of the board. This 3.3v is also connected to a 1.2V LDO regulator, that powers a minimum required powerpins on the Xilinx Spartan 6 FPGA. 
+The 5V is regulated with a 3.3V LDO regulator, which gives power to most of the board. This 3.3V is also connected to a 1.2V LDO regulator, that powers a minimum required power pins on the Xilinx Spartan 6 FPGA. 
 
 \subsection{Measuring the current consumption}
 There is no onboard solutions for measuring the current consumption, this must be done externally if required. 
 
 \subsection{Clock Generation}
-\subsubsection{FPGA Oscillator}The oscillator is connectet to an enable signal on the EFM32 pin PF12. To enable the 120Mhz oscillator PF12 must be set to output and driven high. The oscillator enable pin is also connected to an external input and can be set high by connecting this pin to VCC. The easiest way of enabling the oscillator is to add a jumper on the FPGA\_OSC\_EN header.
+\subsubsection{FPGA Oscillator}The oscillator is connected to an enable signal on the EFM32 pin PF12. To enable the 120MHz oscillator PF12 must be set to output and driven high. The oscillator enable pin is also connected to an external input and can be set high by connecting this pin to VCC. The easiest way of enabling the oscillator is to add a jumper on the FPGA\_OSC\_EN header.
 \newline
 \subsubsection{EFM External Crystal}
 The EFM has internal and one external clock. The external clock source is 48MHz and can be set by using the guide from the EFM, on how to enable external clock source. 
 \subsection{Connectors}
 \subsubsection{HDMI}
-There is two HDMI connectors on the board, both of them HDMI1 and HDMI 2 must also be connected to 5V, and can be set with a jumper at header 8, and header 15 respectivly at the upper right corner. The HDMI 2 is also connected to output pins at P18, this can be used for debugging.
+There are two HDMI connectors on the board, both of them HDMI1 and HDMI 2 must also be connected to 5V, and can be set with a jumper at header 8, and header 15 respectively at the upper right corner. The HDMI 2 is also connected to output pins at P18, this can be used for debugging.
 
 \begin{table}[]
     \centering
     \caption{HDMI Connector}
     \label{HDMI Connector}
     \begin{tabular}{lllll}
-
         HDMI Pin Name            & Header Pin Nr & FPGA HDMI 1 & FPGA HDMI 2 & External \\
+        \hline
         TMDS Data2+              & 3             & B2              & B9              &          \\
         TMDS Data2-              & 5             & A2              & A9              &          \\
         TMDS Data1+              & 7             & D6              & D11             &          \\
@@ -91,7 +90,7 @@ There is two HDMI connectors on the board, both of them HDMI1 and HDMI 2 must al
     \end{tabular}
 \end{table}
 
-\subsubsection{FPC RaspberryPi camera connector}
+\subsubsection{FPC Raspberry Pi camera connector}
 There is 1 Raspberry Pi camera connector on the board. It is also connected to header P11, and can be used for debugging.
 
 \begin{figure}
@@ -104,34 +103,37 @@ There is 1 Raspberry Pi camera connector on the board. It is also connected to h
 \subsubsection{Buttons}
 The board contains 7 buttons, and are all connected to pull-up resistors. When the button is pushed down the input pin will be grounded. 
 
-The FPGA has 2 buttons for controll. These are connected to bank 1 on the P15, and P16 pin.
-The MCU has 4 buttons for controll. These are connected to PD8, PD7, PD6 and PD5. Se table [buttons] for info.
+The FPGA has 2 buttons for control. These are connected to bank 1 on the P15, and P16 pin.
+The MCU has 4 buttons for control. These are connected to PD8, PD7, PD6 and PD5. Se table [buttons] for info.
 The last buttons is connected to reset on EFM. 
 
+% Is the column with pull-up really necessary?
 \begin{table}[]
     \centering
     \caption{I/O Buttons}
     \label{buttons}
     \begin{tabular}{llll}
-        Button & Connection & Pullup/pulldown & Name     \\
-        SW6    & FPGA P15   & Pullup          &          \\
-        SW7    & FPGA P16   & Pullup          &          \\
-        SW1    & EFM PD8    & Pullup          & BTN OK   \\
-        SW2    & EFM PD7    & Pullup          & BTN Back \\
-        SW3    & EFM PD6    & Pullup          & BTN Down \\
-        SW4    & EFM PD5    & Pullup          & BTN Up   \\
-        SW5    & EFM K6     & Pullup          & Reset
+        Button & Connection & Pull-up/pull-down & Name     \\
+        \hline
+        SW6    & FPGA P15   & Pull-up          &          \\
+        SW7    & FPGA P16   & Pull-up          &          \\
+        SW1    & EFM PD8    & Pull-up          & BTN OK   \\
+        SW2    & EFM PD7    & Pull-up          & BTN Back \\
+        SW3    & EFM PD6    & Pull-up          & BTN Down \\
+        SW4    & EFM PD5    & Pull-up          & BTN Up   \\
+        SW5    & EFM K6     & Pull-up          & Reset
     \end{tabular}
 \end{table}
 
 \subsubsection{Header output}
-The EFM has spare pins that all are availiable on the P15 header pins. Pin 28 on P15 header is 3.3V vcc. The rest is pinouts from the EFM. Se table [header\_out] for location of pins.
+The EFM has spare pins that all are available on the P15 header pins. Pin 28 on P15 header is 3.3V VCC. The rest is pinouts from the EFM. Se table [header\_out] for location of pins.
 \begin{table}[]
     \centering
     \caption{Header Output}
     \label{header_out}
     \begin{tabular}{llll}
-        PIN NUM & EFM PIN & USAGE & Shared with \\
+        Pin number & EFM pin & Usage & Shared with \\
+        \hline
         1       & PB4     & I/O   &             \\
         2       & PA7     & I/O   &             \\
         3       & PB5     & I/O   &             \\
@@ -164,19 +166,20 @@ The EFM has spare pins that all are availiable on the P15 header pins. Pin 28 on
 \end{table}
 
 \subsection{SRAM}
-The FPGA is connected to two SRAM, recognised as SRAM1 and SRAM2. These are connected to pins on the FPGA bank 1 and bank 2.  They are also in case of failure, or for any reason connected to output pins on the development board. We will not go through all the pins here. This can easily be seen from the figure in the schematics. The schematics will be availiable in the appendix. 
+The FPGA is connected to two SRAM, recognised as SRAM1 and SRAM2. These are connected to pins on the FPGA bank 1 and bank 2.  They are also in case of failure, or for any reason connected to output pins on the development board. We will not go through all the pins here. This can easily be seen from the figure in the schematics. The schematics will be available in the appendix. 
 
 \subsection{JTAG and Programmer}
 Both the FPGA and the EFM is connected with pinouts to a programmer. The EFM is connected to a 20 pin header that can be used with the generic programming pin from a EFM development kit. 
-The FPGA is connected to a 8 pin JTAG header, this can be routed to a debugger used for FPGA programming.  Se table 2 for EFM programmer pin, se figure 1 for FPGA programmer pin.
+The FPGA is connected to a 8 pin JTAG header, this can be routed to a debugger used for FPGA programming.  See table \ref{tab:efmprogrammer} for EFM programmer pin, see figure \ref{fig:fpgaprogrammer} for FPGA programmer pin.
 
 Program\_B is connected to PB11, Done is connected to PB12.
 \begin{table}[]
     \centering
     \caption{Programming Output for EFM}
-    \label{efmprogrammer}
+    \label{tab:efmprogrammer}
     \begin{tabular}{ll}
         Pin                     & USAGE     \\
+        \hline
         1                       & VCC       \\
         3                       & N/C       \\
         5                       & N/C       \\
@@ -199,16 +202,17 @@ Program\_B is connected to PB11, Done is connected to PB12.
 \end{figure}
 
 \subsection{Programming FPGA using EFM SPI}
-The FPGA can also be programmed from the EFM using the SPI on the EFM. 
+The FPGA can also be programmed from the EFM using SPI from the EFM. 
 
-INIT\_B shares the the same pin as the SRAM2 data line, but when programming the FPGA the SRAM will not be active. Se table ref..
+INIT\_B shares the same pin as the SRAM2 data line, but when programming the FPGA the SRAM will not be active. Se table \ref{tab:spiprogrammer}
 
 \begin{table}[]
     \centering
     \caption{Programming FPGA using EFM SPI}
-    \label{spiprogrammer}
+    \label{tab:spiprogrammer}
     \begin{tabular}{lll}
-        EFM PIN & FPGA & USAGE   \\
+        EFM pin & FPGA & Usage   \\
+        \hline
         PB8     & U3   & INIT\_B \\
         PD3     & U15  & CS      \\
         PD2     & R15  & CLK     \\
@@ -217,9 +221,9 @@ INIT\_B shares the the same pin as the SRAM2 data line, but when programming the
     \end{tabular}
 \end{table}
 \subsection{LED}
-There are 2 leds on the board. One is connected to power on the board and will light up if power is connected. The last led is programmable from the FPGA on pin N11. Set this pin high and the led wil light up.
+There are 2 LEDs on the board. One is connected to power on the board and will light up if power is connected. The last LED is programmable from the FPGA on pin N11. Set this pin high and the LED wil light up.
 \subsection{EBI-BUS}
-THE FPGA and the EFM is connected with a high speed parallel bus. 20 adressable pins and 16 datalines.  Se figure 2 and 3 for EFM pins.
+The FPGA and the EFM is connected with a high speed parallel bus. 20 addressable pins and 16 data lines.  Se figure \ref{fig:ebibus} and \ref{fig.ebicontrol} for EFM pins.
 
 
 \begin{figure}
@@ -231,7 +235,7 @@ THE FPGA and the EFM is connected with a high speed parallel bus. 20 adressable 
 \begin{figure}
     \includegraphics[width=\linewidth]{img/EBI-bus_2.png}
     \caption{EBI-Bus control signals}
-    \label{fig:ebicontroll}
+    \label{fig:ebicontrol}
 \end{figure}
-There has been a change in the layout, so the EBI\_WEn pin is connnected to U10 instead of J6.
 
+There has been a change in the layout, so the EBI\_WEn pin is connnected to U10 instead of J6.

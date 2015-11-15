@@ -35,14 +35,27 @@ We then change the definition of the kernel function $K(x', y')$ to evaluate to 
 Imposing this restriction on the kernel function means each pixel in the image matrix is a function of its neighbourhood rather than the entire image.
 To visualize this, for each pixel in the image matrix, overlay the kernel with its center on the currently evaluated pixel.
 Each neighbour pixel, including the center which is its own neighbour, is multiplied with its corresponding kernel value relative to the center pixel.
-For each multiplication the result is summed, and the final sum represents the output pixel. 
+For each multiplication the result is summed, and the final sum represents the output pixel.
+Each pixel has as many neighbours as there are elements in the kernel matrix. 
+Conversively each pixel is part of as many neighbourhoods as there are elements in the kernel matrix, and in each neighbourhood it is associated with a unique element of the kernel.
+% We can view the task of convolution in two ways, either we can view it as calculating the mapping for each kernel element for a pixel and accumulate the result with each respective reduce function, or we may view it as 
 
 TODO: nice illustration of convolution
 
-\subsection{Abstracting convolution}
+\subsection{Generalize convolution}
 We can abstract the convolution process by using mapping function $f: R x R \rightarrow R$ in place of multiplication, and $g: R x R \rightarrow R$ in place of addition.
-A convolution can then be described as $(f, g)$, where the standard convolution can be expressed as $(*, +)$, while the mapping operators $(min, +)$ describes finding the shortest path.
+A convolution can then be described as $(f, g)$, from here on referred to as the map function and the reduce function, where the standard convolution can be expressed whit $(*, +)$, while $(min, +)$ describes finding the shortest path.
 The only restriction we impose on $f$ and $g$ is that they form a semiring.
 Abstract algebra is outside of the scope of our report, but informally we impose that the TODO 
 
+Can we use domains outside of R? 
+Describe associativity, for instance show minus not nescessarily working?
+
+\section{Implementing convolution}
+On modern computers the memory bandwidth will usually be the bottleneck of any operation involving large amounts of data, such as an image. TODO reference (or is it considered common knowledge?)
+The essence of implementing efficient convolution is therefore removing redundant data movement.
+Whenever we move a pixel into working memory we ideally want to perform a map operation for every neighbourhood it is part of.
+If a pixel is ejected from memory it will have to be retrieved again until all convolutions it is part of has been calculated.
+Ideally we would have enough memory to store an entire image and work on all parts simultaneously. While this can certainly be done, if we want speed we have to sacrifice memory size.
+The challenge is therefore to use as little memory as possible balanced with reducing redundant loads.\\
 

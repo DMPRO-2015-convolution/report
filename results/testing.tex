@@ -14,12 +14,10 @@ It was discovered that two of the data pins for the second memory chip was excha
 Nevertheless, this would not make a difference even if the wires were swapped as the data would be swapped twice, first when writing, then when reading, resulting in the correct data being read.
 
 \subsubsection{Flashing the MCU}
-The MCU was successfully flashed through a development board.
-%TODO: How was this verified?
+The ARM Debug header on the computer was connected to the corresponding header on an EFM32GG development kit. The MCU was successfully flashed, verified by inspecting variables in the debug mode of Simplicity Studio.
 
 \subsubsection{SD Card}
-Reads and writes to the SD card through the EFM was tested. It turned out the wires for the connector had been flipped, but the test passed after rotating the SD card slot 180 degrees to make the connections align.
-%TODO: How was this verified?
+Reads and writes to the MicroSD card through the MCU was tested by reading a small file from the card into a buffer and inspecting it with the debug mode of Simplicity Studio. It turned out the wires for the connector had been flipped, but the test passed after rotating the SD card slot 180 degrees to make the connections align.
 
 \subsubsection{Configuring the FPGA}
 The FPGA was configured both using JTAG and through the MCU with a bit file. The file contained a configuration for the FPGA that would allow us to control the on-board LED using one of the buttons. The button controlled the led after configuration, thus we concluded the configuration was successful.

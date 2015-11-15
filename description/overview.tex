@@ -19,6 +19,7 @@ Figure \ref{fig:systemArchitecture} displays the overall system architecture.
 Notice how data flows from left to right in figure \ref{fig:systemArchitecture}.
 The data we are going to process is first created by the camera and sent to the MCU.
 The MCU may have to do some conversion should the camera provide the image in a format unsuitable for the processor, but will mainly be forwarding the data directly to the FPGA.
+However, interfacing with the camera is assumed to be simpler to do from the MCU than from the FPGA as libraries most likely already exists.
 
 On the FPGA, the data is received by an EBI controller which takes care of the protocol used on the bus and forwards data to the processor.
 When data arrives at the processor, the convolution starts and the output is written to SRAM.

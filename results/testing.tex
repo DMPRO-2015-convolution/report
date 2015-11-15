@@ -1,2 +1,27 @@
 \section{Testing}
 
+
+\subsection{FPGA}
+
+
+\subsection{Hardware}
+After soldering the board, different components were tested to ensure proper operation of components and set of components.
+This is advantageous because potential bugs can be found before all components are combined into a complex system that is hard to debug.
+
+\subsubsection{SRAM Connection}
+The resistance between SRAM pins and the corresponding header pins was measured to ensure all wires were connected properly.
+It was discovered that two of the data pins for the second memory chip was exchanged, but we concluded this must be due to a swapping of the labels on the board, not the actual wires.
+Nevertheless, this would not make a difference even if the wires were swapped as the data would be swapped twice, first when writing, then when reading, resulting in the correct data being read.
+
+\subsubsection{Flashing the MCU}
+The MCU was successfully flashed using JTAG through a development board.
+%TODO: How was this verified?
+
+\subsubsection{SD Card}
+Reads and writes to the SD card through the EFM was tested. It turned out the wires for the connector had been flipped, but the test passed after rotating the SD card slot 180 degrees to make the connections align.
+%TODO: How was this verified?
+
+\subsubsection{Configuring the FPGA}
+The FPGA was configured both using JTAG and through the MCU with a bit file. The file contained a configuration for the FPGA that would allow us to control the on-board LED using one of the buttons. The button controlled the led after configuration, thus we concluded the configuration was successful.
+
+\subsubsection{HDMI output}

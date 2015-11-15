@@ -2,13 +2,13 @@
 The given task can be solved in multiple ways. This section presents our interpretation and the requirements for our system.
 
 \subsection{Area of Focus}
-As the task places no restrictions on what we should focus on as long as the computer performs convolution, we considered several possible areas to focus on, some inspired by the previous project reports:
+As the task places no restrictions on what we should focus on as long as the computer performs convolution, we considered several possibilities, some inspired by the previous project reports:
 
-\begin{enumerate}
-    \item Energy efficiency
-    \item Generality
-    \item Performance
-\end{enumerate}
+\begin{description}
+    \item[Energy efficiency] Do convolution in an energy efficient manner.
+    \item[Generality] Make it possible to use the system for a wide variety of tasks.
+    \item[Performance] Maximize the throughput of the system.
+\end{description}
 
 In the end, the group decided to focus on performance as this would give us a more engaging demonstration, possibly with convolution performed on a live video stream.
 
@@ -16,11 +16,10 @@ In the end, the group decided to focus on performance as this would give us a mo
 A set of goals or requirements is useful to guide the efforts in the direction of the assignment, and to ensure a demo can be held at the end of the project.
 
 \subsubsection{Functional Requirements}
-The functional requirements set for this project is listed in table \ref{tab:functional-requirements} and a more thorough descriptions follows.
+The functional requirements set for this project is listed in table \ref{tab:FunctionalRequirements} and a more thorough descriptions follows.
 
 \begin{table}[h]
     \centering
-    \label{tab:functional-requirements}
     \begin{tabular}{lp{12cm}l}
         Name & Description & Priority \\
         \hline
@@ -38,6 +37,7 @@ The functional requirements set for this project is listed in table \ref{tab:fun
             Medium
     \end{tabular}
     \caption{Functional Requirements}
+    \label{tab:FunctionalRequirements}
 \end{table}
 
 \paragraph{FR1}
@@ -61,7 +61,6 @@ To make the demonstration a bit smoother and ensure our computer can accomplish 
 
 \begin{table}[h]
     \centering
-    \label{tab:non-functional-requirements}
     \begin{tabular}{lp{12cm}l}
         Name & Description \\
         \hline
@@ -73,7 +72,8 @@ To make the demonstration a bit smoother and ensure our computer can accomplish 
             The cost of developing the system should not exceed a budget of 10 000 NOK \\
     \end{tabular}
     \caption{Non-functional Requirements}
+    \label{tab:NonFunctionalRequirements}
 \end{table}
 
-In addition to our functional requirements, the task at hand also enforces requirements not related to the functionality of the computer produced. These are listed in table \ref{tab:non-functional-requirements}.
+In addition to our functional requirements, the task at hand also enforces requirements not related to the functionality of the computer produced. These are listed in table \ref{tab:NonFunctionalRequirements}.
 

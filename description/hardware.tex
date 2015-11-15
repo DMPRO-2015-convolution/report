@@ -4,7 +4,6 @@ This chapter targets the 1\textsuperscript{st} revision of Camvolution board lay
 \begin{figure}
     \includegraphics[width=\linewidth]{img/OverviewCamvolutionKit}
     \caption{Camvolution board layout}
-    \label{fig:board_layout}
 \end{figure}
 
 \subsection{Features}
@@ -42,7 +41,7 @@ This chapter targets the 1\textsuperscript{st} revision of Camvolution board lay
 \begin{figure}
     \includegraphics[width=\linewidth]{img/"Overview of Camvolution kit".jpg}
     \caption{Overview of Camvolution board}
-    \label{fig:board_layout}
+    \label{fig:BoardLayout}
 \end{figure}
 
 \subsection{Power Supply}
@@ -96,7 +95,7 @@ There is 1 Raspberry Pi camera connector on the board. It is also connected to h
 \begin{figure}
     \includegraphics[width=\linewidth]{img/fpc_header.jpg}
     \caption{Raspberry Pi connector}
-    \label{fig:fpc_header}
+    \label{fig:FpcHeader}
 \end{figure}
 
 \subsection{Digital I/O}
@@ -104,13 +103,12 @@ There is 1 Raspberry Pi camera connector on the board. It is also connected to h
 The board contains 7 buttons, and are all connected to pull-up resistors. When the button is pushed down the input pin will be grounded. 
 
 The FPGA has 2 buttons for control. These are connected to bank 1 on the P15, and P16 pin.
-The MCU has 4 buttons for control. These are connected to PD8, PD7, PD6 and PD5. Se table \ref{tab:buttons} for info.
+The MCU has 4 buttons for control. These are connected to PD8, PD7, PD6 and PD5. Se table \ref{tab:Buttons} for info.
 The last buttons is connected to reset on EFM. 
 
 % Is the column with pull-up really necessary?
 \begin{table}[]
     \centering
-    \label{tab:buttons}
     \begin{tabular}{llll}
         Button & Connection & Pull-up/pull-down & Name     \\
         \hline
@@ -123,13 +121,13 @@ The last buttons is connected to reset on EFM.
         SW5    & EFM K6     & Pull-up          & Reset
     \end{tabular}
     \caption{I/O Buttons}
+    \label{tab:Buttons}
 \end{table}
 
 \subsubsection{Header output}
-The EFM has spare pins that all are available on the P15 header pins. Pin 28 on P15 header is 3.3V VCC. The rest is pinouts from the EFM. Se table \ref{tab:headerOut} for location of pins.
+The EFM has spare pins that all are available on the P15 header pins. Pin 28 on P15 header is 3.3V VCC. The rest is pinouts from the EFM. Se table \ref{tab:HeaderOut} for location of pins.
 \begin{table}[]
     \centering
-    \label{tab:headerOut}
     \begin{tabular}{llll}
         Pin number & EFM pin & Usage & Shared with \\
         \hline
@@ -163,6 +161,7 @@ The EFM has spare pins that all are available on the P15 header pins. Pin 28 on 
         28      & 3.3V    &       &
     \end{tabular}
     \caption{Header Output}
+    \label{tab:HeaderOut}
 \end{table}
 
 \subsection{SRAM}
@@ -170,12 +169,11 @@ The FPGA is connected to two SRAM, recognised as SRAM1 and SRAM2. These are conn
 
 \subsection{JTAG and Programmer}
 Both the FPGA and the EFM is connected with pinouts to a programmer. The EFM is connected to a 20 pin header that can be used with the generic programming pin from a EFM development kit. 
-The FPGA is connected to a 8 pin JTAG header, this can be routed to a debugger used for FPGA programming.  See table \ref{tab:efmprogrammer} for EFM programmer pin, see figure \ref{fig:fpgaprogrammer} for FPGA programmer pin.
+The FPGA is connected to a 8 pin JTAG header, this can be routed to a debugger used for FPGA programming.  See table \ref{tab:EfmProgrammer} for EFM programmer pin, see figure \ref{fig:FpgaProgrammer} for FPGA programmer pin.
 
 Program\_B is connected to PB11, Done is connected to PB12.
 \begin{table}[]
     \centering
-    \caption{Programming Output for EFM}
     \begin{tabular}{ll}
         Pin                     & USAGE     \\
         \hline
@@ -192,23 +190,23 @@ Program\_B is connected to PB11, Done is connected to PB12.
         4,6,8,10,12,14,16,18,20 & GND       \\
         2                       & N/C
     \end{tabular}
-    \label{tab:efmprogrammer}
+    \caption{Programming Output for EFM}
+    \label{tab:EfmProgrammer}
 \end{table}
 
 \begin{figure}
     \includegraphics[width=\linewidth]{img/FPGA_Programmer.png}
     \caption{Programming output for FPGA}
-    \label{fig:fpgaprogrammer}
+    \label{fig:FpgaProgrammer}
 \end{figure}
 
 \subsection{Programming FPGA using EFM SPI}
 The FPGA can also be programmed from the EFM using SPI from the EFM. 
 
-INIT\_B shares the same pin as the SRAM2 data line, but when programming the FPGA the SRAM will not be active. Se table \ref{tab:spiprogrammer}
+INIT\_B shares the same pin as the SRAM2 data line, but when programming the FPGA the SRAM will not be active. Se table \ref{tab:SpiProgrammer}
 
 \begin{table}[]
     \centering
-    \label{tab:spiprogrammer}
     \begin{tabular}{lll}
         EFM pin & FPGA & Usage   \\
         \hline
@@ -219,23 +217,24 @@ INIT\_B shares the same pin as the SRAM2 data line, but when programming the FPG
         PD0     & R13  & TX
     \end{tabular}
     \caption{Programming FPGA using EFM SPI}
+    \label{tab:SpiProgrammer}
 \end{table}
 \subsection{LED}
 There are 2 LEDs on the board. One is connected to power on the board and will light up if power is connected. The last LED is programmable from the FPGA on pin N11. Set this pin high and the LED wil light up.
 \subsection{EBI-BUS}
-The FPGA and the EFM is connected with a high speed parallel bus. 20 addressable pins and 16 data lines.  Se figure \ref{fig:ebibus} and \ref{fig.ebicontrol} for EFM pins.
+The FPGA and the EFM is connected with a high speed parallel bus. 20 addressable pins and 16 data lines.  Se figure \ref{fig:EbiBus} and \ref{fig:EbiControl} for EFM pins.
 
 
 \begin{figure}
     \includegraphics[width=\linewidth]{img/EBI-bus.png}
     \caption{EBI-Bus input}
-    \label{fig:ebibus}
+    \label{fig:EbiBus}
 \end{figure}
 
 \begin{figure}
     \includegraphics[width=\linewidth]{img/EBI-bus_2.png}
     \caption{EBI-Bus control signals}
-    \label{fig:ebicontrol}
+    \label{fig:EbiControl}
 \end{figure}
 
 There has been a change in the layout, so the EBI\_WEn pin is connnected to U10 instead of J6.

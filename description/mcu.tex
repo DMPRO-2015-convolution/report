@@ -1,6 +1,6 @@
 \section{MCU}
 
-The MCU on the Camvolution board is used as an I/O-controller, reading from a MicroSD card, configuring the FPGA, and feeding kernel and image data to the FPGA over an EBI bus interface. An EFM32GG is used as the MCU on the Camvolution board, providing 128kB RAM, 1024kB internal flash memory and a range of modules including EBI, USART, GPIO and DMA. The board has headers connected to unused pins on the MCU, making it possible for the MCU to communicate with other devices. Figure \ref{fig:mcuOverview} shows how the components are connected.
+The MCU is used as an I/O-processor, reading from a MicroSD card, configuring the FPGA, and feeding kernel and image data to the FPGA over an EBI bus interface. An EFM32GG is used as the MCU for the system, providing 128kB RAM, 1024kB internal flash memory and a range of modules including EBI, USART, GPIO and DMA. The board has headers connected to unused pins on the MCU, making it possible for the MCU to communicate with other devices. Figure \ref{fig:mcuOverview} shows how the components are connected.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/mcu_overview.png}
@@ -9,9 +9,9 @@ The MCU on the Camvolution board is used as an I/O-controller, reading from a Mi
 \end{figure}
 
 \subsection{Storage}
-Due to the limited size of the MCU non-volatile memory not exceeding 1024kB, an additional larger source of data is necessary. A MicroSD card is used for this storage, as it gives the MCU an external storage of up to 32GB and lets the Camvolution board operate independently without being connected to an external computer.
+Due to the limited size of the MCU non-volatile memory not exceeding 1024kB, an additional larger source of data is necessary. A MicroSD card is used for this storage, as it gives the MCU an external storage of up to 32GB and lets the system operate independently without being connected to an external computer.
 
-The code for interfacing the MicroSD card is based on the FAT on SD Card Application Note\cite{an0030}. The MCU communicates with the MicroSD card using SPI transfers with a USART module. FAT32 is used as a file system to make reading content from the MicroSD card more manageable, with the trade-off being increased computational overhead for the MCU. This also allows users to add and replace files for the Camvolution board without having to reprogram the MCU.
+The code for interfacing the MicroSD card is based on the FAT on SD Card Application Note\cite{an0030}. The MCU communicates with the MicroSD card using SPI transfers with a USART module. FAT32 is used as a file system to make reading content from the MicroSD card more manageable, with the trade-off being increased computational overhead for the MCU. This also allows users to add and replace files without having to reprogram the MCU.
 
 In the event of the MCU being unable to access the MicroSD card, it is possible to include kernel files and a few small images on the internal flash memory. Functionality for flashing the FPGA from the MCU will be lost because the size of the configuration files exceeds that of the internal flash memory.
 
@@ -32,13 +32,15 @@ The folder structure on the MicroSD card is shown in Table \ref{microsd_folder}.
 
 
 \subsection{FPGA Configuration}
-When the Camvolution board is powered up the FPGA will not contain a configuration. To be able to use the FPGA properly, the MCU has to program it with one of the binfiles from the storage. Pins between the MCU and the FPGA are connected according to Slave Serial as described in Spartan 6 Configuration User Guide\cite{ug380} page 28. This configuration scheme relies on sending a binfile as a serial data stream using a clk pin and a single data pin. The MCU is able to reset the configuration of the FPGA at any time by setting the program pin low. Configuration status pins set by the FPGA informs the MCU if it is ready to be programmed, if an error occurred while programming or if the FPGA has successfully programmed. 
+When the system is powered up the FPGA will not contain a configuration. To be able to use the FPGA properly, the MCU has to program it with one of the binfiles from the storage. Pins between the MCU and the FPGA are connected according to Slave Serial as described in Spartan 6 Configuration User Guide\cite{ug380} page 28. This configuration scheme relies on sending a binfile as a serial data stream using a clk pin and a single data pin. The MCU is able to reset the configuration of the FPGA at any time by setting the program pin on the FPGA low. Configuration status pins set by the FPGA informs the MCU if it is ready to be programmed, if an error occurred while programming or if the FPGA has successfully programmed.
 
 The FPGA can also be reprogrammed later. For example when using kernels of different sizes, a configuration optimized for a specific size can be configured on the FPGA.
 
+If the MCU is unable to read a configuration file and thus unable to flash the FPGA, it is still possible to use a JTAG header to flash manually.  
 
 \subsection{Kernels}
-The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits us to a maximum size of 15x15 kernels. The next byte is the divisor, which is used for averaging filters. The rest of the bytes in the files are the elements of the kernel.
+Being able to change the convolution kernels while the system is running is considered an important functionality. To support this, the MCU is able to read convolution kernels from MicrodSD or the internal flash memory. 
+In order to make the process of changing kernels for the system, the kernel files has a simple file structure. The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits us to a maximum size of 15x15 kernels. The next byte is the divisor, which is used for averaging filters. The rest of the bytes in the files are the elements of the kernel.
 
 
 \subsection{External Bus Interface}
@@ -68,3 +70,32 @@ By assigning a large block of the memory space to each data stream, we can utili
 The reuse of addresses also provides a natural sync point for the video stream;
 each write to the first address of the address space reserved for streaming video is assumed to be a \textit{frame sync}, which signals the start of a new frame.
 This makes the system less fragile as the processor can catch up with the data stream should it ever end up being out of sync.
+
+\subsection{User Interface}
+Even though the MCU is able to configurate values on the processor, it does not do so until it receives input telling it to perform the configuration. This input comes from a simple user interface based sending a graphical interface over the image stream and let the user control it with buttons. The operation of the system can be controlled by the buttons only, making it easier to use and removing the need for being controlled by an external computer. 
+
+The system provides four buttons for the user interface:
+\begin{itemize}
+	\item UP
+	\item DOWN
+	\item BACK
+	\item OK
+\end{itemize}
+
+\subsubsection{Startup and Reset}
+When the MCU is first started up or reset, it reconfigures the FPGA with a default binfile. After configuration of the FPGA, the MCU configures the processor with default values for the convolution kernel, map operation and reduce operation. The processors image input is then configured to the default input, which can be the camera input or HDMI input.
+
+\subsubsection{Main Menu}
+When pressing the BACK or the OK button, the MCU configures the processor image input to be the EBI bus and the map and reduce operations on the processor to not alter the image. An image containing the main menu of the grapical interface is then loaded from the MicroSD card and sent to the processor over the image stream. The main menu displays the following options:
+
+\begin{itemize}
+	\item Configure kernel
+	\item Configure FPGA
+	\item Configure map operation
+	\item Configure reduce operation
+	\item Select image input source
+\end{itemize}
+
+The UP and DOWN buttons are used to select an option. The OK button bring up a new menu screen listing possible options for the chosen selection. When selecting configure kernel or configure FPGA, a list of the availiable files are presented. Choosing any of the other main menu options will bring up a list of predefined choices. Selecting any of these choices will make the MCU reconfigure the processor with the new values, and go back to showing the camera image stream.
+
+

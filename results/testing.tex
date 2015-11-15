@@ -13,11 +13,11 @@ The resistance between SRAM pins and the corresponding header pins was measured 
 It was discovered that two of the data pins for the second memory chip was exchanged, but we concluded this must be due to a swapping of the labels on the board, not the actual wires.
 Nevertheless, this would not make a difference even if the wires were swapped as the data would be swapped twice, first when writing, then when reading, resulting in the correct data being read.
 
-\subsection{Flashing the MCU}
+\subsubsection{Flashing the MCU}
 The MCU was successfully flashed using JTAG through a development board.
 %TODO: How was this verified?
 
-\subsection{SD Card}
+\subsubsection{SD Card}
 Reads and writes to the SD card through the EFM was tested. It turned out the wires for the connector had been flipped, but the test passed after rotating the SD card slot 180 degrees to make the connections align.
 %TODO: How was this verified?
 

@@ -28,7 +28,7 @@ For a colored RGB image convolution is performed once per color channel.
 
 \subsection{Matrix Operation}
 As described above, an image and a kernel may be convolved with pure calculus by defining functions for accessing matrices.
-By imposing restrictions on the dimesions of the kernel matrix we can conceptualize the convolution process in a way that lends itself well to processing images:
+By imposing restrictions on the dimensions of the kernel matrix we can conceptualize the convolution process in a way that lends itself well to processing images:
 We let the kernel matrix be a square matrix with side length $D$, hereby referred to as the kernel dimensions.
 We then change the definition of the kernel function $K(x', y')$ to evaluate to $0$ whenever $x'$ or $y'$ is outside of the kernel matrix bounds.
 
@@ -40,5 +40,9 @@ For each multiplication the result is summed, and the final sum represents the o
 TODO: nice illustration of convolution
 
 \subsection{Abstracting convolution}
+We can abstract the convolution process by using mapping function $f: R x R \rightarrow R$ in place of multiplication, and $g: R x R \rightarrow R$ in place of addition.
+A convolution can then be described as $(f, g)$, where the standard convolution can be expressed as $(*, +)$, while the mapping operators $(min, +)$ describes finding the shortest path.
+The only restriction we impose on $f$ and $g$ is that they form a semiring.
+Abstract algebra is outside of the scope of our report, but informally we impose that the TODO 
 
 

@@ -1,64 +1,82 @@
-\subsection{Convolution}
-Some words on convolution. Background-ish
+\subsection{Convolution engine}
+In this section we will provide a top down view of our system, introducing how components interface with each others and what their purpose is before we describe their implementation. 
+
 
 \subsection{FPGA}
-
 The very heart of our computer is our custom made architecture implemented on an FPGA.
-In this section we will first describe the overall architecture of our convolution engine, and then we will drill down and examine the core modules.
-Modularity and extendibility is a core principle in our design, however in this section we will describe the processor as if only being able to do 3x3 convolutions.
+In this section we will first describe the overall architecture of the convolution engine, and then we will drill down and examine the core modules.
+Modularity and extendibility is a core principle in our design, however in this section we will describe the processor with the minimum viable kernel dimension, 3 x 3.
 
 \subsubsection{Overall design}
-
-Convolution is a very regular task where data flows only forward. This means that our processor can be simplified, removing the need for a central control module.
-Instead each module simply operates under the assumption that all data inputs are correctly formatted and ordered and does its operations accordingly.
+The overall design of our convolution processor, named "Daisy", shown in fig TODO consists of four main modules with the following responsibilities as follows:
 \begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/DataPath.png}
-    \caption{The data path for our processor, named daisy after the way it daisy chains control}
+    \includegraphics[width=\linewidth]{img/daisy_overview.png}
+    \caption{The data path for our processor, named daisy after the way it daisy chains many control signals}
     \label{fig:Convolution}
 \end{figure}
-In the figure we see this design principle reflected, no data ever flows backwards, only forwards. 
-Breaking up the individual steps we get the typical flow of data.
+
+\begin{description}
+    \item[Input handler] \hfill\\ 
+        The interface between the data stream and our processor is responsible for gathering data from a wide variety of input streams of different bandwidths and speeds and present this data to the processor as a continuous data stream with a fixed width.
+        In order to do this the input handler must be able to translate from any input width to the desired output width.
+        The processed input is then stored in a double buffer, allowing the input handler to both recieve data and feed the processor at the same time.
+        As soon as a buffer is filled the input handler indicates that data is available to the processor and outputs data continously until the buffer is empty.
+    \item[Processor] \hfill\\
+        The processor recieves a pixel stream from the input handler and outputs convoluted data. It consists of a pixel buffer called the conveyor, a buffer for kernel data, an accumulator which performs the map and reduce operations, and a control module. In addition to providing convoluted data it also indicates that the data is valid. 
+        This is nescessary because not all pixels entering the conveyor has access to their full neighbourhood, so the processor cannot provide valid output every cycle.
+    \item[Control] \hfill\\
+        The control module keeps track of the system state by monitoring the input data stream, and issues control signals according to the state.
+        In its initial state the control module is in programming mode. 
+        In this state the control module makes sure the initial instructions are dispatched to the correct modules before it enters data mode.
+        When in data mode the controller keeps track of the data stream from the input handler, and uses this along with the valid signal from the processor to indicate to the output handler whether the output is valid or not.
+    \item[Memory Control] \hfill\\
+        Processed data is fed to one of the two SRAM chips serving as frame buffer. The output handler keeps track of which SRAM chip should be written to, and at which address.
+\end{description}
+
+TODO: This is where the overview should go. The next sections needs to be fleshed out A LOT!
+The content below lacks context because this part is not yet done.
+
+To illustrate how the components work we describe how the first frame of a videostream is processed.
 \begin{enumerate}
-  \item Data from the bus is read by the bus controller. This controller serves as a clock domain crossover and is responsible for delivering data to the input handler in a clock domain crossing FIFO queue.
-  \item The input handler recieves data from the queue and does magic
-  \item Pixel data is held in a special buffer with rows representing the current sweep window.
-  \item The accumulator recieves kernel data from the kernel buffer and performs its mapping function on the kernel value and the pixel from the conveyor belt. 
-When an accumulator has accumulated all its pixels it flushes its value, resetting the accumulator register and writing the old data to the memory control unit.
-  \item Accumulated pixels are reassembled in the mem ctrl unit and written to one of the two SRAM banks, allowing us to double buffer. 
-  \item After being buffered in SRAM pixel data is read by the video ctrl module which outputs video to an HDMI cable, ensuring crisp image quality served in a modern fashion.
+
+    \item In its initial state the control module is in programming mode. It intercepts data from the input handler and fills the kernel buffer and decodes which map and reduction operation should be used
+    \item After the instruction collected the control module enters data mode, and the input module starts filling its double buffer.
+    \item When the input module has filled its first buffer it indicates that it is now outputting valid data which the processor will process.
+    \item The control module keeps track of how much data has been fed to the processor. When the processor indicates it has valid output the control module signals the memory controller to be ready to write output to SRAM 0.
+    \item When the input buffer is exhausted the control waits until all valid data has been flushed from the processor before it resets the processor and waits for the next buffer to fill.
+    \item This cycle continues until the memory controller notices it has finished filling SRAM 0 with an entire frame. The memory controller switches to SRAM 1 and prepares for next frame.
 \end{enumerate}
 
-\subsection{Data in}
+\subsection{Input handler}
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/Sweeps.png}
     \caption{The sweep pattern used to collect data for convolution. The deep grey region indicates overlap, pixels which will be collected twice}
     \label{fig:Sweeps}
 \end{figure}
-Fig:Sweeps shows the pattern in which data is being fed into the processor.
-A good analogy is how a squeegee (nal) is used to clean a window, by doing either horizontal or vertical sweeps.
-In fig:SweepFrontier we show the area of the image we are currently working on.
-Our workarea, or sweep window, is nine pixels wide and three deep, and for each row the convolutions that have the middle row as center pixels are calculated.
+TODO describe how the input handlers work.
+
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/FeedPattern.png}
     \caption{The image three greyed out pixels in the source image represent the three pixels which the regions in grey boxes help calculate. The window is three pixels deep and nine pixels wide}
     \label{fig:SweepFrontier}
 \end{figure}
 
-\subsection{Convolver}
-This section encompasses the four modules forming the heart of the convolution engine as depicted in fig:DaisyView. In the order they are covered, they are:
+\subsection{Processor}
+
+The processor recieves a data stream from the input handler and performs convolution on it, outputting a stream of convoluted image data.
+The four main components are:
 \begin{description}
-    \item[the conveyor belt] \hfill\\ 
-        A buffer responsible for maintaining the three rows of the sweep window and to feed the accumulator with three reads each cycle, one read from each row every cycle.
-        The three rows must be read in such a way that each accumulator may collect the nine subpixels it needs per convolution by reading each conveyor output at the correct time.
+    \item[Conveyor] \hfill\\ 
+        The conveyor holds data in several rows, each one representing a column slice. The conveyor maintains these rows, moving data from row to row like a conveyor belt, and outputting data from each row to the accumulators.
     \item[the kernel buffer] \hfill\\
-        The kernel buffer in the figure is an abstraction, in the implementation the kernel buffer resides much closer to the accumulators, but we separate it in our overview to show how each ALU in the accumulator reads kernel values.
+        The kernel buffer maintains the kernel data and must provide the correct kernel data for each map operation performed in the accumulators.
     \item[the accumulator] \hfill\\
-        The accumulator is being fed data over three wires, and by choosing which wires to read from ensures that each accumulator works on the correct subpixels.
+        The accumulator consists of several buffers, each buffer storing the progress of convoluting a pixel.
+        Input to the accumulator is data from each row of the conveyor, along with kernel data from the kernel buffer, and it is up to the accumulator to make sure the correct kernel data and pixel data is mapped, and that the result is reduced with the content of the correct accumulator.
     \item[the control unit] \hfill\\
         In order for the accumulators and pixel conveyor to be in sync a control unit sends control signals periodically, which are then propogated throughout the system.
 \end{description}
 Fig:DaisyView shows an overview of the four components in the heart of daisy. 
-Lastly, 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/DaisyOverview.png}
     \caption{The four core units in the convolution process}

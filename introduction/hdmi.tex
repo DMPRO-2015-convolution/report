@@ -16,16 +16,18 @@ The lack of a need for a common ground also eliminates problems related to groun
 TMDS transfers 10 bits at a time using an encoding that minimizes the number of transitions required between each set of bits.
 
 \subsubsection{TMDS transmitter}
-\begin{figure}
-    \includegraphics{img/TMDStransmitterdesign.png}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale= 0.7, angle = 90]{img/TMDStransmitterdesign.png}
     \caption{Overview of the TMDS transmitter design}
     \label{fig:TMDSTransmitter}
 \end{figure}
-The TMDS transmitter design can be seen in figure \ref{TMDSTransmitter}. Each color, VSYNC, HSYNC and VDE is sent to the TMDS encoders. In the verilog code this module is called dvi_encoder. The output data is then serialized, using the serdes_n_to_1 module. These serial bitstreams are then sent to the OBUFDS cores to produce the wanted output differential signals. The clock is produced using the PLL_BASE module. The wanted pixel clock is then sent to the ODDR2 module, to get the wanted differential signal output.
+The TMDS transmitter design can be seen in figure \ref{TMDSTransmitter}. Each color, VSYNC, HSYNC and VDE is sent to the TMDS encoders. In the verilog code this module is called dvi\_encoder. The output data is then serialized, using the serdes\_n\_to\_1 module. These serial bitstreams are then sent to the OBUFDS cores to produce the wanted output differential signals. The clock is produced using the PLL\_BASE module. The wanted pixel clock is then sent to the ODDR2 module, to get the wanted differential signal output.
 
 \subsubsection{TMDS receiver}
-\begin{figure}
-    \includegraphics{img/TMDSreceiverdesign.png}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale= 0.7, angle = 90]{img/TMDSreceiverdesign.png}
     \caption{Overview of the TMDS receiver design}
     \label{fig:TMDSReceiver}
 \end{figure}

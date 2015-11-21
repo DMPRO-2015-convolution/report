@@ -5,33 +5,35 @@ In this section we will provide a top down view of our system, introducing how c
 Modularity and extendibility is a core principle in our design, however in this section we will describe the processor with the minimum viable kernel dimension, 3 x 3.
 
 \subsection{Overview}
-The overall design of our convolution processor, named "Daisy", shown in fig TODO consists of four main modules with the following responsibilities as follows:
+The overall design of our convolution processor, named "Daisy", shown in Figure \ref{fig:Convolution} consists of four main modules with the following responsibilities as follows:
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/daisy_overview.png}
-    \caption{The data path for our processor, named daisy after the way it daisy chains many control signals}
-    \label{fig:Convolution}
-\end{figure}
-
-\begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/processor.png}
-    \caption{TODO: put this where it belongs}
-    \label{fig:Convolution}
-\end{figure}
-
-\begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/input_handler.png}
-    \caption{TODO: put this where it belongs}
+    \caption{The data path for our processor, named Daisy after the way it daisy chains many control signals.}
     \label{fig:Convolution}
 \end{figure}
 
 \begin{description}
-    \item[Input handler] \hfill\\ 
+    \item[Input Handler] \hfill\\ 
         The interface between the data stream and our processor is responsible for gathering data from a wide variety of input streams of different bandwidths and speeds and present this data to the processor as a continuous data stream with a fixed width.
         In order to do this the input handler must be able to translate from any input width to the desired output width.
+
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/input_handler.png}
+    \caption{Illustration of the input handler.}
+    \label{fig:Convolution}
+\end{figure}
+
         The processed input is then stored in a double buffer, allowing the input handler to both recieve data and feed the processor at the same time.
         As soon as a buffer is filled the input handler indicates that data is available to the processor and outputs data continously until the buffer is empty.
     \item[Processor] \hfill\\
-        The processor recieves a pixel stream from the input handler and outputs convoluted data. It consists of a pixel buffer called the conveyor, a buffer for kernel data, an accumulator which performs the map and reduce operations, and a control module. In addition to providing convoluted data it also indicates that the data is valid. 
+        The processor recieves a pixel stream from the input handler and outputs convoluted data. It consists of a pixel buffer called the conveyor, a buffer for kernel data, an accumulator which performs the map and reduce operations, and a control module. In addition to providing convoluted data it also indicates that the data is valid.
+
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/processor.png}
+    \caption{Illusration of the processor.}
+    \label{fig:Convolution}
+\end{figure}
+
         This is nescessary because not all pixels entering the conveyor has access to their full neighbourhood, so the processor cannot provide valid output every cycle.
     \item[Control] \hfill\\
         The control module keeps track of the system state by monitoring the input data stream, and issues control signals according to the state.
@@ -59,14 +61,14 @@ To illustrate how the components work we describe how the first frame of a video
 \subsection{Input handler}
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/Sweeps.png}
-    \caption{The sweep pattern used to collect data for convolution. The deep grey region indicates overlap, pixels which will be collected twice}
+    \caption{The sweep pattern used to collect data for convolution. The deep grey region indicates overlap, pixels which will be collected twice.}
     \label{fig:Sweeps}
 \end{figure}
 TODO describe how the input handlers work.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/FeedPattern.png}
-    \caption{The image three greyed out pixels in the source image represent the three pixels which the regions in grey boxes help calculate. The window is three pixels deep and nine pixels wide}
+    \caption{The image three greyed out pixels in the source image represent the three pixels which the regions in grey boxes help calculate. The window is three pixels deep and nine pixels wide.}
     \label{fig:SweepFrontier}
 \end{figure}
 
@@ -77,26 +79,28 @@ The four main components are:
 \begin{description}
     \item[Conveyor] \hfill\\ 
         The conveyor holds data in several rows, each one representing a column slice. The conveyor maintains these rows, moving data from row to row like a conveyor belt, and outputting data from each row to the accumulators.
-    \item[the kernel buffer] \hfill\\
+    \item[The Kernel Buffer] \hfill\\
         The kernel buffer maintains the kernel data and must provide the correct kernel data for each map operation performed in the accumulators.
-    \item[the accumulator] \hfill\\
+    \item[The Accumulator] \hfill\\
         The accumulator consists of several buffers, each buffer storing the progress of convoluting a pixel.
         Input to the accumulator is data from each row of the conveyor, along with kernel data from the kernel buffer, and it is up to the accumulator to make sure the correct kernel data and pixel data is mapped, and that the result is reduced with the content of the correct accumulator.
-    \item[the control unit] \hfill\\
+    \item[The Control Unit] \hfill\\
         In order for the accumulators and pixel conveyor to be in sync a control unit sends control signals periodically, which are then propogated throughout the system.
 \end{description}
-Fig:DaisyView shows an overview of the four components in the heart of daisy. 
+
+Figure \ref{fig:DaisyView} shows an overview of the four components in the heart of Daisy. 
+
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/DaisyOverview.png}
-    \caption{The four core units in the convolution process}
+    \caption{The four core units in the convolution process.}
     \label{fig:DaisyView}
 \end{figure}
 
-\subsubsection{The accumulator}
-Although the accumulator unit is the last unit in the datapath of daisy we will cover it first since it helps motivate the designs further up in the chain.
+\subsubsection{The Accumulator}
+Although the accumulator unit is the last unit in the datapath of Daisy we will cover it first since it helps motivate the designs further up in the chain.
 The accumulator actually consists of seven accumulators, hereby referred to as pixel accumulators. Each pixel accumulator corresponds to a pixel in the middle row.
 The leftmost and the rightmost pixel in the middle row has no accumulator associated with it because it lacks three pixels necessary for a full convolution, necessetating the slight overlap in our feed pattern.
-In fig:DaisyView the input from the conveyor is shown as three wires, one from each row.  
+In Figure \ref{fig:DaisyView} the input from the conveyor is shown as three wires, one from each row.  
 Each accumulator is responsible to read from the correct row at the correct time, such that it accumulates only the subpixels of the source pixel.\\ \\ \\
 \\
 \begin{tabular}{l*{16}{c}r}
@@ -122,7 +126,7 @@ Row 2                   & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray
 Row 3                   & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & \\
 \end{tabular}\\ \\ \\
 
-\subsubsection{The conveyor belt}
+\subsubsection{The Conveyor Belt}
 As established last section, the job of the conveyor is to feed data from each of its rows to the accumulator.
 In addition to serving data to the accumulator the conveyor must also feed new data to the belt and propogate that data downward which gives rise to its name.
 In order to both propagate data downward and feed correct data to the accumulator as efficently as possible the conveyor will utilize the data from a read operation to both feed the accumulator and to transfer data laterally.
@@ -136,14 +140,14 @@ At $T_{1}$ the neighbour recieves the key, and reads from the register above it 
 
 TODO: Figure out a succint way to explain this part
 
-\subsubsection{The controller}
+\subsubsection{The Controller}
 We have established how control flows throughout the system, but we still need a module to give out keys to the leftmost accumulators and registers.
 The controller is responsible for sending out the keys in the correct order and at the correct time.
 Timing is everything, if we misalign read signals and write signals we may end up in a situation where a register fails to read when the register above it writes.
 For example, if the controller sends each read signal one cycle too late each register will read when the register to the right side of the one directly above it, causing the data to be sheared as it moves laterally!
 Other than issuing read and write keys to the registers, the controller also issues a flush key for the accumulators which tells accumulators to drive DATA\_OUT with its contents, and to reset.
 
-\subsubsection{The kernel buffer}
+\subsubsection{The Kernel Buffer}
 In our schematic we present the kernel buffer as a separate submodule. 
 However, having already introduced how instructions are daisy chained it makes sense to do the same with kernels since seven different kernel values are in use at all times.
 Thus the kernel values are kept in a shift register queue living as close to the accumulators as possible, needing only two registers to hold the currently unused kernel values.

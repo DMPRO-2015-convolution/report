@@ -54,7 +54,7 @@ Depending on the kernel matrix, various effects like blurring or sharpening may 
 A small selection of possible kernel matrices and the results the produce can be found in table \ref{tab:KernelMatrices}.
 
 \begin{table}
-    \begin{tabular}{ccm{2cm}}
+    \begin{tabular}{ccm{3cm}}
     Description & Matrix & Result \\
     \hline
     Blur & $
@@ -63,21 +63,21 @@ A small selection of possible kernel matrices and the results the produce can be
             1/9 & 1/9 & 1/9 \\
             1/9 & 1/9 & 1/9
             \end{bmatrix}
-        $ & \includegraphics[width=2cm]{img/LenaBlurred} \\
+        $ & \includegraphics[width=3cm]{img/LenaBlurred} \\
     Edge-detect & $
             \begin{bmatrix}
             -1 & -1 & -1 \\
             -1 & 8 & -1 \\
             -1 & -1 & -1
             \end{bmatrix}
-        $ & \includegraphics[width=2cm]{img/LenaEdge} \\
+        $ & \includegraphics[width=3cm]{img/LenaEdge} \\
     Emboss & $
             \begin{bmatrix}
             -2 & -1 & 0 \\
             -1 & 1 & 1 \\
             0 & 1 & 2
             \end{bmatrix}
-        $ & \includegraphics[width=2cm]{img/LenaEmbossed}
+        $ & \includegraphics[width=3cm]{img/LenaEmbossed}
     \end{tabular}
     \caption{Some kernels used in image processing}
     \label{fig:KernelMatrices}
@@ -87,15 +87,47 @@ As the matrices in table \ref{tab:KernelMatrices} are good examples of, the kern
 This means each output pixel is a function of the same pixel in the original image and its neighbourhood.
 
 \subsection{Generalized convolution}
-We can abstract the convolution process by using mapping function $f: R x R \rightarrow R$ in place of multiplication, and $g: R x R \rightarrow R$ in place of addition.
-A convolution can then be described as $(f, g)$, from here on referred to as the map function and the reduce function, where the standard convolution can be expressed whit $(*, +)$, while $(min, +)$ describes finding the shortest path.
-The only restriction we impose on $f$ and $g$ is that they form a semiring.
-Abstract algebra is outside of the scope of our report, but informally we impose that the TODO 
+Convolution can be separated into to phases; first we have the multiplication before a summation follows.
+In our image processing application, the multiplication phase simply maps a set of input values to a set of output values.
+These values are then reduced into one value by summation.
 
-Can we use domains outside of R? 
-Describe associativity, for instance show minus not nescessarily working?
+To generalize convolution, we can replace the map and reduce operations.
+In our general case, a convolution operation is therefore fully defined by two input matrices and two operations.
 
-\section{Implementing convolution}
+In the realm of image processing, this paves the way for new filters, such as the median, minimum and maximum filters.
+These filters are commonly used to remove noise in images and consists of a convolution kernel matrix filled with 1s (the multiplicative identity), the multiplication operation for the map stage and the minimum, maximum or mean operations respectively for the reduce operations.
+The resulting images created by applying the effect to our test image can be seen in table \ref{tab:GeneralizedKernelMatrices}.
+
+\begin{table}
+
+    \begin{tabular}{lm{3cm}}
+        Reduce operation & Result \\
+        \hline
+        Minimum & \includegraphics[width=3cm]{img/LenaMin} \\
+        Maximum & \includegraphics[width=3cm]{img/LenaMax} \\
+        Median & \includegraphics[width=3cm]{img/LenaMedian}
+    \end{tabular}
+
+    \caption{Some image processing filters using a generalized form of convolution}
+    \label{tab:GeneralizedKernelMatrices}
+
+\end{table}
+
+Generalized convolution can also be used in other areas, such as to calculate the next iteration of cellular automatons. This requires a more advanced reduce operation.
+
+\section{TODO: Implementing convolution}
+Comment from Yaman on this section:
+\begin{quotation}
+the section heading "Implementing convolution" does not match the section content. what is the purpose of this section? is it background? is it meant to describe your own design decisions for the solution?
+
+yes you can assume, bandwidth is a known constraint when working on data-intensive stuff.
+
+but remember there are (generally speaking) two kinds of bandwidth in computing: "off-chip" and "on-chip". off-chip storage is large and low bandwidth, on-chip storage is small and high bandwidth. 
+
+this is why we try to exploit "data reuse" as much as possible; keep the reused bits on-chip so we can access them again and again with high bandwidth.
+\end{quotation}
+
+
 On modern computers the memory bandwidth will usually be the bottleneck of any operation involving large amounts of data, such as an image. TODO reference (or is it considered common knowledge?)
 The essence of implementing efficient convolution is therefore removing redundant data movement.
 Whenever we move a pixel into working memory we ideally want to perform a map operation for every neighbourhood it is part of.

@@ -9,7 +9,7 @@ Performance was the main focus of our project.
 
 TODO: Add more info on achieved throughput given image format, convolution kernel matrix size...
 
-\subsubsection{EBI Throughput}
+\subsubsection{EBI Throughput} \label{subsec:EbiThroughput}
 During the project, the throughput over EBI between a EFM MCU and a Spartan 6 FPGA was tested by sending a sequence of increasing number which were verified on the FPGA.
 A set-up time of 1 cycle was required in addition to the mandatory cycle always introduced by the MCU EBI controller for data to be transferred correctly.
 
@@ -19,3 +19,10 @@ From table \ref{BitRates}, we can conclude this is sufficient to accommodate all
 During the testing, a default FIFO queue implementation from Xilinx was used to cross the clock domain.
 As EBI is asynchronous and therefore does not provide a clock, the last value sent was not received on the FPGA.
 As a workaround, a final don't care value was sent over the bus to push the final data value through the FIFO at the FPGA.
+
+\subsubsection{SRAM throughput} \label{subsec:SramThroughput}
+During SRAM testing, several clock rates were tried to determine the speed achievable to SRAM.
+$\unit[40]{MHz}$ proved to be working, which gives a throughput of $\unit[40]{MHz}\cdot\unit[16]{bit} = \unit[640]{Mbps}$ for reading.
+During writing, this number must be halved as a write requires two cycles (one for address set-up and one for writing), giving a throughput for writing of $\unit[320]{MHz}$.
+
+\emph{TODO:} Double check the max speed. I. e. try 50MHz again. Perhaps something in between.

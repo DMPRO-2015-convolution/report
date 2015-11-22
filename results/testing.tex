@@ -10,8 +10,22 @@ This is advantageous because potential bugs can be found before all components a
 
 \subsubsection{SRAM Connection}
 The resistance between SRAM pins and the corresponding header pins was measured to ensure all wires were connected properly.
-It was discovered that two of the data pins for the second memory chip was exchanged, but we concluded this must be due to a swapping of the labels on the board, not the actual wires.
+It was discovered that two of the address pins for the second memory chip was exchanged, but we concluded this must be due to a swapping of the labels on the board, not the actual wires.
 Nevertheless, this would not make a difference even if the wires were swapped as the data would be swapped twice, first when writing, then when reading, resulting in the correct data being read.
+
+Furthermore, the chips were confirmed to be working by configuring the FPGA with a image that performed the following steps:
+\begin{enumerate}
+    \item Iterate through all memory addresses and write the lower 16 bits of the address XOR some random values (in our case, 0xDEAD and 0xBEEF for SRAM1 and SRAM2 respectively).
+    \item Start over at the lowest address, read the data and compare to the expected value.
+    \item Light the LED with a light characteristic dependent on the result:
+        \begin{itemize}
+            \item Fixed on success
+            \item Occulting on SRAM1 failure
+            \item Flashing on SRAM2 failure (if SRAM1 was successfully read)
+        \end{itemize}
+\end{enumerate}
+
+After fixing some malfunctioning solder points not detected during initial measuring, the test passed.
 
 \subsubsection{Flashing the MCU}
 The ARM Debug header on the computer was connected to the corresponding header on an EFM32GG development kit. The MCU was successfully flashed, verified by inspecting variables in the debug mode of Simplicity Studio.
@@ -22,4 +36,14 @@ Reads and writes to the MicroSD card through the MCU was tested by reading a sma
 \subsubsection{Configuring the FPGA}
 The FPGA was configured both using JTAG and through the MCU with a bit file. The file contained a configuration for the FPGA that would allow us to control the on-board LED using one of the buttons. The button controlled the led after configuration, thus we concluded the configuration was successful.
 
-\subsubsection{HDMI output}
+\subsubsection{HDMI Output}
+HDMI output was confirmed to be working by configuring the FPGA with bit files outputting an image generated on the fly.
+Several images were tried, some filled with a single colour, and some with a repeating gradient pattern.
+
+The image showed up on a connected screen, thus we concluded our HDMI output was working.
+
+\subsection{HDMI Input}
+When trying to configure the FPGA for receiving HDMI through the second port it was discovered that the pins used for the incoming clock signal was connected to a non-clock input pin.
+Ironically, all other pins used for the given HDMI connector were clock pins, and we therefore modified a regular HDMI cable and exchanged one of the colour wire pairs with the clock pair.
+
+HDMI input was confirmed to be working by outputting the received image on the other HDMI connector and displaying the image on a screen.

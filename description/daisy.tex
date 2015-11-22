@@ -1,11 +1,16 @@
 \subsection{Convolution engine}
-In this section we will provide a top down view of our system, introducing how components interface with each others and what their purpose is before we describe their implementation. 
+In this section we will describe the convolution engine which is at the heart of the FPGA architecture.
+A design goal for our system was to reconfigure the FPGA depending on the task, which necessitates synthesizing several versions of our architecture so that the correct architecture may be chosen at run time.
+In order to achive this we had to parametrize our design, allowing us to generate different architectures by simply changing a parameter once.
+The parameters available are:
 
-
-\subsection{FPGA}
-The very heart of our computer is our custom made architecture implemented on an FPGA.
-In this section we will first describe the overall architecture of the convolution engine, and then we will drill down and examine the core modules.
-Modularity and extendibility is a core principle in our design, however in this section we will describe the processor with the minimum viable kernel dimension, 3 x 3.
+\begin{Description}
+    \item[Kernel dimensions] \hfill \\
+        The most fundamental parameter in our design, the kernel dimension dictates how many pixels we need to calculate a single output pixel.
+        This is very fundamental parameter, and we will see how setting the kernel dimension will effect other important sizes in our system as we explore the system.
+    \item[Data input width etc etc] \hfill \\
+        Some words etc
+\end{description}
 
 \subsubsection{Overall design}
 The overall design of our convolution processor, named "Daisy", shown in fig TODO consists of four main modules with the following responsibilities as follows:

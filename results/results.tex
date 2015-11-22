@@ -11,9 +11,10 @@ TODO: Add more info on achieved throughput given image format, convolution kerne
 
 \subsubsection{EBI Throughput}
 During the project, the throughput over EBI between a EFM MCU and a Spartan 6 FPGA was tested by sending a sequence of increasing number which were verified on the FPGA.
-A setup time of 1 cycle was required in addition to the mandatory cycle always introduced by the MCU EBI controller for data to be transferred correctly.
+A set-up time of 1 cycle was required in addition to the mandatory cycle always introduced by the MCU EBI controller for data to be transferred correctly.
 
 Since the MCU is running with a clock speed of 48MHz, this resulted in a maximum throughput of $\unit[16]{bits} \cdot \unit[48]{MHz} / 2 = \unit[384]{Mbps}$.
+From table \ref{BitRates}, we can conclude this is sufficient to accommodate all options listed except the most data intensive.
 
 During the testing, a default FIFO queue implementation from Xilinx was used to cross the clock domain.
 As EBI is asynchronous and therefore does not provide a clock, the last value sent was not received on the FPGA.

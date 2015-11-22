@@ -1,6 +1,18 @@
 \section{Field-Programmable Gate Array}
-TODO: Small section on FPGA and how it can work as reconfigurable hardware. Our system can reconfigure this at runtime. Make this a point later?
+Speeding up computations can be done in several ways, but a common approach for operations performed often is to implement the operation in hardware.
+A good example is multiplication in modern processors.
+This operation is not strictly necessary as the same behaviour can be simulated by repeatedly summing values in a loop, but it is still commonly available in hardware because this makes the implementation more efficient.
+The drawback of hardware implementation is that the hardware resources used cannot be used for other operations.
 
-An FPGA is an integrated circuit which is designed to be configured after it has been manufactured. It consists of reconfigurable logic blocks and connections between them. The configuration of an FPGA can be specified by a hardware description language.
+An FPGA is an integrated circuit which is designed to be configured after it has been manufactured.
+It consists of reconfigurable logic blocks and configurable connections between them, and allows the behaviour of the FPGA to be specified at run time. Usually this is done by describing the behaviour using a hardware description language which is then used to create a configuration bit file for the FPGA.
 
-Because an FPGA is reconfigurable hardware, it can be reconfigured at will. In our system we are using this feature to reconfigure the FPGA at runtime.
+An FPGA is a good compromise; the FPGA implementation runs considerably faster than for many operations, and as the configuration can be changed at any time, the resources can be used for many different purposes without doing changes to the actual hardware.
+For example, the very same FPGA can be used to decode video in one moment, and to perform convolution in the blink of an eye in the next.
+
+This approach has in fact already been implemented, at least by Intel on their Xeon processors\cite{intelxeonfpga}.
+
+\subsection{Chisel}
+Another drawback of hardware implementation is the time required for development time required \cite{fpgaprosandcons}. 
+Even though the hardware can be reconfigured, the configurations still need to be coded using techniques similar to the ones used for developing regular hardware.
+One attempt to reduce the development time is the hardware description language Chisel, which aims to be a flexible alternative to VHDL and Verilog \cite{chiselpaper}, and thereby reduce development time.

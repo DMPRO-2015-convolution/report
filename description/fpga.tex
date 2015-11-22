@@ -24,29 +24,32 @@ The parameters available are:
         The data width that the convolution engine should output. As with input, translating widths is nescessary.
 \end{description}
 
-By parametrizing the convolution engine we can view it as any other processor module with the following inputs and outputs:
+By parametrizing the convolution engine we can view it as any other processor module with the inputs and outputs shown in Table \ref{tbl:ConvolutionEngineIO}.
 
-% \begin{tabular}{ l | l | l }
-% \multicolumn{2}{c}{Input}
-%     \hline
-%     Signal & Width\\
-%     \hline
-%     Image data in           & Image input width     & Data stream from camera on row format \\
-%     Image data valid        & 1                     & image data input is valid\\
-%     Control data in         & Control data width    & Data stream from MCU\\
-%     Control data valid      & 1                     & MCU data is valid\\
-%     Request image data      & 1                     & Current output data is recieved\\
-%     Reset                   & 1                     & Convolution engine should reset
-% \end{tabular}
-% 
-% \begin{tabular}{ l | l | l}
-%     \multicolumn{2}{c}{Output}
-%     \hline
-%     Signal & Width\\
-%     \hline
-%     Image data out          & Image input width     & The processed image data on row format\\
-%     Image data valid        & 1                     & Current output data is valid
-% \end{tabular}
+\begin{table}[h]
+    \begin{tabular}{l | l | l | l }
+        &   Signal & Width\\
+        \hline
+        \multirow{5}{*}{Input}
+        &   Image data in           & Image input width     & Data stream from camera on row format
+        \\
+        &   Image data valid        & 1                     & image data input is valid
+        \\
+        &   Control data in         & Control data width    & Data stream from MCU
+        \\
+        &   Control data valid      & 1                     & MCU data is valid
+        \\
+        &   Request image data      & 1                     & Current output data is recieved
+        \\
+        &   Reset                   & 1                     & Convolution engine should reset
+        \\\hline
+        \multirow{2}{*}{Output}
+        &   Image data out          & Image input width     & The processed image data on row format\\
+        &   Image data valid        & 1                     & Current output data is valid
+    \end{tabular}
+    \caption{TODO}
+    \label{tbl:ConvolutionEngineIO}
+\end{table}
 
 To the outside system the convolution engine is now a module that once programmed operates on a data stream of an image and outputting a processed stream. 
 By using valid signals the outside system can provide data at any pace, and throttle the output by requesting data when the convolution engine indicates that data is ready. 

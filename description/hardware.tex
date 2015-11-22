@@ -1,6 +1,8 @@
 \section{Hardware}
 This chapter targets the 1\textsuperscript{st} revision of Camvolution board layout. The board is intended for use of camera input and to display a convoluted output to one of the HDMI connectors. It has several redundant headers, in case the 1\textsuperscript{st} revision should have any faults. The hardware that relates to the Xilinx Spartan 6 FPGA, and Giant Gecko 990 EFM is not covered here.
 
+\emph{TODO:} Mention and add appendix with schematics.
+
 \begin{figure}
     \includegraphics[width=\linewidth]{img/OverviewCamvolutionKit}
     \caption{Camvolution board layout}
@@ -165,7 +167,11 @@ The EFM has spare pins that all are available on the P15 header pins. Pin 28 on 
 \end{table}
 
 \subsection{SRAM}
-The FPGA is connected to two SRAM, recognised as SRAM1 and SRAM2. These are connected to pins on the FPGA bank 1 and bank 2.  They are also in case of failure, or for any reason connected to output pins on the development board. We will not go through all the pins here. This can easily be seen from the figure in the schematics. The schematics will be available in the appendix. 
+The FPGA is connected to two SRAM chips from Alliance Memory, one on bank 1 and another on bank 2.
+They support a data width of 16 bits and have an access time of \unit[10]{ns} \cite{sramdatasheet}, which means we have a maximum throughput of $(\unit[10]{ns})^{-1} = \unit[1,6]{Gbps}$ to each chip.
+This is more than sufficient for our application as can be seen in Table \ref{tab:BitRates}, but we do expect this number to be significantly less due to latencies introduced on the FPGA and by the wires in between.
+
+To make debugging easier, all wires connecting the FPGA and SRAM chips have been placed on headers.
 
 \subsection{JTAG and Programmer}
 Both the FPGA and the EFM is connected with pinouts to a programmer. The EFM is connected to a 20 pin header that can be used with the generic programming pin from a EFM development kit. 

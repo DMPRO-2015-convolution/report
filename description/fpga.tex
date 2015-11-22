@@ -52,10 +52,38 @@ By using valid signals the outside system can provide data at any pace, and thro
 
 \subsection{A conceptual overview}
 In this section we provide a conceptual description of how convolution is performed in our system.
-fig SWEEPS 2 shows, from the perspective of the convolution engine, how an image is being "swept" in a squeegee line fashion.
-By \textit{sweeping} an image we read the image data as column slices. This \textit{Sweep frontier} is shown in the figure as the dark gray area. 
-One of the tasks of the convolution engine is to buffer rows from the input until it has enough rows to feed the \textit{Core} with a data stream, from now on referred to as the swipe frontier.\\
-By letting the convolution unit take care of reordering the data we can now view the core as a module with a swipe frontier as input and a stream of processed pixels as output.
+
+\subsubsection{Data input}
+We will first discuss how image data is presented to the processor at the core of the convolution engine.
+Fig: TODO truls image 1 shows how the convolution engine buffers rows from the image input until it has accumulated enough rows.
+These rows form a \textit{Sweep}, which is fed into the processor as a series of column slices.
+We have now established how the processor is fed data from the convolution engine, and we can now explore what happens inside the processor.
+
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/daisy_processing.pdf}
+    \caption{The data path for our processor, named Daisy after the way it daisy chains many control signals.}
+    \label{fig:Convolution}
+\end{figure}
+
+\subsubsection{The sweep frontier} 
+As TODO truls image 1 shows, each sweep is fed through the processor as a data stream.
+This stream of pixel data is again buffered in a special register called the \textit{conveyor belt}.
+The purpose of the conveyor belt is to maintain the \textit{sweep frontier}, consisting of the most recent data from the current sweep.
+The conveyor has several rows of registers, representing the \textit{sweep depth}, each row as wide as a column slice, representing the \textit{sweep width}.
+We have introduced a lot of concepts without explaining why they are important, and how they tie together, but we now have the nescessary pieces.
+Recall from the background section how the dimensions of the kernel dictates the size of each pixels neighbourhood.  
+When we use a kernel of size 3x3 we need to perform a mapping with nine pixels to output one output pixel, and if we use a 5x5 kernel we need 25 operations.
+So how does this tie in with sweep frontier, depths and widths?     TODO: figure ?\\
+Using a 3x3 kernel, if we let the sweep depth be 3 then every pixel on the middle row has access to all of its neighbours.
+Conversively, with a 5x5 kernel we need a depth of 5 to simultaneously have access to each neighbour, which is why kernel size acts as a paramater before synthesizing, allowing the
+design to be tailored to one kernel size.
+We now see the benefit of having a sweep depth similar to the kernel dimension, but what about the sweep width, how wide should it be, and why?
+To answer this we must take a deeper look at the conveyor and ALU.
+
+\subsubsection{Processing pixels}
+When using a kernel of size 3x3 we have established that the sweep depth should be 3, and so we have three rows in the conveyor.
+for each pixel in the middle row we want to 
+
 
 \subsection{Overview}
 The overall design of our convolution processor, named "Daisy", shown in Figure \ref{fig:Convolution} consists of four main modules with the following responsibilities as follows:

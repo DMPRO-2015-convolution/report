@@ -9,7 +9,7 @@ The MCU is used as an I/O-processor, reading from a MicroSD card, configuring th
 \end{figure}
 
 \subsection{Storage}
-Due to the limited size of the MCU non-volatile memory not exceeding 1024kB, an additional larger source of data is necessary. A MicroSD card is used for this storage, as it gives the MCU an external storage of up to 32GB and lets the system operate independently without being connected to an external computer.
+Due to the limited size of the MCU non-volatile memory not exceeding 1024kB, an additional larger source of data is necessary for storing files such as images and configuration files for the FPGA. A MicroSD card is used for this storage, as it gives the MCU an external storage of up to 32GB and lets the system operate independently without being connected to an external computer.
 
 The code for interfacing the MicroSD card is based on the FAT on SD Card Application Note\cite{an0030}. The MCU communicates with the MicroSD card using SPI transfers with a USART module. FAT32 is used as a file system to make reading content from the MicroSD card more manageable, with the trade-off being increased computational overhead for the MCU. This also allows users to add and replace files without having to reprogram the MCU.
 
@@ -44,35 +44,53 @@ In order to make the process of changing kernels for the system, the kernel file
 
 \clearpage % TODO: find a better way to put the wrapfigure on one page
 \subsection{External Bus Interface}
-\begin{wrapfigure}[14]{r}{6cm}
-    \centering
-    \includegraphics[]{img/EbiAddressSpace.pdf}
-    \caption{EBI Address Space}
-    \label{fig:EbiAddressSpace}
-\end{wrapfigure}
+%\begin{wrapfigure}[14]{r}{6cm}
+%    \centering
+%    \includegraphics[]{img/EbiAddressSpace.pdf}
+%    \caption{EBI Address Space}
+%    \label{fig:EbiAddressSpace}
+%\end{wrapfigure}
 The FPGA and the MCU is connected through an EBI bus.
 This interface is supported natively by the MCU and can therefore be handled by its built-in direct memory access (DMA) unit, which hopefully makes streaming video from the MCU faster, more reliable and easier to implement.
 
 In addition to streaming video, the MCU should also control the operation of the processor.
-To accomplish this, we utilize the large address space available.
-An overview can be seen in figure \ref{fig:EbiAddressSpace}.
+
+\subsubsection{EBI Banks}
+The EBI module on the MCU supports reading and writing to multiple memory banks, where each bank has its own memory space on the MCU and its own chip select signals. For the system, one bank is used access SRAM and another bank is used to communicate with the processor.
+
+Even though the width of the EBI bus is 20-bit, only 3 addresses are used when communicating with the processor. Table \ref{ebi_processor_addresses} explains the functionality of the different adresses.
+
+\begin{table}[h!]
+\centering
+	\begin{tabular}{ | l | p{10cm} |}
+		\hline
+		Address & Functionality \\ \hline
+		0 & Data stream. Used for sending images and configuration data to the processor. \\ \hline
+		1 & EBI mode override. Writing 1 to this address will give EBI access to SRAM. \\ \hline
+		2 & Reset. Writing anything to this address will reset the processor. \\ \hline
+		>2 & Data written to addresses larger than 2 will be ignored by the processor. \\ \hline
+	\end{tabular}
+	\caption{Address functionality for processor bank}
+	\label{ebi_processor_addresses}
+\end{table}
+
 
 \subsubsection{Processor Configuration}
-Configuration values for the processor have their own memory addresses so that configuring it is only a matter of saving the correct values to the correct addresses.
+To configure the processor with new kernel, map and reduce values, the MCU needs to reset it. After the processor has been reset, it expects the configuration values as a data stream. The MCU then sends all of the configuration values to address 0. When the processor is fully configured, the MCU can be set to send an image stream or just wait for input.
 
-Note that the amount of space allocated to each group of options in figure \ref{fig:EbiAddressSpace} is more than needed.
-This simplifies the process of adding more configuration options if required at a later point.
+%TODO Proper details of input stream.
 
-\subsubsection{Streaming Data}
-Some data is of unknown or unlimited length. This data is streamed to daisy by reusing the same addresses several times.
-By assigning a large block of the memory space to each data stream, we can utilize the DMA without having to worry about unintendedly overwriting configuration values.
+\subsubsection{SRAM Access}
+Instead of sending everything as a data stream to the processor, the MCU can access the image memory in SRAM. This makes it possible for the MCU to only update a part of the screen, instead of updating the whole screen every time it needs to be refreshed.
 
-The reuse of addresses also provides a natural sync point for the video stream;
-each write to the first address of the address space reserved for streaming video is assumed to be a \textit{frame sync}, which signals the start of a new frame.
-This makes the system less fragile as the processor can catch up with the data stream should it ever end up being out of sync.
+For the MCU to access SRAM it needs to enable the EBI mode override by writing 1 to address 1 on the processor bank. By doing this, the MCU will receive direct access to the SRAM through the FPGA.
+The EBI bank for accessing SRAM can then be used to read and write from memory.
+
+Writing 0 to address 1 on the processor bank will disable the EBI mode override, and resume normal operation of the processor.
+
 
 \subsection{User Interface}
-Even though the MCU is able to configurate values on the processor, it does not do so until it receives input telling it to perform the configuration. This input comes from a simple user interface based sending a graphical interface over the image stream and let the user control it with buttons. The operation of the system can be controlled by the buttons only, making it easier to use and removing the need for being controlled by an external computer. 
+The system has a simple graphical user interface which is displayed on the screen. The interface has menus where it is possible to change different configuration values for the processor, such as kernels, map and reduce operators and FPGA configuration. Controlling the user interface is done with buttons, making it easier to use and removing the need for being controlled by an external computer.
 
 The system provides four buttons for the user interface:
 \begin{itemize}

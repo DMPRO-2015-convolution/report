@@ -1,4 +1,5 @@
 \section{System Overview}
+\input{description/definitions}
 As stated in the requirements, the system should handle streaming video from a camera, perform convolution and be able to provide the result as an output stream.
 The convolution is to be done on the FPGA using a custom processor implementation named \textit{Daisy}, described in section \ref{sec:processor}.
 To make the FPGA as simple as possible, the camera is connected to and controlled by the MCU, and the video is passed to the convolution processor in a suitable format over an EBI bus.

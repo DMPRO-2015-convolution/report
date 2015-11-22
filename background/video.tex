@@ -1,0 +1,49 @@
+\section{Digital Video}
+Through the times video has been encoded in a variety of formats, each with its advantages and drawbacks.
+In our project, we need to find a balance between quality, size and performance that maximizes our throughput without sacrificing too much image quality.
+
+A common encoding for images is to encode the pixels in a 2-dimensional array in a row-major order, or in other words as an array of scanlines.
+
+\subsection{Resolution}
+The number of pixels in each scanline and the number of scanlines, more commonly referred to as the width and height of the image, determines the size of each pixel on the screen.
+
+Too few pixels results in an image with visible pixel, thus of poor quality.
+Too many pixels gives a huge performance penalty as higher resolutions require more storage space and therefore also more throughput.
+
+\subsection{Colors}
+Each element stored must provide the color of the pixel it represents.
+
+\subsubsection{Separate Component}
+One way of achieving this goal is to separate the color into three components and store each individually.
+A common choice of components is red, green and blue, giving rise to the RGB color model.
+
+Furthermore, it is possible to store each component as a separate pixel or to interlace the different components in the same image so that all the information required to determine the color of a pixel resides in one place.
+
+As data stored by computers is discrete and of limited size, we have a limited number of values to use when describing the amount of each component present in a given color.
+The number of values that can be represented is referred to as the \textit{depth} of the image, commonly given in the number of bits used to represent a single color.
+
+\subsubsection{Indexed}
+Another way to store the color information is to select a set of colors and assign each color a number.
+This is especially useful when reducing the size of an image by reducing the number of available colors.
+With an index color representation, the most commonly used colors can be selected and assigned numbers, thus reducing the error introduced by forcing the colors into a smaller space.
+
+\subsection{Bit Rates}
+An important measure in determining the efficiency of a given video format is the bit rate, the rate at which bits needs to be provided in order to display the video.
+For uncompressed video, we need to know the frame rate in addition to the image resolution and color representation to be able to determine the bit rate of the video.
+
+Table \ref{tab:BitRates} displays the bit rate required at some common resolutions, depths/index sizes and frame rates.
+\begin{table}[]
+    \centering
+    \begin{tabular}{ccrrr}
+        Resolution & Depth/index size & Bit rate @ 15Hz & Bit rate @ 30Hz & Bit rate @ 60Hz \\
+        \hline
+        320x240 & 8 bit & 9,2 Mbps   & 18,4 Mbps  & 36,9 Mbps  \\
+        320x240 & 16 bit & 18,4 Mbps  & 36,9 Mbps  & 73,7 Mbps  \\
+        320x240 & 24 bit & 27,6 Mbps  & 55,3 Mbps  & 110,6 Mbps \\
+        640x480 & 8 bit & 36,9 Mbps  & 73,7 Mbps  & 147,5 Mbps \\
+        640x480 & 16 bit & 73,7 Mbps  & 147,5 Mbps & 294,9 Mbps \\
+        640x480 & 24 bit & 110,6 Mbps & 221,2 Mbps & 442,4 Mbps
+    \end{tabular}
+    \caption{Bit rates given different video parameters}
+    \label{tab:BitRates}
+\end{table}

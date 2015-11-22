@@ -1,0 +1,19 @@
+\section{Raspberry Pi Camera}
+After some consideration it was decided that the \textit{Raspberry Pi Camera Board}\footnote{\url{https://www.raspberrypi.org/products/camera-module/}} would be used as the camera module for the system.
+The \textit{Raspberry Pi Foundation} has designed this peripheral for use with the \textit{Raspberry Pi} computer.
+
+There were several advantages leading to this choice, including
+\begin{itemize}
+    \item   Availability from retailers
+    \item   Associated open source software
+    \item   Wdiely used in other projects, meaning there is a lot of experience to draw from
+\end{itemize}
+
+The camera module can take still shots as well as record continuous video.
+The camera sensor sits on a board with a controller unit which connects to the Pi (or another master device) via a 16-pin ribbon cable.
+Communication over this cable is defined by the proprietary \textit{MIPI Camera Serial Interface} (CSI) specification.
+
+The master device controls the camera module by sending instructions over an I2C bus on the ribbon cable,
+and the camera module responds with picture data over two clocked differential busses.
+Parameters that may be controlled include video encoding, resolution in two dimensions and framerate.
+

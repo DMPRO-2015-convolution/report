@@ -72,20 +72,17 @@ The purpose of the conveyor belt is to maintain the \textit{sweep frontier}, con
 The conveyor has several rows of registers, representing the \textit{sweep depth}, each row as wide as a column slice, representing the \textit{sweep width}.
 Figures \ref{frontier1} and \ref{frontier2} show the sweep window for a 3x3 convolution.
 Recall from the background section how the dimensions of the kernel dictates the size of each pixels neighbourhood.
-When we use a kernel of size 3x3 we need to perform a mapping with nine pixels to output one output pixel, and if we use a 5x5 kernel we need 25 operations.
 In \ref{frontier1} we see that the seven middle pixels, marked as gray, have access to their entire neighbourhood.
 By letting the frontier depth equal the kernel dimension, the middle row will always have access to their whole neighbourhood, explaining the purpose of the sweep depth.
-So how does this tie in with sweep frontier, depths and widths?
-Using a 3x3 kernel, if we let the sweep depth be 3 then every pixel on the middle row has access to all of its neighbours.
-Conversively, with a 5x5 kernel we need a depth of 5 to simultaneously keep each neighbour in the conveyor, which is why kernel size acts as a paramater before synthesizing, allowing the
-design to be tailored to one kernel size.
+Had we used a 5x5 kernel instead we would have had a sweep depth of 5, again making it possible to have the entire neighbourhood in memory.
+Had we used a a kernel with size 5x5 we would need a depth of 5 to simultaneously keep each neighbour in the conveyor, which is why kernel size acts as a paramater before synthesizing, allowing the design to be tailored to one kernel size.
 We now see the benefit of having a sweep depth similar to the kernel dimension, but what about the sweep width, how wide should it be, and why?
 To answer this we must take a deeper look at the conveyor and ALU.
 \clearpage
 \begin{figure}[h!]
     \centering
     \includegraphics[width=10cm]{img/frontier1.png}
-    \caption{The frontier. The three rightmost pixels are shown with its full neighbourhood}
+    \caption{The frontier. The three rightmost pixels are shown with its full neighbourhood, which overlaps with its neighbours.}
     \label{fig:frontier1}
 \end{figure}
 
@@ -98,7 +95,10 @@ To answer this we must take a deeper look at the conveyor and ALU.
 
 \subsubsection{Processing pixels}
 Again, recall from the background section that each output pixel is the result of each neighbour pixel being mapped with its associated kernel and reduced with accumulated value.
-With a 3x3 kernel, 
+With a 3x3 kernel this means we need at least nine cycles per pixel, and with 5x5 we would need 25.
+Ideally we want to output a pixel each cycle, which is why we use a row of ALUs, each consisting of a mapping unit and a reduction unit, allowing us to process several pixels simultaneously.
+Fig \ref{frontier1} shows how the leftmost and rightmost pixels lack the nescessary neighbours, so it makes sense to have as many ALUs as the sweep width, minus the mantle.
+For a 5x5 convolution, the mantle would be of size 2, meaning that.
 
 To explain how pixels are processed we will consider a 3x3 kernel.
 Each pixel that enters the conveyor is part of 9 neighbourhoods, and should be used in 9 mapping operations.

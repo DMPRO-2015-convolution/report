@@ -1,20 +1,61 @@
 \subsection{Convolution engine}
 In this section we will describe the convolution engine which is at the heart of the FPGA architecture.
+We will first describe the convolution engine as a stream processor seen from the outside system, before showing how the convolution engine works on a conceptual basis.
+Lastly we will show how the convolution engine is implemented.
+
+\subsection{The convolution engine as a component}
 A design goal for our system was to reconfigure the FPGA depending on the task, which necessitates synthesizing several versions of our architecture so that the correct architecture may be chosen at run time.
-In order to achive this we had to parametrize our design, allowing us to generate different architectures by simply changing a parameter once.
+In addition to using several architectures, each version is also programmable, allowing the kernel values, map operators and reduce operators to be programmed at runtime.
+In order to achive this we parametrized our design, allowing us to generate different architectures by simply changing a parameter once.
 The parameters available are:
 
-\begin{Description}
+\begin{description}
     \item[Kernel dimensions] \hfill \\
         The most fundamental parameter in our design, the kernel dimension dictates how many pixels we need to calculate a single output pixel.
         This is very fundamental parameter, and we will see how setting the kernel dimension will effect other important sizes in our system as we explore the system.
-    \item[Data input width etc etc] \hfill \\
-        Some words etc
+    \item[Image input width] \hfill \\
+        The width which input image data is presented 
+    \item[Pixel width] \hfill \\
+        The width of each pixel. When image input width and pixel width does not match, for instance with 16 bit input width and 24 bit pixel width, the convolution engine must buffer and translate the input stream 
+    \item[Control input width] \hfill \\
+        As with input data width, the convolution engine must know the width of the incoming control data.
+    \item[Image output width] \hfill \\
+        The data width that the convolution engine should output. As with input, translating widths is nescessary.
 \end{description}
-The very heart of our computer is our custom made architecture implemented on an FPGA.
-In this section we will provide a top down view of our system, introducing how components interface with each others and what their purpose is before we describe their implementation. 
+\\ \\
+By parametrizing the convolution engine we can view it as any other processor module with the following inputs and outputs:
+\\ \\ \\ \\
+\begin{tabular}{ l | l | l }
+\multicolumn{2}{c}{Input}
+    \hline \\
+    Signal & Width\\
+    \hline \\
+    Image data in           & Image input width     & Data stream from camera on row format \\
+    Image data valid        & 1                     & image data input is valid\\
+    Control data in         & Control data width    & Data stream from MCU\\
+    Control data valid      & 1                     & MCU data is valid\\
+    Request image data      & 1                     & Current output data is recieved\\
+    Reset                   & 1                     & Convolution engine should reset
+\end{tabular}
+\\ \\ \\ \\
+\begin{tabular}{ l | l | l}
+    \multicolumn{2}{c}{Output}
+    \hline \\
+    Signal & Width\\
+    \hline \\
+    Image data out          & Image input width     & The processed image data on row format\\
+    Image data valid        & 1                     & Current output data is valid
+\end{tabular}
+\\ \\ \\ \\
+To the outside system the convolution engine is now a module that once programmed operates on a data stream of an image and outputting a processed stream. 
+By using valid signals the outside system can provide data at any pace, and throttle the output by requesting data when the convolution engine indicates that data is ready. 
 
-Modularity and extendibility is a core principle in our design, however in this section we will describe the processor with the minimum viable kernel dimension, 3 x 3.
+\subsection{A conceptual overview}
+In this section we provide a conceptual description of how convolution is performed in our system.
+fig SWEEPS 2 shows, from the perspective of the convolution engine, how an image is being "swept" in a squeegee line fashion.
+By \textit{sweeping} an image we read the image data as column slices. This \textit{Sweep frontier} is shown in the figure as the dark gray area. 
+One of the tasks of the convolution engine is to buffer rows from the input until it has enough rows to feed the \textit{Core} with a data stream, from now on referred to as the swipe frontier.\\
+By letting the convolution unit take care of reordering the data we can now view the core as a module with a swipe frontier as input and a stream of processed pixels as output.
 
 \subsection{Overview}
 The overall design of our convolution processor, named "Daisy", shown in Figure \ref{fig:Convolution} consists of four main modules with the following responsibilities as follows:

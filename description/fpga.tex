@@ -1,3 +1,44 @@
+\section{FPGA}
+\begin{figure}
+    \centering
+    \includegraphics{img/FpgaOverview}
+    \caption{FPGA Overview}
+    \label{fig:FpgaOverview}
+\end{figure}
+
+On the FPGA we must handle an incoming video stream and the configuration data arriving from the MCU before we perform the actual convolution and output the final video stream. In addition, some of the different components run at different clock speeds, thus we need to introduce queues to synchronize data on the boundaries between clock domains.
+
+In Figure \ref{fig:FpgaOverview}, the top components on the FPGA are depicted.
+
+\subsection{EBI}
+As EBI is asynchronous, the incoming data for the FPGA must be synchronized to the processor clock domain before being used by clocked logic in the FPGA.
+This is done by sending the data through a first-in first-out (FIFO) queue immediately after arrival.
+
+After being synchronized, the EBI manager checks the addresses to determine what action to perform. In some cases, the data is resized from 16 to 24 bits and forwarded to the processor. In other cases, the data sets a control bit in the EBI manager which turns on EFM mode for the FPGA.
+
+In EFM mode, EBI is routed to one of the memory chips to allow the MCU to read and write data and the HDMI output module is locked to the very same chip.
+This allows the MCU to paint user interfaces on the screen so that the system can be controlled through buttons.
+Configuration may include loading a new bit file onto the FPGA or setting up a different kernel for the processor.
+
+\subsection{Memory}
+The memory manager handles reading and writing to memory, and swapping the chips used as a double buffer when a frame is finished.
+This includes calculating what addresses to place the arriving data at and what data to read.
+
+In addition, the chip enable (or write enable) signal for the memory chips have to be pulsed in order to save data, which requires write cycle management.
+This consists of a set-up phase and a write phase, giving a duty cycle of \unit[50]{\%} for the chip enable signal.
+
+As stated in Section \ref{subsec:sram}, the memory chips are 16 bits wide, thus data from the processor must be resized from 24 bits to 16 bits before being written to memory.
+Similarly, data read from the memory must be resized back to 24 bits before being sent to HDMI.
+
+\subsection{HDMI}
+Before the data from memory arrives is used by the HDMI module, it passes through a FIFO queue which has two functions:
+\begin{itemize}
+    \item Synchronize the data to the clock domain of the HDMI
+    \item Act as a buffer in case the memory is too slow
+\end{itemize}
+
+That is, we may be able to hide the speed difference between the memory and the HDMI because there is a pause between each frame that the memory can use to catch up with the HDMI data consumption.
+
 \section{Convolution Engine}
 \label{sec:processor}
 In this section we will describe the convolution engine which is at the heart of the FPGA architecture.
@@ -7,7 +48,7 @@ Lastly we will show how the convolution engine is implemented.
 \subsection{The Convolution Engine as a Component}
 A design goal for our system was to reconfigure the FPGA depending on the task, which necessitates synthesizing several versions of our architecture so that the correct architecture may be chosen at run time.
 In addition to using several architectures, each version is also programmable, allowing the kernel values, map operators and reduce operators to be programmed at runtime.
-In order to achive this we parametrized our design, allowing us to generate different architectures by simply changing a parameter once.
+In order to achieve this we parametrized our design, allowing us to generate different architectures by simply changing a parameter once.
 The parameters available are:
 
 \begin{description}

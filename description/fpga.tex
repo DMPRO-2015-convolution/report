@@ -62,7 +62,7 @@ The parameters available are:
     \item[Control Input Width] \hfill \\
         As with input data width, the convolution engine must know the width of the incoming control data.
     \item[Image Output Width] \hfill \\
-        The data width that the convolution engine should output. As with input, translating widths is nescessary.
+        The data width that the convolution engine should output. As with input, translating widths is necessary.
 \end{description}
 
 By parametrizing the convolution engine we can view it as any other processor module with the inputs and outputs shown in Table \ref{tbl:ConvolutionEngineIO}.
@@ -80,7 +80,7 @@ By parametrizing the convolution engine we can view it as any other processor mo
         \\
         &   Control data valid      & 1                     & MCU data is valid
         \\
-        &   Request image data      & 1                     & Current output data is recieved
+        &   Request image data      & 1                     & Current output data is received
         \\
         &   Reset                   & 1                     & Convolution engine should reset
         \\\hline
@@ -120,10 +120,10 @@ The purpose of the conveyor belt is to maintain the \textit{sweep frontier}, con
 The conveyor has several rows of registers, representing the \textit{sweep depth}, each row as wide as a column slice, representing the \textit{sweep width}.
 Figures \ref{fig:frontier1} and \ref{fig:frontier2} show the sweep window for a 3x3 convolution.
 Recall from the background section how the dimensions of the kernel dictates the size of each pixels neighbourhood.
-In \ref{fig:frontier1} we see that the seven middle pixels, marked as gray, have access to their entire neighbourhood.
+In \ref{fig:frontier1} we see that the seven middle pixels, marked as grey, have access to their entire neighbourhood.
 By letting the frontier depth equal the kernel dimension, the middle row will always have access to their whole neighbourhood, explaining the purpose of the sweep depth.
 Had we used a 5x5 kernel instead we would have had a sweep depth of 5, again making it possible to have the entire neighbourhood in memory.
-Had we used a a kernel with size 5x5 we would need a depth of 5 to simultaneously keep each neighbour in the conveyor, which is why kernel size acts as a paramater before synthesizing, allowing the design to be tailored to one kernel size.
+Had we used a kernel with size 5x5 we would need a depth of 5 to simultaneously keep each neighbour in the conveyor, which is why kernel size acts as a parameter before synthesizing, allowing the design to be tailored to one kernel size.
 We now see the benefit of having a sweep depth similar to the kernel dimension, but what about the sweep width, how wide should it be, and why?
 To answer this we must take a deeper look at the conveyor and ALU.
 \clearpage
@@ -145,12 +145,12 @@ To answer this we must take a deeper look at the conveyor and ALU.
 Again, recall from the background section that each output pixel is the result of each neighbour pixel being mapped with its associated kernel and reduced with accumulated value.
 With a 3x3 kernel this means we need at least nine cycles per pixel, and with 5x5 we would need 25.
 Ideally we want to output a pixel each cycle, which is why we use a row of ALUs, each consisting of a mapping unit and a reduction unit, allowing us to process several pixels simultaneously.
-Figure \ref{fig:frontier1} shows how the leftmost and rightmost pixels lack the nescessary neighbours, so it makes sense to have as many ALUs as the sweep width, minus the mantle.
+Figure \ref{fig:frontier1} shows how the leftmost and rightmost pixels lack the necessary neighbours, so it makes sense to have as many ALUs as the sweep width, minus the mantle.
 For a 5x5 convolution, the mantle would be of size 2, meaning that.
 
 To explain how pixels are processed we will consider a 3x3 kernel.
 Each pixel that enters the conveyor is part of 9 neighbourhoods, and should be used in 9 mapping operations.
-Ideally the processor should accept one pixel each clock cycle, and conversively it should have a processed pixel ready each cycle, apart from the border pixels which does not have sufficent neighbours.
+Ideally the processor should accept one pixel each clock cycle, and conversely it should have a processed pixel ready each cycle, apart from the border pixels which does not have sufficient neighbours.
 
 
 A natural frontier width, and the one we use, would be as wide as the square of the kernel dimension, 9 in the case of a 3x3 kernel.
@@ -177,18 +177,18 @@ The overall design of our convolution processor, named "Daisy", shown in Figure 
     \label{fig:Convolution}
 \end{figure}
 
-        The processed input is then stored in a double buffer, allowing the input handler to both recieve data and feed the processor at the same time.
-        As soon as a buffer is filled the input handler indicates that data is available to the processor and outputs data continously until the buffer is empty.
+        The processed input is then stored in a double buffer, allowing the input handler to both receive data and feed the processor at the same time.
+        As soon as a buffer is filled the input handler indicates that data is available to the processor and outputs data continuously until the buffer is empty.
     \item[Processor] \hfill\\
-        The processor recieves a pixel stream from the input handler and outputs convoluted data. It consists of a pixel buffer called the conveyor, a buffer for kernel data, an accumulator which performs the map and reduce operations, and a control module. In addition to providing convoluted data it also indicates that the data is valid.
+        The processor receives a pixel stream from the input handler and outputs convoluted data. It consists of a pixel buffer called the conveyor, a buffer for kernel data, an accumulator which performs the map and reduce operations, and a control module. In addition to providing convoluted data it also indicates that the data is valid.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/processor.png}
-    \caption{Illusration of the processor.}
+    \caption{Illustration of the processor.}
     \label{fig:Convolution}
 \end{figure}
 
-        This is nescessary because not all pixels entering the conveyor has access to their full neighbourhood, so the processor cannot provide valid output every cycle.
+        This is necessary because not all pixels entering the conveyor has access to their full neighbourhood, so the processor cannot provide valid output every cycle.
     \item[Control] \hfill\\
         The control module keeps track of the system state by monitoring the input data stream, and issues control signals according to the state.
         In its initial state the control module is in programming mode. 
@@ -201,7 +201,7 @@ The overall design of our convolution processor, named "Daisy", shown in Figure 
 TODO: This is where the overview should go. The next sections needs to be fleshed out A LOT!
 The content below lacks context because this part is not yet done.
 
-To illustrate how the components work we describe how the first frame of a videostream is processed.
+To illustrate how the components work we describe how the first frame of a video stream is processed.
 \begin{enumerate}
 
     \item In its initial state the control module is in programming mode. It intercepts data from the input handler and fills the kernel buffer and decodes which map and reduction operation should be used
@@ -228,7 +228,7 @@ TODO describe how the input handlers work.
 
 \subsection{Processor}
 
-The processor recieves a data stream from the input handler and performs convolution on it, outputting a stream of convoluted image data.
+The processor receives a data stream from the input handler and performs convolution on it, outputting a stream of convoluted image data.
 The four main components are:
 \begin{description}
     \item[Conveyor] \hfill\\ 
@@ -236,10 +236,10 @@ The four main components are:
     \item[The Kernel Buffer] \hfill\\
         The kernel buffer maintains the kernel data and must provide the correct kernel data for each map operation performed in the accumulators.
     \item[The Accumulator] \hfill\\
-        The accumulator consists of several buffers, each buffer storing the progress of convoluting a pixel.
+        The accumulator consists of several buffers, each buffer storing the progress of convolving a pixel.
         Input to the accumulator is data from each row of the conveyor, along with kernel data from the kernel buffer, and it is up to the accumulator to make sure the correct kernel data and pixel data is mapped, and that the result is reduced with the content of the correct accumulator.
     \item[The Control Unit] \hfill\\
-        In order for the accumulators and pixel conveyor to be in sync a control unit sends control signals periodically, which are then propogated throughout the system.
+        In order for the accumulators and pixel conveyor to be in sync a control unit sends control signals periodically, which are then propagated throughout the system.
 \end{description}
 
 Figure \ref{fig:DaisyView} shows an overview of the four components in the heart of Daisy. 
@@ -251,11 +251,11 @@ Figure \ref{fig:DaisyView} shows an overview of the four components in the heart
 \end{figure}
 
 \subsubsection{The Accumulator}
-Although the accumulator unit is the last unit in the datapath of Daisy we will cover it first since it helps motivate the designs further up in the chain.
+Although the accumulator unit is the last unit in the data path of Daisy we will cover it first since it helps motivate the designs further up in the chain.
 The accumulator actually consists of seven accumulators, hereby referred to as pixel accumulators. Each pixel accumulator corresponds to a pixel in the middle row.
-The leftmost and the rightmost pixel in the middle row has no accumulator associated with it because it lacks three pixels necessary for a full convolution, necessetating the slight overlap in our feed pattern.
+The leftmost and the rightmost pixel in the middle row has no accumulator associated with it because it lacks three pixels necessary for a full convolution, necessitating the slight overlap in our feed pattern.
 In Figure \ref{fig:DaisyView} the input from the conveyor is shown as three wires, one from each row.  
-Each accumulator is responsible to read from the correct row at the correct time, such that it accumulates only the subpixels of the source pixel.\\ \\ \\
+Each accumulator is responsible to read from the correct row at the correct time, such that it accumulates only the sub pixels of the source pixel.\\ \\ \\
 \\
 \begin{tabular}{l*{16}{c}r}
     Time (cycle)        & $T_{0}$ & $T_{1}$ & $T_{2}$ & $T_{2}$ & $T_{4}$  & $T_{5}$ & $T_{6}$ & $T_{7}$ & $T_{8}$ & $T_{9}$ & $T_{10}$ & $T_{11}$ & $T_{12}$ & $T_{13}$ & $T_{14}$\\
@@ -265,9 +265,9 @@ Row 2                   & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 
 Row 3                   & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & \\
 \end{tabular}\\ \\ \\
 We will first focus on the leftmost accumulator starting at time T0 doing the following reads. 
-It first reads three values from Row 3 which corresponds to its southwestern subpixel at $T_{0}$, its southern subpixel at $T_{1}$, and its southeastern subpixel at $T_{2}$, shown as the greyed out cells in row 3.
-At time $T_{3}$ it starts reading from Row 2, reading its western, middle and eastern subpixels at respectively $T_{3}$, $T_{4}$, and $T_{5}$, shown as the greyed out cells in row 2.
-Finally it reads its northwestern, northern and northwestern subpixel at time $T_{6}$ to $T_{8}$ from Row 1.
+It first reads three values from Row 3 which corresponds to its south-western sub pixel at $T_{0}$, its southern sub pixel at $T_{1}$, and its south eastern sub pixel at $T_{2}$, shown as the greyed out cells in row 3.
+At time $T_{3}$ it starts reading from Row 2, reading its western, middle and eastern sub pixels at respectively $T_{3}$, $T_{4}$, and $T_{5}$, shown as the greyed out cells in row 2.
+Finally it reads its north-western, northern and north-western sub pixel at time $T_{6}$ to $T_{8}$ from Row 1.
 What about the second leftmost accumulator then? By following the exact same read pattern, but waiting one cycle allows it to read all its values in the same manner as the leftmost accumulator!
 The second accumulator reads from Row 3 at time $T_{1}$, switches to Row 2 at $T_{4}$ and again to Row 1 from $T_{7}$ to $T_{9}$. 
 In fact, every accumulator starts one cycle later than its left neighbour, meaning every accumulator has accumulated its necessary pixels at different times.

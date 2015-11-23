@@ -251,9 +251,9 @@ Because we used a 0603 footprint for capacitors and resistors. We then had to ch
 \subsection{HDMI connector}
 At the time of routing the HDMI connectors to the fpga, we had no plan to use the HDMI as input for video. Still we made an extra HDMI connector in case one should fail. 
 \subsubsection{GCKLOCK problems on input}
-Because of later problems with the rpi camera we had to look for other input solutions. Unforturnatly the HDMI input clock +/- needs to be connected to G_CKLOCK pins on FPGA. And we had only connected TDMS 0/1/2 +/- to G_CLOCK. Because this wireing is impossible to change afterwards, we opened the HDMI cable and switched the cables internal pins to make it work. This error only exist when using HDMI as input, and therefore we where not aware of this at the early time of pcb design. 
+Because of later problems with the rpi camera we had to look for other input solutions. Unforturnatly the HDMI input clock +/- needs to be connected to G\_CKLOCK pins on FPGA. And we had only connected TDMS 0/1/2 +/- to G\_CLOCK. Because this wireing is impossible to change afterwards, we opened the HDMI cable and switched the cables internal pins to make it work. This error only exist when using HDMI as input, and therefore we where not aware of this at the early time of pcb design. 
 \subsubsection{Data communication between devices}
-The HDMI has also a I2C interface, that it uses to communicate its display data. Such as supported devices, monitor parameters etc. This is not required for HDMI to actually work, but on most computers the HDMI will not output anything unless you force output HDMI signals. To make this job easier we could have added some routing to the I2C cables connectors on the HDMI connector. // link to wiki https://en.wikipedia.org/wiki/Display_Data_Channel.
+The HDMI has also a I2C interface, that it uses to communicate its display data. Such as supported devices, monitor parameters etc. This is not required for HDMI to actually work, but on most computers the HDMI will not output anything unless you force output HDMI signals. To make this job easier we could have added some routing to the I2C cables connectors on the HDMI connector. \cite{wikiddc}
 \subsection{Comments on design faults}
 The amount of design faults on this board is not that many, the few we had was not that difficult to make workarounds for. 
 

@@ -158,6 +158,7 @@ The EFM has spare pins that all are available on the P15 header pins. Pin 28 on 
 \end{table}
 
 \subsection{SRAM}
+\label{subsec:sram}
 The FPGA is connected to two SRAM chips from Alliance Memory, one on bank 1 and another on bank 2.
 They support a data width of 16 bits and have an access time of \unit[10]{ns} \cite{sramdatasheet}, which means we have a maximum throughput of $(\unit[10]{ns})^{-1} = \unit[1,6]{Gbps}$ to each chip.
 This is more than sufficient for our application as can be seen in Table \ref{tab:BitRates}, but we do expect this number to be significantly less due to latencies introduced on the FPGA and by the wires in between.

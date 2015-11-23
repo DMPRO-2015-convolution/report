@@ -1,3 +1,44 @@
+\section{FPGA}
+\begin{figure}
+    \centering
+    \includegraphics{img/FpgaOverview}
+    \caption{FPGA Overview}
+    \label{fig:FpgaOverview}
+\end{figure}
+
+On the FPGA we must handle an incoming video stream and the configuration data arriving from the MCU before we perform the actual convolution and output the final video stream. In addition, some of the different components run at different clock speeds, thus we need to introduce queues to synchronize data on the boundaries between clock domains.
+
+In Figure \ref{fig:FpgaOverview}, the top components on the FPGA are depicted.
+
+\subsection{EBI}
+As EBI is asynchronous, the incoming data for the FPGA must be synchronized to the processor clock domain before being used by clocked logic in the FPGA.
+This is done by sending the data through a first-in first-out (FIFO) queue immediately after arrival.
+
+After being synchronized, the EBI manager checks the addresses to determine what action to perform. In some cases, the data is resized from 16 to 24 bits and forwarded to the processor. In other cases, the data sets a control bit in the EBI manager which turns on EFM mode for the FPGA.
+
+In EFM mode, EBI is routed to one of the memory chips to allow the MCU to read and write data and the HDMI output module is locked to the very same chip.
+This allows the MCU to paint user interfaces on the screen so that the system can be controlled through buttons.
+Configuration may include loading a new bit file onto the FPGA or setting up a different kernel for the processor.
+
+\subsection{Memory}
+The memory manager handles reading and writing to memory, and swapping the chips used as a double buffer when a frame is finished.
+This includes calculating what addresses to place the arriving data at and what data to read.
+
+In addition, the chip enable (or write enable) signal for the memory chips have to be pulsed in order to save data, which requires write cycle management.
+This consists of a set-up phase and a write phase, giving a duty cycle of \unit[50]{\%} for the chip enable signal.
+
+As stated in Section \ref{subsec:sram}, the memory chips are 16 bits wide, thus data from the processor must be resized from 24 bits to 16 bits before being written to memory.
+Similarly, data read from the memory must be resized back to 24 bits before being sent to HDMI.
+
+\subsection{HDMI}
+Before the data from memory arrives is used by the HDMI module, it passes through a FIFO queue which has two functions:
+\begin{itemize}
+    \item Synchronize the data to the clock domain of the HDMI
+    \item Act as a buffer in case the memory is too slow
+\end{itemize}
+
+That is, we may be able to hide the speed difference between the memory and the HDMI because there is a pause between each frame that the memory can use to catch up with the HDMI data consumption.
+
 \section{Convolution Engine}
 \label{sec:processor}
 In this section we will describe the convolution engine which is at the heart of the FPGA architecture.
@@ -6,7 +47,7 @@ We will first describe the convolution engine as a stream processor seen from th
 \subsection{The Convolution Engine as a Component}
 A design goal for our system was to reconfigure the FPGA depending on the task, which necessitates synthesizing several versions of our architecture so that the correct architecture may be chosen at run time.
 In addition to using several architectures, each version is also programmable, allowing the kernel values, map operators and reduce operators to be programmed at runtime.
-In order to achive this we parametrized our design, allowing us to generate different architectures by simply changing a parameter once.
+In order to achieve this we parametrized our design, allowing us to generate different architectures by simply changing a parameter once.
 The parameters available are:
 
 \begin{description}
@@ -20,7 +61,7 @@ The parameters available are:
     \item[Control Input Width] \hfill \\
         As with input data width, the convolution engine must know the width of the incoming control data.
     \item[Image Output Width] \hfill \\
-        The data width that the convolution engine should output. As with input, translating widths is nescessary.
+        The data width that the convolution engine should output. As with input, translating widths is necessary.
 \end{description}
 
 By parametrizing the convolution engine we can view it as any other processor module with the inputs and outputs shown in Table \ref{tbl:ConvolutionEngineIO}.
@@ -38,7 +79,7 @@ By parametrizing the convolution engine we can view it as any other processor mo
         \\
         &   Control data valid      & 1                     & MCU data is valid
         \\
-        &   Request image data      & 1                     & Current output data is recieved
+        &   Request image data      & 1                     & Current output data is received
         \\
         &   Reset                   & 1                     & Convolution engine should reset
         \\\hline
@@ -165,12 +206,12 @@ There two major concerns for the accumulator unit is:
 Again, recall from the background section that each output pixel is the result of each neighbour pixel being mapped with its associated kernel and reduced with accumulated value.
 With a 3x3 kernel this means we need at least nine cycles per pixel, and with 5x5 we would need 25.
 Ideally we want to output a pixel each cycle, which is why we use a row of ALUs, each consisting of a mapping unit and a reduction unit, allowing us to process several pixels simultaneously.
-Figure \ref{fig:frontier1} shows how the leftmost and rightmost pixels lack the nescessary neighbours, so it makes sense to have as many ALUs as the sweep width, minus the mantle.
+Figure \ref{fig:frontier1} shows how the leftmost and rightmost pixels lack the necessary neighbours, so it makes sense to have as many ALUs as the sweep width, minus the mantle.
 For a 5x5 convolution, the mantle would be of size 2, meaning that.
 
 To explain how pixels are processed we will consider a 3x3 kernel.
 Each pixel that enters the conveyor is part of 9 neighbourhoods, and should be used in 9 mapping operations.
-Ideally the processor should accept one pixel each clock cycle, and conversively it should have a processed pixel ready each cycle, apart from the border pixels which does not have sufficent neighbours.
+Ideally the processor should accept one pixel each clock cycle, and conversely it should have a processed pixel ready each cycle, apart from the border pixels which does not have sufficient neighbours.
 
 
 A natural frontier width, and the one we use, would be as wide as the square of the kernel dimension, 9 in the case of a 3x3 kernel.
@@ -184,7 +225,41 @@ By accepting a new pixel in the conveyor every cycle we can now only keep a pixe
     \label{fig:Convolution}
 \end{figure}
 
+<<<<<<< HEAD
 To illustrate how the components work we describe how the first frame of a videostream is processed.
+=======
+\begin{description}
+    \item[Input Handler] \hfill\\ 
+        The interface between the data stream and our processor is responsible for gathering data from a wide variety of input streams of different bandwidths and speeds and present this data to the processor as a continuous data stream with a fixed width.
+        In order to do this the input handler must be able to translate from any input width to the desired output width.
+
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/input_handler.png}
+    \caption{Illustration of the input handler.}
+    \label{fig:Convolution}
+\end{figure}
+
+        The processed input is then stored in a double buffer, allowing the input handler to both receive data and feed the processor at the same time.
+        As soon as a buffer is filled the input handler indicates that data is available to the processor and outputs data continuously until the buffer is empty.
+    \item[Processor] \hfill\\
+        The processor receives a pixel stream from the input handler and outputs convoluted data. It consists of a pixel buffer called the conveyor, a buffer for kernel data, an accumulator which performs the map and reduce operations, and a control module. In addition to providing convoluted data it also indicates that the data is valid.
+
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/processor.png}
+    \caption{Illustration of the processor.}
+    \label{fig:Convolution}
+\end{figure}
+
+        This is necessary because not all pixels entering the conveyor has access to their full neighbourhood, so the processor cannot provide valid output every cycle.
+    \item[Control] \hfill\\
+        The control module keeps track of the system state by monitoring the input data stream, and issues control signals according to the state.
+        In its initial state the control module is in programming mode. 
+        In this state the control module makes sure the initial instructions are dispatched to the correct modules before it enters data mode.
+        When in data mode the controller keeps track of the data stream from the input handler, and uses this along with the valid signal from the processor to indicate to the output handler whether the output is valid or not.
+    \item[Memory Control] \hfill\\
+        Processed data is fed to one of the two SRAM chips serving as frame buffer. The output handler keeps track of which SRAM chip should be written to, and at which address.
+\end{description}
+
 \begin{enumerate}
 
     \item In its initial state the control module is in programming mode. It intercepts data from the input handler and fills the kernel buffer and decodes which map and reduction operation should be used
@@ -211,7 +286,7 @@ To illustrate how the components work we describe how the first frame of a video
 
 \subsection{Processor}
 
-The processor recieves a data stream from the input handler and performs convolution on it, outputting a stream of convoluted image data.
+The processor receives a data stream from the input handler and performs convolution on it, outputting a stream of convoluted image data.
 The four main components are:
 \begin{description}
     \item[Conveyor] \hfill\\ 
@@ -219,17 +294,17 @@ The four main components are:
     \item[The Kernel Buffer] \hfill\\
         The kernel buffer maintains the kernel data and must provide the correct kernel data for each map operation performed in the accumulators.
     \item[The Accumulator] \hfill\\
-        The accumulator consists of several buffers, each buffer storing the progress of convoluting a pixel.
+        The accumulator consists of several buffers, each buffer storing the progress of convolving a pixel.
         Input to the accumulator is data from each row of the conveyor, along with kernel data from the kernel buffer, and it is up to the accumulator to make sure the correct kernel data and pixel data is mapped, and that the result is reduced with the content of the correct accumulator.
     \item[The Control Unit] \hfill\\
-        In order for the accumulators and pixel conveyor to be in sync a control unit sends control signals periodically, which are then propogated throughout the system.
+        In order for the accumulators and pixel conveyor to be in sync a control unit sends control signals periodically, which are then propagated throughout the system.
 \end{description}
 
 % Figure \ref{fig:DaisyView} shows an overview of the four components in the heart of Daisy. 
 
 
 \subsubsection{The Accumulator}
-Although the accumulator unit is the last unit in the datapath of Daisy we will cover it first since it helps motivate the designs further up in the chain.
+Although the accumulator unit is the last unit in the data path of Daisy we will cover it first since it helps motivate the designs further up in the chain.
 The accumulator actually consists of seven accumulators, hereby referred to as pixel accumulators. Each pixel accumulator corresponds to a pixel in the middle row.
 The leftmost and the rightmost pixel in the middle row has no accumulator associated with it because it lacks three pixels necessary for a full convolution, necessetating the slight overlap in our feed pattern.
 % In Figure \ref{fig:DaisyView} the input from the conveyor is shown as three wires, one from each row.  
@@ -243,9 +318,9 @@ Row 2                   & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 
 Row 3                   & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & \\
 \end{tabular}\\ \\ \\
 We will first focus on the leftmost accumulator starting at time T0 doing the following reads. 
-It first reads three values from Row 3 which corresponds to its southwestern subpixel at $T_{0}$, its southern subpixel at $T_{1}$, and its southeastern subpixel at $T_{2}$, shown as the greyed out cells in row 3.
-At time $T_{3}$ it starts reading from Row 2, reading its western, middle and eastern subpixels at respectively $T_{3}$, $T_{4}$, and $T_{5}$, shown as the greyed out cells in row 2.
-Finally it reads its northwestern, northern and northwestern subpixel at time $T_{6}$ to $T_{8}$ from Row 1.
+It first reads three values from Row 3 which corresponds to its south-western sub pixel at $T_{0}$, its southern sub pixel at $T_{1}$, and its south eastern sub pixel at $T_{2}$, shown as the greyed out cells in row 3.
+At time $T_{3}$ it starts reading from Row 2, reading its western, middle and eastern sub pixels at respectively $T_{3}$, $T_{4}$, and $T_{5}$, shown as the greyed out cells in row 2.
+Finally it reads its north-western, northern and north-western sub pixel at time $T_{6}$ to $T_{8}$ from Row 1.
 What about the second leftmost accumulator then? By following the exact same read pattern, but waiting one cycle allows it to read all its values in the same manner as the leftmost accumulator!
 The second accumulator reads from Row 3 at time $T_{1}$, switches to Row 2 at $T_{4}$ and again to Row 1 from $T_{7}$ to $T_{9}$. 
 In fact, every accumulator starts one cycle later than its left neighbour, meaning every accumulator has accumulated its necessary pixels at different times.

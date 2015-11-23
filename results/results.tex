@@ -22,7 +22,6 @@ As a workaround, a final don't care value was sent over the bus to push the fina
 
 \subsubsection{SRAM throughput} \label{subsec:SramThroughput}
 During SRAM testing, several clock rates were tried to determine the speed achievable to SRAM.
-$\unit[40]{MHz}$ proved to be working, which gives a throughput of $\unit[40]{MHz}\cdot\unit[16]{bit} = \unit[640]{Mbps}$ for reading.
-During writing, this number must be halved as a write requires two cycles (one for address set-up and one for writing), giving a throughput for writing of $\unit[320]{MHz}$.
-
-\emph{TODO:} Double check the max speed. I. e. try 50MHz again. Perhaps something in between.
+After some binary search through the frequency spectrum, $\unit[49]{MHz}$ proved to be working.
+This gives a throughput of $\unit[49]{MHz}\cdot\unit[16]{bit} = \unit[784]{Mbps}$ for reading.
+During writing however, this number must be halved as a write requires two cycles (one for address set-up and one for writing), giving a throughput for writing of $\unit[392]{Mbps}$.

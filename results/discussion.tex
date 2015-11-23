@@ -20,4 +20,4 @@ When it comes to SRAM, the throughput measured in section \ref{subsec:SramThroug
 Even though the chip has an access time of \unit[10]{ns}, writing requires a write pulse width of minimum \unit[8]{ns}, and since we have a duty cycle of \unit[50]{\%}, the lower bound on a write is \unit[16]{ns}.
 Thus the specifications for the SRAM chips guarantees a write speed of $(2\cdot\unit[8]{ns})^{-1} \cdot \unit[16]{bits} / 2 = \unit[500]{Mbps}$.
 
-Our speed being lower may be due to latencies in the FPGA as the signals have to propagate from the registers, through logic and some multiplexers before reaching the bus and finally the SRAM chips them selves.
+Our speed being lower may be due to latencies in the FPGA as the signals have to propagate from the registers, through logic and some multiplexers before reaching the bus and finally the SRAM chips them selves. In addition, more experimenting with the write and read cycles could probably have improved the clock rate slightly giving a slightly higher throughput.

@@ -3,7 +3,7 @@
 The MCU is used as an I/O-processor, reading from a MicroSD card, configuring the FPGA, and feeding configuration and image data to the processor over an EBI bus interface. An EFM32GG is used as the MCU for the system, providing 128kB RAM, 1024kB internal flash memory and a range of modules including EBI, USART, GPIO and DMA. The board has headers connected to unused pins on the MCU, making it possible for the MCU to communicate with other devices. Figure \ref{fig:mcuOverview} shows how the components are connected.
 
 \begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/mcu_overview.png}
+    \includegraphics[width=\linewidth]{img/mcu_overview.pdf}
     \caption{Overview of the components connected to the MCU}
     \label{fig:mcuOverview}
 \end{figure}
@@ -56,14 +56,7 @@ If the MCU is unable to read a configuration file and thus unable to flash the F
 Being able to change the convolution kernels while the system is running is considered an important functionality. To support this, the MCU is able to read convolution kernels from MicrodSD or the internal flash memory. 
 In order to make the process of changing kernels for the system, the kernel files has a simple file structure. The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits us to a maximum size of 15x15 kernels. The rest of the bytes in the files are the elements of the kernel.
 
-%\clearpage % TODO: find a better way to put the wrapfigure on one page
 \subsection{External Bus Interface}
-%\begin{wrapfigure}[14]{r}{6cm}
-%    \centering
-%    \includegraphics[]{img/EbiAddressSpace.pdf}
-%    \caption{EBI Address Space}
-%    \label{fig:EbiAddressSpace}
-%\end{wrapfigure}
 The FPGA and the MCU is connected through an EBI bus.
 This interface is supported natively by the MCU and can therefore be handled by its built-in direct memory access (DMA) unit, which hopefully makes streaming video from the MCU faster, more reliable and easier to implement.
 
@@ -90,9 +83,13 @@ Even though the width of the EBI bus is 20-bit, only 3 addresses are used when c
 
 
 \subsubsection{Processor Configuration}
-To configure the processor with new kernel, map and reduce values, the MCU needs to reset it. After the processor has been reset, it expects the configuration values as a data stream. The MCU then sends all of the configuration values to address 0. When the processor is fully configured, the MCU can be set to send an image stream or just wait for input.
+To configure the processor with new kernel, map and reduce values, the MCU needs to reset it. After the processor has been reset, it expects the configuration values as a data stream. The MCU then sends all of the configuration values to address 0. When the processor is fully configured, the MCU can be set to send an image stream or just wait for input. The procedure for configuring the processor is described in Figure \ref{fig:processorConfiguration}.
 
-%TODO Proper details of input stream.
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/processor_configuration.pdf}
+    \caption{Processor configuration procedure}
+    \label{fig:processorConfiguration}
+\end{figure}
 
 \subsubsection{SRAM Access}
 Instead of sending everything as a data stream to the processor, the MCU can access the image memory in SRAM. This makes it possible for the MCU to only update a part of the screen, instead of updating the whole screen every time it needs to be refreshed.
@@ -102,6 +99,13 @@ The EBI bank for accessing SRAM can then be used to read and write from memory.
 
 Writing 0 to address 1 on the processor bank will disable the EBI mode override, and resume normal operation of the processor.
 
+Figure \ref{fig:sramAccess} shows the MCU writing and reading from SRAM.
+
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/sram_access.pdf}
+    \caption{SRAM access over EBI}
+    \label{fig:sramAccess}
+\end{figure}
 
 \subsection{User Interface}
 The system has a simple graphical user interface which is displayed on the screen. The interface has menus where it is possible to change different configuration values for the processor, such as kernels, map and reduce operators and FPGA configuration. Controlling the user interface is done with buttons, making it easier to use and removing the need for being controlled by an external computer.

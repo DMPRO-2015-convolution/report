@@ -1,5 +1,5 @@
 \section{Hardware}
-This chapter targets the 1\textsuperscript{st} revision of Camvolution board layout. The board is intended for use of camera input and to display a convoluted output to one of the HDMI connectors. It has several redundant headers, in case the 1\textsuperscript{st} revision should have any faults. The hardware that relates to the Xilinx Spartan 6 FPGA, and Giant Gecko 990 EFM is not covered here.
+This chapter targets the pcb design and the design specifications. The board is intended for use of camera input and to display a convoluted output to one of the HDMI connectors. It has several redundant headers, in case the 1\textsuperscript{st} revision should have any faults. The hardware that relates to the Xilinx Spartan 6 FPGA, and Giant Gecko 990 EFM is not covered here.
 
 \emph{TODO:} Mention and add appendix with schematics.
 
@@ -11,13 +11,7 @@ This chapter targets the 1\textsuperscript{st} revision of Camvolution board lay
 \subsection{Features}
 \begin{itemize}
     \item Xilinx Spartan 6 FPGA
-        \begin{itemize}
-            \item Target control
-        \end{itemize}
     \item Giant Gecko 990 EFM
-        \begin{itemize}
-            \item Board Controller
-        \end{itemize}
     \item Connectors
         \begin{itemize}
             \item HDMI I/O
@@ -51,12 +45,9 @@ The board is powered by a MiniUSB connector, with two possible options for power
 
 The 5V is regulated with a 3.3V LDO regulator, which gives power to most of the board. This 3.3V is also connected to a 1.2V LDO regulator, that powers a minimum required power pins on the Xilinx Spartan 6 FPGA. 
 
-\subsection{Measuring the current consumption}
-There is no onboard solutions for measuring the current consumption, this must be done externally if required. 
-
 \subsection{Clock Generation}
 \subsubsection{FPGA Oscillator}The oscillator is connected to an enable signal on the EFM32 pin PF12. To enable the 120MHz oscillator PF12 must be set to output and driven high. The oscillator enable pin is also connected to an external input and can be set high by connecting this pin to VCC. The easiest way of enabling the oscillator is to add a jumper on the FPGA\_OSC\_EN header.
-\newline
+
 \subsubsection{EFM External Crystal}
 The EFM has internal and one external clock. The external clock source is 48MHz and can be set by using the guide from the EFM, on how to enable external clock source. 
 \subsection{Connectors}
@@ -244,3 +235,25 @@ The FPGA and the EFM is connected with a high speed parallel bus. 20 addressable
 \end{figure}
 
 There has been a change in the layout, so the EBI\_WEn pin is connnected to U10 instead of J6.
+
+
+\section{Design faults}
+In this 1\textsuperscript{}st revision fo the pcb, we made a few design faults that we had to make small hacks to fix. 
+\subsection{Voltage regulator}
+Our first encounter was the voltage regulator that was connected to ground, but through a 100 ohm resistor and a capacitor. This forced the voltage output up to 4.15v and may have bricked our fpga that has a voltage maximum at 3.95v.
+The reason for this flaw was a failure to read the full specs of the datasheet.
+\subsection{Memory card}
+After mounting the SdCard-connector we found that all the pinouts on the sdcard was inverted. The easiest solution was to the turn the SdCard-connector 180 degrees and mount part of it outside the board. This was an acceptable fix for the mcu team. 
+\subsection{MCU clock48mhz}
+There was a fail in the design of the 48mhz external clock pads for the MCU, this was due to failure of wiring the pads to the right pins on the external crystal. To fix this we bought a new type of crystall, that had a smaller surface, and only two pins. This flaw could have been avoided if we had printed out the pcb board on a A4 sheet, and tested the component fit on the pcb. Unfortunatly we did not have the components at the time of ordering the pcb.
+\subsection{Decoupling Capacitors}
+Because we used a 0603 footprint for capacitors and resistors. We then had to change to a bigger 0805 or 1208 footprint when mounting a capacitor larger then 10uF. This is because capasitors at this many uF does not exist in 0603 footprint. In the heat of the last few days, the pcb team forgot about this and we do not have 100uF capacitors decoupling on the pcb.
+\subsection{HDMI connector}
+At the time of routing the HDMI connectors to the fpga, we had no plan to use the HDMI as input for video. Still we made an extra HDMI connector in case one should fail. 
+\subsubsection{GCKLOCK problems on input}
+Because of later problems with the rpi camera we had to look for other input solutions. Unforturnatly the HDMI input clock +/- needs to be connected to G_CKLOCK pins on FPGA. And we had only connected TDMS 0/1/2 +/- to G_CLOCK. Because this wireing is impossible to change afterwards, we opened the HDMI cable and switched the cables internal pins to make it work. This error only exist when using HDMI as input, and therefore we where not aware of this at the early time of pcb design. 
+\subsubsection{Data communication between devices}
+The HDMI has also a I2C interface, that it uses to communicate its display data. Such as supported devices, monitor parameters etc. This is not required for HDMI to actually work, but on most computers the HDMI will not output anything unless you force output HDMI signals. To make this job easier we could have added some routing to the I2C cables connectors on the HDMI connector. // link to wiki https://en.wikipedia.org/wiki/Display_Data_Channel.
+\subsection{Comments on design faults}
+The amount of design faults on this board is not that many, the few we had was not that difficult to make workarounds for. 
+

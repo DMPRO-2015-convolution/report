@@ -7,7 +7,7 @@ As our PCB includes two HDMI connectors, it is possible to do this.
 Another way is getting the image data from the MCU or directly from the camera through the FPC connector, do convolution and then send the result as HDMI output.
 
 \subsection{Transition-Minimized Differential Signaling}
-Transition-Minimized Differential Signaling(TMDS) is a standard used for transmitting video data over HDMI.
+Transition-Minimized Differential Signaling (TMDS) is a standard used for transmitting video data over HDMI.
 HDMI uses it at the physical layer, and our implementation uses the native TMDS I/O interface that is featured by the Spartan-6 FPGAs.
 Four channels of serial data establish the HDMI video transmission.
 It has three channels for the RBG colour information and one for the pixel data rate clock.

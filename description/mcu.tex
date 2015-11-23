@@ -1,12 +1,19 @@
 \section{MCU}
 
-The MCU is used as an I/O-processor, reading from a MicroSD card, configuring the FPGA, and feeding kernel and image data to the FPGA over an EBI bus interface. An EFM32GG is used as the MCU for the system, providing 128kB RAM, 1024kB internal flash memory and a range of modules including EBI, USART, GPIO and DMA. The board has headers connected to unused pins on the MCU, making it possible for the MCU to communicate with other devices. Figure \ref{fig:mcuOverview} shows how the components are connected.
+The MCU is used as an I/O-processor, reading from a MicroSD card, configuring the FPGA, and feeding configuration and image data to the processor over an EBI bus interface. An EFM32GG is used as the MCU for the system, providing 128kB RAM, 1024kB internal flash memory and a range of modules including EBI, USART, GPIO and DMA. The board has headers connected to unused pins on the MCU, making it possible for the MCU to communicate with other devices. Figure \ref{fig:mcuOverview} shows how the components are connected.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/mcu_overview.png}
     \caption{Overview of the components connected to the MCU}
     \label{fig:mcuOverview}
 \end{figure}
+
+\subsection{Configuration}
+In this section there are two separate forms of configuration. 
+\begin{itemize}
+	\item Configuration of the FPGA means configuring the logic on the chip by resetting it and programming it with a binary configuration file.
+	\item Configuration of the processor means configuring the processor that is implemented on the FPGA with kernels, map operators and reduce operators.
+\end{itemize}
 
 \subsection{Storage}
 Due to the limited size of the MCU non-volatile memory not exceeding 1024kB, an additional larger source of data is necessary for storing files such as images and configuration files for the FPGA. A MicroSD card is used for this storage, as it gives the MCU an external storage of up to 32GB and lets the system operate independently without being connected to an external computer.
@@ -32,7 +39,14 @@ The folder structure on the MicroSD card is shown in Table \ref{microsd_folder}.
 
 
 \subsection{FPGA Configuration}
-When the system is powered up the FPGA will not contain a configuration. To be able to use the FPGA properly, the MCU has to program it with one of the binfiles from the storage. Pins between the MCU and the FPGA are connected according to Slave Serial as described in Spartan 6 Configuration User Guide\cite{ug380} page 28. This configuration scheme relies on sending a binfile as a serial data stream using a clk pin and a single data pin. The MCU is able to reset the configuration of the FPGA at any time by setting the program pin on the FPGA low. Configuration status pins set by the FPGA informs the MCU if it is ready to be programmed, if an error occurred while programming or if the FPGA has successfully programmed.
+When the system is powered up the FPGA will not contain a configuration. To be able to use the FPGA properly, the MCU has to program it with one of the binfiles from the storage. Pins between the MCU and the FPGA are connected according to Slave Serial as described in Spartan 6 Configuration User Guide\cite{ug380} page 28. This configuration scheme relies on sending a binfile as a serial data stream using a clk pin and a single data pin. The MCU is able to reset the configuration of the FPGA at any time by setting the program pin on the FPGA low. Configuration status pins set by the FPGA informs the MCU if it is ready to be programmed, if an error occurred while programming or if the FPGA has successfully programmed. Figure \ref{fig:fpgaConfiguration} shows the FPGA configuration procedure. 
+
+
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/fpga_configuration.pdf}
+    \caption{FPGA configuration procedure}
+    \label{fig:fpgaConfiguration}
+\end{figure}
 
 The FPGA can also be reprogrammed later. For example when using kernels of different sizes, a configuration optimized for a specific size can be configured on the FPGA.
 
@@ -40,9 +54,9 @@ If the MCU is unable to read a configuration file and thus unable to flash the F
 
 \subsection{Kernels}
 Being able to change the convolution kernels while the system is running is considered an important functionality. To support this, the MCU is able to read convolution kernels from MicrodSD or the internal flash memory. 
-In order to make the process of changing kernels for the system, the kernel files has a simple file structure. The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits us to a maximum size of 15x15 kernels. The next byte is the divisor, which is used for averaging filters. The rest of the bytes in the files are the elements of the kernel.
+In order to make the process of changing kernels for the system, the kernel files has a simple file structure. The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits us to a maximum size of 15x15 kernels. The rest of the bytes in the files are the elements of the kernel.
 
-\clearpage % TODO: find a better way to put the wrapfigure on one page
+%\clearpage % TODO: find a better way to put the wrapfigure on one page
 \subsection{External Bus Interface}
 %\begin{wrapfigure}[14]{r}{6cm}
 %    \centering

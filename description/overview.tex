@@ -1,33 +1,42 @@
 \section{System Overview}
 \input{description/definitions}
-As stated in the requirements, the system should handle streaming video from a camera, perform convolution and be able to provide the result as an output stream.
-The convolution is to be done on the FPGA using a custom processor implementation named \textit{Daisy}, described in section \ref{sec:processor}.
-To make the FPGA as simple as possible, the camera is connected to and controlled by the MCU, and the video is passed to the convolution processor in a suitable format over an EBI bus.
 
-Furthermore, as HDMI output is not available on the MCU and the bus between the MCU and FPGA is already assumed to be a bottleneck, the HDMI output is placed on the FPGA.
-
-Figure \ref{fig:systemArchitecture} displays the overall system architecture.
-
-\begin{figure}
-    \includegraphics{img/SystemArchitecture.pdf}
-    \caption{System Architecture}
-    \label{fig:systemArchitecture}
+\begin{figure}[h]
+    \centering
+    \includegraphics{img/SystemOverview.pdf}
+    \caption{System Overview}
+    \label{fig:SystemOverview}
 \end{figure}
 
+As stated in the introduction, we want our system to perform convolution on a live video stream.
+This is visualized in Figure \ref{fig:SystemOverview}.
+The video stream flows into our system from an external source, preferably a camera as depicted in the figure.
+Then our system performs the convolution and passes the image on to an external display, in this case a screen.
+As stated in the requirements, the system should handle streaming video from a camera, perform convolution and be able to provide the result as an output stream.
 
+\subsection{Implementation}
+The convolution is to be done on the FPGA using a custom processor implementation named \textit{Daisy}, described in section \ref{sec:processor}.
+First of all, this satisfies non-function requirement NFR1, secondly this allows us to do hardware accelerated convolution which will hopefully make it possible to achieve the speeds we have in mind.
+Thirdly, this demonstrates how an FPGA can be used as reconfigurable hardware to accelerate application specific tasks.
 
-\subsection{Data Flow}
-Notice how data flows from left to right in figure \ref{fig:systemArchitecture}.
-The data we are going to process is first created by the camera and sent to the MCU.
-The MCU may have to do some conversion should the camera provide the image in a format unsuitable for the processor, but will mainly be forwarding the data directly to the FPGA.
-However, interfacing with the camera is assumed to be simpler to do from the MCU than from the FPGA as libraries most likely already exists.
+This reconfiguration is going to be done by our MCU which will fetch the configuration from an SD card so that the configuration can be easily exchanged for a different one to harvest the advantages of reconfigurable hardware.
+In addition to configuring the FPGA, the MCU should also handle the input stream arriving from a camera or another external video source.
+As convolution is done on the FPGA, the MCU should forward the video stream to the FPGA and possibly perform some preprocessing should the video format from the camera be unsuitable for our core on the FPGA.
 
-On the FPGA, the data is received by an EBI controller which takes care of the protocol used on the bus and forwards data to the processor.
-When data arrives at the processor, the convolution starts and the output is written to SRAM.
+Connected to the FPGA is also some extra memory as the internal memory on the FPGA is limited in size.
+This memory in supposed to work as a buffer to make the system more tolerable to variable data bit rates and to reduce the chance of synchronization issues as the video stream may have to cross clock domain boundaries.
 
-The SRAM is temporary storage to avoid synchronization issues between the FPGA and the HDMI controller.
-Synchronization at this point would require the rest of the system to always be able to provide data at the exact rate provided by HDMI and was considered to be too risky.
+As HDMI output is not available on the MCU and the bus between the MCU and FPGA is already assumed to be a bottleneck, the HDMI output is placed on the FPGA.
+This the final data flow through the system can be seen in Figure \ref{fig:VideoDataFlow}.
 
+Figure \ref{fig:systemArchitecture} displays the overall data flow between the components in the system.
+Notice that most of the data flows from the left to the right. Video arrives through the camera and flows through the system all the way to the HDMI output, FPGA configurations flow from the SD card to the FPGA through the MCU on configuration.
+
+\begin{figure}
+    \includegraphics{img/VideoDataFlow}
+    \caption{Video Data Flow}
+    \label{fig:VideoDataFlow}
+\end{figure}
 
 \subsection{Backup Solutions} \label{subsec:RiskAssessment}
 During the project, a risk assessment was done to find and reduce the risk of failure.

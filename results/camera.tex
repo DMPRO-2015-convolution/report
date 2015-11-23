@@ -1,0 +1,24 @@
+\subsection{Camera Input}
+\label{sec:camera_discussion}
+In the early stages of the project,
+we looked at various camera modules online and tried to assess how they would work in our system.
+Some modules were very simple, and some had many features.
+The PiCamera was the most feature-complete module we looked at.
+We looked into the camera control protocol for the PiCamera,
+and found \textit{some} information about it,
+like the open source C and Python camera control libraries for the Raspberry Pi
+and the pinouts for the ribbon connector.
+From what we found, we interpreted that it shouldn't be too hard to implement camera control with the MCU or FPGA.
+
+When the time came to make a choice for the camera module and order it,
+the PiCamera was the only option that was available from the retailers we were using,
+so the choice was easy.
+
+Had we looked for more information about the PiCamera online before this,
+we would have perhaps found the Raspberry Pi engineer recommending not using the PiCamera for an FPGA project\footnote{\url{https://www.raspberrypi.org/forums/viewtopic.php?t=119977&p=812191}} or the unclaimed \$1000 bounty for an open-source driver for the PiCamera\footnote{\url{https://parallella.org/forums/viewtopic.php?f=10&t=2514}}.
+
+The backup solution presented in \ref{subsec:RiskAssessment} where input from the camera is provided through HDMI directly to the FPGA might have been a better option from the start.
+Our decision to send the data through the MCU on its way to the FPGA was based on the wrong assumptions;
+It was rather hard to find a camera module that interfaced easily with the MCU.
+
+

@@ -2,16 +2,16 @@
 Through the times video has been encoded in a variety of formats, each with its advantages and drawbacks.
 In our project, we need to find a balance between quality, size and performance that maximizes our throughput without sacrificing too much image quality.
 
-A common encoding for images is to encode the pixels in a 2-dimensional array in a row-major order, or in other words as an array of scanlines.
+A common encoding for images is to encode the pixels in a two-dimensional array in a row-major order, in other words as an array of scanlines.
 
 \subsection{Resolution}
 The number of pixels in each scanline and the number of scanlines, more commonly referred to as the width and height of the image, determines the size of each pixel on the screen.
 
-Too few pixels results in an image with visible pixel, thus of poor quality.
-Too many pixels gives a huge performance penalty as higher resolutions require more storage space and therefore also more throughput.
+Too few pixels results in a "pixelated" image where the pixels are distinct.
+Too many pixels gives a huge performance penalty as higher resolutions require more storage space and throughput.
 
-\subsection{Colors}
-Each element stored must provide the color of the pixel it represents.
+\subsection{Colours}
+Each element stored must provide the colour of the pixel it represents.
 
 \subsubsection{Separate Component}
 One way of achieving this goal is to separate the color into three components and store each individually.

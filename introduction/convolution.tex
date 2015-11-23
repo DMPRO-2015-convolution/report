@@ -1,5 +1,5 @@
 \section{Convolution}
-\begin{figure}
+\begin{figure}[h]
     \centering
     \begin{subfigure}{5cm}
         \centering
@@ -12,10 +12,11 @@
         \includegraphics[width=4.5cm]{img/LenaProcessed}
         \caption{After sharpening}
     \end{subfigure}
-    \caption{Lena test image}
+    \caption{Sharpening performed with convolution on \textit{Lena} test image}
     \label{fig:Lena}
 \end{figure}
-\begin{figure}
+
+\begin{figure}[h]
     \centering
     \includegraphics{img/BasicConvolution}
     \caption{Basic convolution in image processing}
@@ -23,9 +24,10 @@
 \end{figure}
 
 Convolution is a mathematical operation that can be applied to images or other signals in one or multiple dimensions.
-This is commonly used by image processing software to produce blur, edge detect, sharpening filters and more.
+This is commonly used by image processing software to perform blurring, edge detection, sharpening and more.
 
 An example of the result produced by a sharpening filter implemented with convolution can be seen in figure \ref{fig:Lena}.
 The convolution itself requires two inputs, the original image and a \textit{convolution kernel matrix}.
 In the case of image processing, the kernel defines what kind of filter is applied.
 The inputs and outputs of convolution when used for image processing is illustrated in figure \ref{fig:BasicConvolution}.
+

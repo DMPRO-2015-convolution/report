@@ -1,56 +1,85 @@
-\clearpage
-\section{Video}
-\subsection{Throughput}
-For a video feed of resolution $W*H$, $B$ bits per pixel and $F$ frames per second the required bandwidth is given by the product of the terms
-\[
-    H * W * B * F
-\]
+\section{Video Input}
+After some consideration it was decided that the \textit{Raspberry Pi Camera Board}\footnote{\url{https://www.raspberrypi.org/products/camera-module/}} (PiCamera) would be used as the camera module for the system.
+The circumstances leading to this choice are discussed in section \ref{sec:camera_discussion}.
+In addition to the camera, a backup scheme with video from the SD card controlled by the MCU was also planned.
+Lastly, a second HDMI port was also added to the board, opening the possibility of HDMI input.
 
-This number may grow very quickly when increasing some of the terms.
-It was clear from the beginning that we would no be able to output full HD video,
-but it was not not clear what exactly the limits would be, nor where the bottlenecks would be located.
-
-The Raspberry Pi camera can output resolutions and framerates based on commands from the master device.
-It may output encoded video, but this would have to be decoded before convolution,
-so it was decided to go with 24-bit raw RGB as camera output.
+\input{description/camera}
+\input{description/sd}
 
 \subsection{Options for Video Path}
-There were several options for how to move the video stream to the processor.
+There were several options for how to move the video stream to the processor,
+as illustrated by Figure \ref{fig:VideoPath}.
 
-\begin{figure}[h]
+\begin{figure}
     \centering
     \includegraphics[width=\linewidth]{img/VideoPath}
     \caption{Paths an input video stream could take to reach the processor.}
     \label{fig:VideoPath}
 \end{figure}
 
-\subsubsection{Direct Path from Camera to Processor}
-The path with the fewest bottleneck would be to send data directly from the camera to the processor.
-This would also mean that the FPGA would have to act as the camera master,
-sending control signals over I2C.
+\subsubsection{MCU as Camera Master}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{img/MCU_CameraMaster}
+    \caption{MCU as input controller. Hardware components in green, software components in blue.}
+    \label{fig:MCU_CameraMaster}
+\end{figure}
 
-\subsubsection{Camera to MCU to Processor}
-The signals from the camera could also be routed to the MCU.
-This would mean that the MCU would be the camera master,
-leaving the FPGA free to work on other problems.
-Another advantage of this is that the processor would not need to mode-switch between SD and camera input,
-since the MCU would handle this.
+The first possibility we explored was to have the MCU be the camera master.
+It would send commands to the camera module and receive video input.
+With this setup the MCU would have the responsibility of multiplexing input from camera or SD and the FPGA wouldn't have to know anything about the source of the video stream,
+only that it comes via the MCU-FPGA connection.
+Figure \ref{fig:MCU_CameraMaster} illustrates this.
 
-\subsubsection{Using the Raspberry Pi as Camera Controller}
-Instead of reverse-engineering the camera control protocol,
-the system could include a whole Raspberry Pi with a camera as the camera module.
+\subsubsection{FPGA as Camera Master}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{img/FPGA_CameraMaster}
+    \caption{FPGA with input controller module. Hardware components in green, FPGA submodules in red.}
+    \label{fig:FPGA_CameraMaster}
+\end{figure}
+
+Another option for system architecture would be to have the FPGA be camera master,
+with another submodule in the FPGA switching between input from MCU and input from camera.
+
+As we learned more about the PiCamera we came to the realization that the FPGA would be more appropriate to handle the differential bus data stream from the PiCamera.
+We therefore pivoted and began working on a VHDL camera control module.
+The first step for this would be to implement an I2C master module that would send control signals to the PiCamera.
+
+It was at this point we started realizing how undocumented this control protocol was.
+After searching online and inspecting the Raspbery Pi Python and C camera control libraries with no luck,
+we tried attaching a logic analyser to listen in on the communication between the Raspberry Pi and the PiCamera when starting a recording.
+With the logic analyzer we were able to save a recording of the I2C control communication,
+which we tried to recreate with our VHDL camera control module.
+While we were able to send the same data to the samme addresses,
+we were not able to get any acknowledgements from the PiCamera on the control bus.
+Efforts into figuring out why the PiCamera wouldn't respond were fruitless, so the idea was eventually abandoned.
+
+\subsubsection{Using the Raspberry Pi}
+We had little success in reverse-engineering the camera control protocol.
+However, we did have the Raspberry Pi with the functioning camera control provided.
+
+Our system could include a whole Raspberry Pi with a camera as the camera module.
 Programming the Pi to start recording is very easy thanks to the provided software.
-However the video stream would then have to be outputted from the Pi to the Camvolution computer somehow,
-which would introduce a considerable bottleneck.
+The challenge then would be to get the video stream out of the Raspberry Pi and into the processor.
 
-\subsubsection{GPIO}
-Software was written for the Pi which started recording then used the Pi GPIO pins as a clocked parallell bus to output color values.
-Getting this program to work was not very difficult,
-however it was very slow.
+\subsubsection{GPIO Pins}
+The Raspberry Pi has GPIO pins that are controllable with software.
+A script was written which could start a camera recording,
+then output the pixel data it on a the GPIO pins as a parallel bus with one clock pin and 8 data pins.
+This was very simple to implement, however it was also very slow.
+With a Raspberry Pi 2 the best frequency achieved was ca. $600kHz$.
 
-\subsubsection{HDMI}
-The Pi has an HDMI output.
-Since the Camvolution board has two HDMI ports,
-it would be possible to output video from the Pi to Camvolution over HDMI.
-This would require a HDMI decoding module to be implemented on Camvolution.
+The Raspberry Pi also has hardware support for SPI over some of the GPIO pins.
+Directing the video stream to this instead was more promising,
+since the frequency of the clock in this mode was able to go up to a $32MHz$\footnote{\url{http://elinux.org/index.php?title=RPi\_SPI\#Speed\_2}},
+which would be a massive improvement even if the transfer was serial instead of 8-bit parallel.
+Unfortunately what was observed was that while the transfer of chunks of data was fast,
+there were long delays between chunks.
+
+\subsubsection{HDMI Output}
+Seeing that all efforts into using the camera were either failing or at bet offering a tiny stream of data,
+we decided to concentrate on the HDMI input of the Camvolution system.
+The Raspberry Pi has HDMI out, so it would definently be possible to use the PiCamera with this setup.
 

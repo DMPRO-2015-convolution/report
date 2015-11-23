@@ -1,5 +1,5 @@
 \section{Convolution}
-This section introduces the convolution from a more mathematical perspective and then gives some less traditional applications of a more generalized version.
+This section introduces convolution from a more mathematical perspective and then gives some less traditional applications of a more generalized version.
 
 \subsection{Definition}
 Conceptually, the convolution operation gives the overlap between two functions as a function of the offset between the functions.
@@ -10,26 +10,27 @@ Mathematically, convolution is defined by an integral:
     (f * g)(t) = \int^{\infty}_{-\infty}{f(\tau)g(t-\tau) d\tau}
 \]
 
-Its discrete counterpart is:
+The discrete counterpart to this is:
 
 \[
     (f * g)(n) = \sum^{\infty}_{i=-\infty}{f(i)g(n-i)}
 \]
+
+This discrete variant is visualized in Figure \ref{fig:VisualConvolution} where we have focused on only three of the values in the input functions.
+Notice how the corresponding values from the input functions are multiplied before the products are summed.
 
 \begin{figure}
     \centering
     \includegraphics{img/VisualConvolution}
     \caption{
         Convolution performed on discrete functions.
-        Each box represent an output value of the function.
+        Each box represent a discrete output value of the function.
     }
     \label{fig:VisualConvolution}
 \end{figure}
 
-This is visualized in figure \ref{fig:VisualConvolution} where we have focused on only 3 of the values in the input functions. Notice how the corresponding values from the input functions are multiplied together before the products are summed.
-
-This can also be extended to multiple dimensions by summing across the additional dimensions.
-For the discrete case, this gives
+Convolution can also be extended to multiple dimensions by summing across the additional dimensions.
+For the discrete case, a two-dimensional convolution is expressed as:
 \[
     (f * g)(n, m) = \sum^{\infty}_{i=-\infty}\sum^{\infty}_{j=-\infty}{f(i, j)g(n-i, m-j)}
 \]
@@ -38,22 +39,25 @@ For the discrete case, this gives
 As mentioned in the introduction, convolution can be used in image processing to apply various filters to an image.
 
 A monochrome image can be thought of as a 2D matrix with a width $W$ and height $H$.
+The operation to be performed on the image matrix can be expressed as another matrix called the \textit{kernel}.
 Let $I(x, y)$ be a function for accessing a specific value in the image matrix.
-Let $K(x, y)$ be a function for accessing a specific value in a special matrix called the \textit{kernel},
-or $0$ if $x$ or $y$ is out of bounds for the matrix.
+Let $K(x, y)$ be a function for accessing a specific value in the kernel,
+or $0$ if $x$ or $y$ is out of bounds for the kernel matrix.
 
 The convolution of the image and the kernel is then given by
 \[
-    C(x, y) = \sum^{H}_{h=0} \sum^{W}_{w=0}{I(w, h)K(w - x, h -y)}
+    C(x, y) = \sum^{H}_{h=0} \sum^{W}_{w=0}{I(w, h)K(w - x, h - y)}
 \]
 where $C(x, y)$ is the output image.
+Because $K(w - x, h - y)$ is $0$ for most $w, h$, the resulting values are determined by only a small \textit{neighbourhood} part of the input matrix around $x, y$.
 
-For a coloured image, each channel is processed separately.
+For a coloured image, convolution can be performed once per color channel and the convolved channels put together again to produce a convolved coloured image.
 
 Depending on the kernel matrix, various effects like blurring or sharpening may be applied to the image with convolution.
 A small selection of possible kernel matrices and the results when applied to the image in figure \ref{fig:LenaOriginal} can be found in table \ref{tab:KernelMatrices}.
 
 \begin{table}
+    \centering
     \begin{tabular}{ccm{3cm}}
     Description & Matrix & Result \\
     \hline
@@ -86,20 +90,23 @@ A small selection of possible kernel matrices and the results when applied to th
 As the matrices in table \ref{tab:KernelMatrices} are good examples of, the kernel matrices used for image processing is usually small compared to the images, and often of a constant size.
 This means each output pixel is a function of the same pixel in the original image and its neighbourhood.
 
-\subsection{Generalized convolution}
-Convolution can be separated into to phases; first we have the multiplication before a summation follows.
-In our image processing application, the multiplication phase simply maps a set of input values to a set of output values.
-These values are then reduced into one value by summation.
+\subsection{Generalized Convolution}
+The convolution described above can be separated into two stages: first multiplication, then a summation.
+The multiplication stage simply maps a set of input values to a set of output values by using the kernel matrix values as factors.
+These products are then reduced into a single value by summation.
 
-To generalize convolution, we can replace the map and reduce operations.
-In our general case, a convolution operation is therefore fully defined by two input matrices and two operations.
+By recognizing that the process consists of mapping and reduction,
+it then becomes possible to substitute other mapping and reducing operations.
+A generalized convolution operation is therefore fully defined by two input matrices and two operations.
 
 In the realm of image processing, this paves the way for new filters, such as the median, minimum and maximum filters.
-These filters are commonly used to remove noise in images and consists of a convolution kernel matrix filled with 1s (the multiplicative identity), the multiplication operation for the map stage and the minimum, maximum or mean operations respectively for the reduce operations.
-The resulting images created by applying the effect to our test image can be seen in table \ref{tab:GeneralizedKernelMatrices}.
+These filters are commonly used to remove noise in images and consists of a convolution kernel matrix filled with ones (the multiplicative identity),
+the multiplication operation for the map stage
+and the minimum, maximum or mean operations respectively for the reduce operations.
+The resulting images created by applying the effect to the \textit{Lena} test image can be seen in table \ref{tab:GeneralizedKernelMatrices}.
 
 \begin{table}
-
+    \centering
     \begin{tabular}{lm{3cm}}
         Reduce operation & Result \\
         \hline
@@ -110,7 +117,6 @@ The resulting images created by applying the effect to our test image can be see
 
     \caption{Some image processing filters using a generalized form of convolution}
     \label{tab:GeneralizedKernelMatrices}
-
 \end{table}
 
 Generalized convolution can also be used in other areas, such as to calculate the next iteration of cellular automatons. This requires a more advanced reduce operation.

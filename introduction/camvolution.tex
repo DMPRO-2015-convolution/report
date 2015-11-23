@@ -6,7 +6,7 @@ This section presents our interpretation and the requirements for our system.
 As the task places no restrictions on what we should focus on as long as the computer performs convolution, we considered several possibilities, some inspired by the previous project reports:
 
 \begin{description}
-    \item[Energy efficiency] Do convolution in an energy efficient manner.
+    \item[Energy Efficiency] Do convolution in an energy efficient manner.
     \item[Generality] Make it possible to use the system for a wide variety of tasks.
     \item[Performance] Maximize the throughput of the system.
 \end{description}
@@ -20,7 +20,7 @@ This video stream should come from a video camera attached to the computer.
 A set of goals or requirements is useful to guide the efforts in the direction of the assignment, and to ensure a demonstration can be held at the end of the project.
 
 \subsubsection{Functional Requirements}
-The functional requirements set for this project is listed in table \ref{tab:FunctionalRequirements} and more thorough descriptions follow.
+The functional requirements set for this project is listed in Table \ref{tab:FunctionalRequirements} and more thorough descriptions follow.
 
 \begin{table}[h]
     \centering
@@ -28,7 +28,7 @@ The functional requirements set for this project is listed in table \ref{tab:Fun
         Name & Description & Priority \\
         \hline
         FR1 &
-            The processor should do convolution on a 2 dimensional image with at least a 3x3 convolution kernel &
+            The processor should do convolution on a two-dimensional image with at least a 3x3 convolution kernel &
             High \\
         FR2 &
             The processor should have a video port to show graphical output &
@@ -46,7 +46,7 @@ The functional requirements set for this project is listed in table \ref{tab:Fun
 
 \paragraph{FR1}
 The processor should be able to do convolution.
-As the assignment states, this should be done on a 2 dimensional structure for which we have chosen an image.
+As the assignment states, this should be done on a two-dimensional structure for which we have chosen an image.
 Since image convolution is meaningless with a convolution kernel smaller than 3x3,
 this is also included in the requirements.
 
@@ -61,7 +61,7 @@ This requires an input stream which we have decided should come from a video cam
 \paragraph{FR4}
 To make the demonstration a bit smoother and ensure our computer can accomplish our goals independently, we also require that the machine should be able to boot and operate without an external computer.
 
-\subsubsection{Non-functional Requirements}
+\subsubsection{Non-Functional Requirements}
 \begin{table}[h]
     \centering
     \begin{tabular}{lp{12cm}l}
@@ -70,13 +70,13 @@ To make the demonstration a bit smoother and ensure our computer can accomplish 
         NFR1 &
             The processor should be implemented on a Xilinx FPGA \\
         NFR2 &
-            The processor should use Silicon Labs EFM32 microcontroller as I/O processor \\
+            The processor should use a Silicon Labs EFM32 microcontroller as an I/O processor \\
         NFR3 &
-            The cost of developing the system should not exceed a budget of 10 000 NOK \\
+            The cost of developing the system should not exceed a budget of 10.000 NOK \\
     \end{tabular}
-    \caption{Non-functional Requirements}
+    \caption{Non-Functional Requirements}
     \label{tab:NonFunctionalRequirements}
 \end{table}
 
-In addition to our functional requirements, the task at hand also enforces requirements not related to the functionality of the computer produced. These are listed in table \ref{tab:NonFunctionalRequirements}.
+In addition to our functional requirements, the task at hand also enforces requirements not related to the functionality of the computer produced. These are listed in Table \ref{tab:NonFunctionalRequirements}.
 

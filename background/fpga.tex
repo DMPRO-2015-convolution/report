@@ -7,10 +7,10 @@ The drawback of hardware acceleration is that the hardware resources are used to
 An FPGA is an integrated circuit which is designed to be configured after it has been manufactured, as opposed to an ASIC (Application-Specific Integrated Circuit).
 It consists of reconfigurable logic blocks and configurable connections between them, allowing the behaviour of the FPGA to be specified at run time. Usually this is done by describing the behaviour using a hardware description language, which is then used to create a configuration file for the FPGA.
 
-FPGAs is a good compromise between software and ASICs; the FPGA implementation runs considerably faster than software for many operations, and as the configuration can be changed at any time, the resources can be used for many different purposes without doing changes to the actual hardware.
+FPGAs are a good compromise between software and ASICs; the FPGA implementation runs considerably faster than software for many operations, and as the configuration can be changed at any time, the resources can be used for many different purposes without doing changes to the actual hardware.
 For example, the very same FPGA can be used to decode video in one moment, and to perform convolution in the blink of an eye in the next.
 
-This approach has in fact already been implemented by Intel on their Xeon processors \cite{intelxeonfpga}.
+This approach has in fact already been implemented by Intel on their Xeon processors. \cite{intelxeonfpga}
 
 \subsection{Chisel}
 Another drawback of hardware implementation is the time required for development \cite{fpgaprosandcons}. 

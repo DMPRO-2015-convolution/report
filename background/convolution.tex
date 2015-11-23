@@ -51,10 +51,10 @@ The convolution of the image and the kernel is then given by
 where $C(x, y)$ is the output image.
 Because $K(w - x, h - y)$ is $0$ for most $w, h$, the resulting values are determined by only a small \textit{neighbourhood} part of the input matrix around $x, y$.
 
-For a coloured image, convolution can be performed once per color channel and the convolved channels put together again to produce a convolved coloured image.
+For a coloured image, convolution can be performed once per colour channel. The convolved channels can then be put together again to produce a convolved coloured image.
 
 Depending on the kernel matrix, various effects like blurring or sharpening may be applied to the image with convolution.
-A small selection of possible kernel matrices and the results when applied to the image in figure \ref{fig:LenaOriginal} can be found in table \ref{tab:KernelMatrices}.
+A small selection of possible kernel matrices and the results when applied to the image in Figure \ref{fig:LenaOriginal} can be found in Table \ref{tab:KernelMatrices}.
 
 \begin{table}
     \centering
@@ -83,11 +83,11 @@ A small selection of possible kernel matrices and the results when applied to th
             \end{bmatrix}
         $ & \includegraphics[width=3cm]{img/LenaEmbossed}
     \end{tabular}
-    \caption{Some kernels used in image processing}
+    \caption{Some kernels used in image processing.}
     \label{tab:KernelMatrices}
 \end{table}
 
-As the matrices in table \ref{tab:KernelMatrices} are good examples of, the kernel matrices used for image processing is usually small compared to the images, and often of a constant size.
+As the matrices in Table \ref{tab:KernelMatrices} are good examples of, the kernel matrices used for image processing is usually small compared to the images, and often of a constant size.
 This means each output pixel is a function of the same pixel in the original image and its neighbourhood.
 
 \subsection{Generalized Convolution}
@@ -103,7 +103,7 @@ In the realm of image processing, this paves the way for new filters, such as th
 These filters are commonly used to remove noise in images and consists of a convolution kernel matrix filled with ones (the multiplicative identity),
 the multiplication operation for the map stage
 and the minimum, maximum or mean operations respectively for the reduce operations.
-The resulting images created by applying the effect to the \textit{Lena} test image can be seen in table \ref{tab:GeneralizedKernelMatrices}.
+The resulting images created by applying the effect to the \textit{Lena} test image can be seen in Table \ref{tab:GeneralizedKernelMatrices}.
 
 \begin{table}
     \centering
@@ -115,7 +115,7 @@ The resulting images created by applying the effect to the \textit{Lena} test im
         Median & \includegraphics[width=3cm]{img/LenaMedian}
     \end{tabular}
 
-    \caption{Some image processing filters using a generalized form of convolution}
+    \caption{Some image processing filters using a generalized form of convolution.}
     \label{tab:GeneralizedKernelMatrices}
 \end{table}
 

@@ -14,22 +14,22 @@ Too many pixels gives a huge performance penalty as higher resolutions require m
 Each element stored must provide the colour of the pixel it represents.
 
 \subsubsection{Separate Component}
-One way of achieving this goal is to separate the color into three components and store each individually.
-A common choice of components is red, green and blue, giving rise to the RGB color model.
+One way of achieving this goal is to separate the colour into three components and store each individually.
+A common choice of components is red, green and blue, giving rise to the RGB colour model.
 
-Furthermore, it is possible to store each component as a separate pixel or to interlace the different components in the same image so that all the information required to determine the color of a pixel resides in one place.
+Furthermore, it is possible to store each component as a separate pixel or to interlace the different components in the same image so that all the information required to determine the colour of a pixel resides in one place.
 
-As data stored by computers is discrete and of limited size, we have a limited number of values to use when describing the amount of each component present in a given color.
-The number of values that can be represented is referred to as the \textit{depth} of the image, commonly given in the number of bits used to represent a single color.
+As data stored by computers is discrete and of limited size, we have a limited number of values to use when describing the amount of each component present in a given colour.
+The number of values that can be represented is referred to as the \textit{depth} of the image, commonly given in the number of bits used to represent a single colour.
 
 \subsubsection{Indexed}
-Another way to store the color information is to select a set of colors and assign each color a number.
-This is especially useful when reducing the size of an image by reducing the number of available colors.
-With an index color representation, the most commonly used colors can be selected and assigned numbers, thus reducing the error introduced by forcing the colors into a smaller space.
+Another way to store the colour information is to select a set of colours and assign each colour a number.
+This is especially useful when reducing the size of an image by reducing the number of available colours.
+With an index colour representation, the most commonly used colours can be selected and assigned numbers, thus reducing the error introduced by forcing the colours into a smaller space.
 
 \subsection{Bit Rates}
 An important measure in determining the efficiency of a given video format is the bit rate, the rate at which bits needs to be provided in order to display the video.
-For uncompressed video, we need to know the frame rate in addition to the image resolution and color representation to be able to determine the bit rate of the video.
+For uncompressed video, we need to know the frame rate in addition to the image resolution and colour representation to be able to determine the bit rate of the video.
 
 Table \ref{tab:BitRates} displays the bit rate required at some common resolutions, depths/index sizes and frame rates.
 \begin{table}[]
@@ -44,6 +44,6 @@ Table \ref{tab:BitRates} displays the bit rate required at some common resolutio
         640x480 & 16 bit & 73,7 Mbps  & 147,5 Mbps & 294,9 Mbps \\
         640x480 & 24 bit & 110,6 Mbps & 221,2 Mbps & 442,4 Mbps
     \end{tabular}
-    \caption{Bit rates given different video parameters}
+    \caption{Bit rates given different video parameters.}
     \label{tab:BitRates}
 \end{table}

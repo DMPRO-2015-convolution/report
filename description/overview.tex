@@ -27,15 +27,15 @@ Connected to the FPGA is also some extra memory as the internal memory on the FP
 This memory in supposed to work as a buffer to make the system more tolerable to variable data bit rates and to reduce the chance of synchronization issues as the video stream may have to cross clock domain boundaries.
 
 As HDMI output is not available on the MCU and the bus between the MCU and FPGA is already assumed to be a bottleneck, the HDMI output is placed on the FPGA.
-This the final data flow through the system can be seen in Figure \ref{fig:VideoDataFlow}.
+This the final data flow through the system can be seen in Figure \ref{fig:SystemArchitecture}.
 
 Figure \ref{fig:systemArchitecture} displays the overall data flow between the components in the system.
 Notice that most of the data flows from the left to the right. Video arrives through the camera and flows through the system all the way to the HDMI output, FPGA configurations flow from the SD card to the FPGA through the MCU on configuration.
 
 \begin{figure}
-    \includegraphics{img/VideoDataFlow}
+    \includegraphics{img/SystemArchitecture}
     \caption{Video Data Flow}
-    \label{fig:VideoDataFlow}
+    \label{fig:SystemArchitecture}
 \end{figure}
 
 \subsection{Backup Solutions} \label{subsec:RiskAssessment}

@@ -1,8 +1,11 @@
-:\subsection{Raspberry Pi Camera}
+\subsection{Raspberry Pi Camera}
+After some consideration it was decided that the \textit{Raspberry Pi Camera Board}\footnote{\url{https://www.raspberrypi.org/products/camera-module/}} (PiCamera) would be used as the camera module for the system.
+The circumstances leading to this choice are discussed in section \ref{sec:camera_discussion}.
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.75\textwidth]{img/picamera}
-    \caption{Raspberry Pi Camera}
+    \caption{Raspberry Pi Camera connected to Camvolution board}
 \end{figure}
 
 The \textit{Raspberry Pi Foundation} has designed this peripheral for use with the \textit{Raspberry Pi} computer.
@@ -11,6 +14,6 @@ The module consists of a camera sensor on a board with a controller unit which c
 Communication over this cable is defined by the proprietary \textit{MIPI Camera Serial Interface} (CSI) specification.
 
 The master device controls the camera module by sending instructions over an I2C bus on the ribbon cable,
-and the camera module responds with picture data over two clocked differential busses.
+and the camera module responds with picture data over two clocked differential busses.\cite{picam-pinout}
 Parameters that may be controlled include video encoding, resolution in two dimensions and framerate.
 

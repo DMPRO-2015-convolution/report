@@ -31,13 +31,13 @@ The functional requirements set for this project is listed in Table \ref{tab:Fun
             The processor should do convolution on a two-dimensional image with at least a 3x3 convolution kernel &
             High \\
         FR2 &
-            The processor should have a video port to show graphical output &
+            The processor should have a display port to show graphical output &
             High \\
         FR3 &
-            It should be able to use a camera as input &
+            The system should be able to use a camera as input &
             Medium \\
         FR4 &
-            The machine should boot and operate without an external computer &
+            The system should boot and operate without an external computer &
             Medium
     \end{tabular}
     \caption{Functional Requirements}
@@ -46,22 +46,25 @@ The functional requirements set for this project is listed in Table \ref{tab:Fun
 
 \paragraph{FR1}
 The processor should be able to do convolution.
-As the assignment states, this should be done on a two-dimensional structure for which we have chosen an image.
+As the assignment states, this should be done on a two-dimensional structure, for which we have chosen an image.
 Since image convolution is meaningless with a convolution kernel smaller than 3x3,
 this is also included in the requirements.
 
 \paragraph{FR2}
 It follows directly from the assignment text that we must be able to display output from an application that produces graphical data.
-To accomplish this, the computer is required to have a video port that can output graphics.
+To accomplish this, the computer is required to have a display port that can output graphics.
 
 \paragraph{FR3}
 As we decided to focus on performance, one of our goals is to be able to do convolution on a live video stream.
-This requires an input stream which we have decided should come from a video camera connected to our computer.
+This requires an input stream which we have decided should come from a video camera connected to the computer.
 
 \paragraph{FR4}
-To make the demonstration a bit smoother and ensure our computer can accomplish our goals independently, we also require that the machine should be able to boot and operate without an external computer.
+To make the demonstration a bit smoother and ensure the computer can accomplish our goals independently, we also require that the system should be able to boot and operate without an external computer.
 
 \subsubsection{Non-Functional Requirements}
+
+In addition to the functional requirements, the task at hand also enforces requirements not related to the functionality of the computer produced. These are listed in Table \ref{tab:NonFunctionalRequirements}.
+
 \begin{table}[h]
     \centering
     \begin{tabular}{lp{12cm}l}
@@ -70,13 +73,11 @@ To make the demonstration a bit smoother and ensure our computer can accomplish 
         NFR1 &
             The processor should be implemented on a Xilinx FPGA \\
         NFR2 &
-            The processor should use a Silicon Labs EFM32 microcontroller as an I/O processor \\
+            The computer should use a Silicon Labs EFM32 microcontroller as an I/O processor \\
         NFR3 &
             The cost of developing the system should not exceed a budget of 10.000 NOK \\
     \end{tabular}
     \caption{Non-Functional Requirements}
     \label{tab:NonFunctionalRequirements}
 \end{table}
-
-In addition to our functional requirements, the task at hand also enforces requirements not related to the functionality of the computer produced. These are listed in Table \ref{tab:NonFunctionalRequirements}.
 

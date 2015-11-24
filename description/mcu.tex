@@ -1,6 +1,9 @@
 \section{MCU}
 
-The MCU is used as an I/O-processor, reading from a MicroSD card, configuring the FPGA, and feeding configuration and image data to the processor over an EBI bus interface. An EFM32GG is used as the MCU for the system, providing 128kB RAM, 1024kB internal flash memory and a range of modules including EBI, USART, GPIO and DMA. The board has headers connected to unused pins on the MCU, making it possible for the MCU to communicate with other devices. Figure \ref{fig:mcuOverview} shows how the components are connected.
+An EFM32GG is used as the MCU for the system.
+It provides 128kB RAM, 1024kB internal flash memory and a range of modules including EBI, USART, GPIO and DMA.
+The MCU is used as an I/O-processor, reading from a MicroSD card, configuring the FPGA, and feeding configuration and image data to the processor over an EBI bus interface.
+Figure \ref{fig:mcuOverview} shows how the components are connected.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/mcu_overview.pdf}
@@ -9,16 +12,16 @@ The MCU is used as an I/O-processor, reading from a MicroSD card, configuring th
 \end{figure}
 
 \subsection{Configuration}
-In this section there are two separate forms of configuration. 
+In this section the term configuration is used in two different contexts.
 \begin{itemize}
 	\item Configuration of the FPGA means configuring the logic on the chip by resetting it and programming it with a binary configuration file.
 	\item Configuration of the processor means configuring the processor that is implemented on the FPGA with kernels, map operators and reduce operators.
 \end{itemize}
 
 \subsection{Storage}
-Due to the limited size of the MCU non-volatile memory not exceeding 1024kB, an additional larger source of data is necessary for storing files such as images and configuration files for the FPGA. A MicroSD card is used for this storage, as it gives the MCU an external storage of up to 32GB and lets the system operate independently without being connected to an external computer.
+The MCU has a limited non-volatile memory of 1024kB. Because of this, an additional larger source of data is necessary for storing files such as images and configuration files for the FPGA. A MicroSD card is used for this storage. It gives the MCU an external storage of up to 32GB and lets the system operate independently without being connected to an external computer.
 
-The code for interfacing the MicroSD card is based on the FAT on SD Card Application Note\cite{an0030}. The MCU communicates with the MicroSD card using SPI transfers with a USART module. FAT32 is used as a file system to make reading content from the MicroSD card more manageable, with the trade-off being increased computational overhead for the MCU. This also allows users to add and replace files without having to reprogram the MCU.
+The code for interfacing the MicroSD card is based on the \textit{FAT on SD Card Application Note} \cite{an0030}. The MCU communicates with the MicroSD card using SPI transfers with a USART module. FAT32 is used as a file system to make reading content from the MicroSD card more manageable, with the trade-off being increased computational overhead for the MCU TODO: Citation for these claims about FAT. This also allows users to add and replace files without having to reprogram the MCU.
 
 In the event of the MCU being unable to access the MicroSD card, it is possible to include kernel files and a few small images on the internal flash memory. Functionality for flashing the FPGA from the MCU will be lost because the size of the configuration files exceeds that of the internal flash memory.
 
@@ -26,12 +29,12 @@ The folder structure on the MicroSD card is shown in Table \ref{microsd_folder}.
 
 \begin{table}[h!]
 \centering
-	\begin{tabular}{ | l | p{10cm} |}
-		\hline
+	\begin{tabular}{ l p{10cm} }
+		
 		Folder Name & Contents \\ \hline
 		binfile & Contains binary configuration files that can be used to program the FPGA to alter its behaviour. \\ \hline
 		image & Contains images that can be fed to the FPGA. Serves as a backup for the camera input. Supports 24-bit BMP files and 24-bit raw image data. \\ \hline
-		kernel & Contains different kernels used for convolution. \\ \hline
+		kernel & Contains different kernels used for convolution.
 	\end{tabular}
 	\caption{MicroSD card folder structure}
 	\label{microsd_folder}
@@ -39,7 +42,7 @@ The folder structure on the MicroSD card is shown in Table \ref{microsd_folder}.
 
 
 \subsection{FPGA Configuration}
-When the system is powered up the FPGA will not contain a configuration. To be able to use the FPGA properly, the MCU has to program it with one of the binfiles from the storage. Pins between the MCU and the FPGA are connected according to Slave Serial as described in Spartan 6 Configuration User Guide\cite{ug380} page 28. This configuration scheme relies on sending a binfile as a serial data stream using a clk pin and a single data pin. The MCU is able to reset the configuration of the FPGA at any time by setting the program pin on the FPGA low. Configuration status pins set by the FPGA informs the MCU if it is ready to be programmed, if an error occurred while programming or if the FPGA has successfully programmed. Figure \ref{fig:fpgaConfiguration} shows the FPGA configuration procedure. 
+When the system is powered up the FPGA will not contain a configuration. To be able to use the FPGA properly, the MCU has to program it with one of the binary files from the storage. Pins between the MCU and the FPGA are connected according to Slave Serial as described in \textit{Spartan-6 Configuration User Guide} \cite[Page 28]{ug380}. This configuration scheme relies on sending a binary file as a serial data stream using a clock pin and a single data pin. The MCU is able to reset the configuration of the FPGA at any time by setting the program pin on the FPGA low. The configuration status pins are set by the FPGA. This informs the MCU if it is ready to be programmed, if an error occurred while programming or if the FPGA has been successfully programmed. Figure \ref{fig:fpgaConfiguration} illustrates the FPGA configuration procedure. 
 
 
 \begin{figure}[h!]
@@ -54,28 +57,28 @@ If the MCU is unable to read a configuration file and thus unable to flash the F
 
 \subsection{Kernels}
 Being able to change the convolution kernels while the system is running is considered an important functionality. To support this, the MCU is able to read convolution kernels from MicrodSD or the internal flash memory. 
-In order to make the process of changing kernels for the system, the kernel files has a simple file structure. The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits us to a maximum size of 15x15 kernels. The rest of the bytes in the files are the elements of the kernel.
+In order to make the process of changing kernels for the system easy, the kernel files has a simple file structure. The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits us to a maximum size of 15x15 kernels. The rest of the bytes in the files are the elements of the kernel.
 
 \subsection{External Bus Interface}
 The FPGA and the MCU is connected through an EBI bus.
-This interface is supported natively by the MCU and can therefore be handled by its built-in direct memory access (DMA) unit, which hopefully makes streaming video from the MCU faster, more reliable and easier to implement.
+This interface is supported natively by the EFM and can therefore be handled by its built-in direct memory access (DMA) unit, which hopefully makes streaming video from the MCU faster, more reliable and easier to implement.
 
 In addition to streaming video, the MCU should also control the operation of the processor.
 
 \subsubsection{EBI Banks}
-The EBI module on the MCU supports reading and writing to multiple memory banks, where each bank has its own memory space on the MCU and its own chip select signals. For the system, one bank is used access SRAM and another bank is used to communicate with the processor.
+The EBI module on the MCU supports reading and writing to multiple memory banks, where each bank has its own memory space on the MCU and its own chip select signals. For the system, one bank is used to access SRAM, and another bank is used to communicate with the processor.
 
 Even though the width of the EBI bus is 20-bit, only 3 addresses are used when communicating with the processor. Table \ref{ebi_processor_addresses} explains the functionality of the different adresses.
 
 \begin{table}[h!]
 \centering
-	\begin{tabular}{ | l | p{10cm} |}
-		\hline
+	\begin{tabular}{ l p{10cm} }
+		
 		Address & Functionality \\ \hline
 		0 & Data stream. Used for sending images and configuration data to the processor. \\ \hline
 		1 & EBI mode override. Writing 1 to this address will give EBI access to SRAM. \\ \hline
 		2 & Reset. Writing anything to this address will reset the processor. \\ \hline
-		>2 & Data written to addresses larger than 2 will be ignored by the processor. \\ \hline
+		>2 & Data written to addresses larger than 2 will be ignored by the processor.
 	\end{tabular}
 	\caption{Address functionality for processor bank}
 	\label{ebi_processor_addresses}
@@ -83,7 +86,7 @@ Even though the width of the EBI bus is 20-bit, only 3 addresses are used when c
 
 
 \subsubsection{Processor Configuration}
-To configure the processor with new kernel, map and reduce values, the MCU needs to reset it. After the processor has been reset, it expects the configuration values as a data stream. The MCU then sends all of the configuration values to address 0. When the processor is fully configured, the MCU can be set to send an image stream or just wait for input. The procedure for configuring the processor is described in Figure \ref{fig:processorConfiguration}.
+To configure the processor with new kernel, map and reduce values, the MCU needs to be able to reset the processor. After the processor has been reset, the MCU writes a sequence of configuration values to address 0. When the processor is fully configured, the MCU can either be set to send an image stream or just wait for input. The procedure for configuring the processor is illustrated in Figure \ref{fig:processorConfiguration}.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/processor_configuration.pdf}
@@ -119,7 +122,7 @@ The system provides four buttons for the user interface:
 \end{itemize}
 
 \subsubsection{Startup and Reset}
-When the MCU is first started up or reset, it reconfigures the FPGA with a default binfile. After configuration of the FPGA, the MCU configures the processor with default values for the convolution kernel, map operation and reduce operation. The processors image input is then configured to the default input, which can be the camera input or HDMI input.
+When the MCU is first started up or reset, it reconfigures the FPGA with a default binary file. After configuration of the FPGA, the MCU configures the processor with default values for the convolution kernel, map operation and reduce operation. The processor's image input is then configured to the default input, which can be the camera input or HDMI input.
 
 \subsubsection{Main Menu}
 When pressing the BACK or the OK button, the MCU configures the processor image input to be the EBI bus and the map and reduce operations on the processor to not alter the image. An image containing the main menu of the grapical interface is then loaded from the MicroSD card and sent to the processor over the image stream. The main menu displays the following options:

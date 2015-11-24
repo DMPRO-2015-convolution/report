@@ -1,0 +1,22 @@
+\section{High-Definition Multimedia Interface (HDMI)}
+Our implementation of HDMI on the FPGA was based on the Xilinx application note 495\cite{xapp495} and its reference design files.
+
+We used an HDMI input as the source for the picture to be convoluted, and an HDMI output to show the result.
+HDMI uses TMDS at the physical layer, and our implementation use the native TMDS I/O interface that is featured by the Spartan-6 FPGAs.
+
+\subsubsection{HDMI input}
+To get pixel information from the HDMI input, we have a verilog module called dvi\_decoder. This module sends the TMDS clock signals to a differential buffer, a Spartan 6 primitive called BUFIO2 and then into a PLL to get the required clocks. The required clocks for making HDMI signals into 10 bit words are:
+\begin{itemize}
+    \item   Pixel clock, which is the same rate as the TMDS clock.
+    \item   2x pixel clock, used when making 5 bit words into 10 bit words.
+    \item   10x pixel clock, used as IO clock.
+\end{itemize}
+
+After the clock is retrieved from the TMDS signals, it sends the TMDS signals for each of the colors into their own instance of the decode submodule.
+
+
+The output data is then serialized, using the serdes\_n\_to\_1 module.
+These serial bitstreams are then sent to the OBUFDS cores to produce the wanted output differential signals.
+The clock is produced using the PLL\_BASE module.
+The wanted pixel clock is then sent to the ODDR2 module, to get the wanted differential signal output.
+\subsubsection{HDMI output}

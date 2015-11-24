@@ -21,7 +21,7 @@ In this section the term configuration is used in two different contexts.
 \subsection{Storage}
 The MCU has a limited non-volatile memory of 1024kB. Because of this, an additional larger source of data is necessary for storing files such as images and configuration files for the FPGA. A MicroSD card is used for this storage. It gives the MCU an external storage of up to 32GB and lets the system operate independently without being connected to an external computer.
 
-The code for interfacing the MicroSD card is based on the \textit{FAT on SD Card Application Note} \cite{an0030}. The MCU communicates with the MicroSD card using SPI transfers with a USART module. FAT32 is used as a file system to make reading content from the MicroSD card more manageable, with the trade-off being increased computational overhead for the MCU TODO: Citation for these claims about FAT. This also allows users to add and replace files without having to reprogram the MCU.
+The code for interfacing the MicroSD card is based on the \textit{FAT on SD Card Application Note} \cite{an0030}. The MCU communicates with the MicroSD card using SPI transfers with a USART module. FAT32 is used as a file system to make reading content from the MicroSD card more manageable, with the trade-off being increased computational overhead for the MCU \cite{msfat}. This also allows users to add and replace files without having to reprogram the MCU.
 
 In the event of the MCU being unable to access the MicroSD card, it is possible to include kernel files and a few small images on the internal flash memory. Functionality for flashing the FPGA from the MCU will be lost because the size of the configuration files exceeds that of the internal flash memory.
 

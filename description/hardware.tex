@@ -1,15 +1,17 @@
-\section{Hardware}
-This chapter targets the pcb design and the design discutions when making the pcb.
-The board is intended for use of camera input and to display a convoluted output to one of the HDMI connectors.
-It has several headers, in case the 1\textsuperscript{st} revision should have any faults.
+\section{PCB Design}
+This section describes the PCB design and explains the decisions related to this.
+The board is intended for use camera input and to send output to one of the HDMI connectors.
+It has several headers, in case the first revision should have any faults.
 The hardware that relates to the Xilinx Spartan 6 FPGA, and Giant Gecko 990 EFM is not covered here.
 
-\begin{figure}
+\begin{figure}[h]
     \includegraphics[width=\linewidth]{img/OverviewCamvolutionKit}
     \caption{Camvolution board layout}
 \end{figure}
 
-\subsection{Features}
+\subsection{Board Features}
+Figure \ref{fig:BoardLayout} shows an overview of the board with various components labeled.
+
 \begin{itemize}
     \item Xilinx Spartan 6 FPGA
     \item Giant Gecko 990 EFM
@@ -25,7 +27,7 @@ The hardware that relates to the Xilinx Spartan 6 FPGA, and Giant Gecko 990 EFM 
         \begin{itemize}
             \item 7 Mechanical Buttons
             \item 7 Expansion Headers
-            \item 2 LED's
+            \item 2 LEDs
         \end{itemize}
     \item External memory
         \begin{itemize}
@@ -40,31 +42,34 @@ The hardware that relates to the Xilinx Spartan 6 FPGA, and Giant Gecko 990 EFM 
 \end{figure}
 
 \subsection{Power Supply}
-The board is powered by a MiniUSB connector, with two possible options for powering it. Either connect it to the pc, or use an 5V USB power supply.
+The board is powered by a MiniUSB connector.
+Both a PC and a 5V USB power supply is able to power the system.
 
 The 5V is regulated with a 3.3V LDO regulator, which gives power to most of the board.
-This 3.3V is also connected to a 1.2V LDO regulator, that powers a minimum required power pins on the Xilinx Spartan 6 FPGA. 
+This 3.3V is also connected to a 1.2V LDO regulator which powers the minimum required power pins on the Xilinx Spartan 6 FPGA.
 
 \subsection{Clock Generation}
-\subsubsection{FPGA Oscillator}The oscillator is connected to an enable signal on the EFM32 pin PF12.
+\subsubsection{FPGA Oscillator}
+The oscillator is connected to an enable signal on the EFM32 pin PF12.
 To enable the 120MHz oscillator PF12 must be set to output and driven high.
 The oscillator enable pin is also connected to an external input and can be set high by connecting this pin to VCC.
 The easiest way of enabling the oscillator is to add a jumper on the FPGA\_OSC\_EN header.
 
 \subsubsection{EFM External Crystal}
-The EFM has internal and one external clock.
+The EFM has one internal and one external clock.
 The external clock source is 48MHz and can be set by using the guide from the EFM, on how to enable external clock source.
+TODO clarify above sentence
 
 \subsection{Connectors}
 \subsubsection{HDMI}
-There are two HDMI connectors on the board, both of them HDMI1 and HDMI 2 must also be connected to 5V, and can be set with a jumper at header 8, and header 15 respectively at the upper right corner.
+There are two HDMI connectors on the board, both of them must also be connected to 5V, and can be set with a jumper at header 8, and header 15 respectively at the upper right corner.
 The HDMI 2 is also connected to output pins at P18, this can be used for debugging.
-Se table \ref{HDMI_Connector} in apendix for pinouts.
+See Table \ref{HDMI_Connector} for pinouts.
 
 \subsubsection{FPC Raspberry Pi camera connector}
 There is 1 Raspberry Pi camera connector on the board.
 It is also connected to header P11, and can be used for debugging.
-Se figure \ref{fig:FpcHeader} in apendix for pin configuration.
+See Figure \ref{fig:FpcHeader} for pin configuration.
 
 \subsection{Digital I/O}
 \subsubsection{Buttons}
@@ -75,14 +80,14 @@ The FPGA has 2 buttons for control.
 These are connected to bank 1 on the P15, and P16 pin.
 The MCU has 4 buttons for control.
 These are connected to PD8, PD7, PD6 and PD5.
-Se table \ref{tab:Buttons} n apendix for info.
+See Table \ref{tab:Buttons} for info.
 The last buttons is connected to reset on EFM.
 
 \subsubsection{Header output}
 The EFM has spare pins that all are available on the P15 header pins.
 Pin 28 on P15 header is 3.3V VCC.
 The rest is pinouts from the EFM.
-Se table \ref{tab:HeaderOut} in apendix for location of pins.
+See Table \ref{tab:HeaderOut} for location of pins.
 
 \subsection{SRAM}
 \label{subsec:sram}
@@ -131,7 +136,7 @@ Program\_B is connected to PB11, Done is connected to PB12.
 The FPGA can also be programmed from the EFM using SPI from the EFM.
 
 INIT\_B shares the same pin as the SRAM2 data line, but when programming the FPGA the SRAM will not be active.
-Se table \ref{tab:SpiProgrammer}
+See table \ref{tab:SpiProgrammer}
 
 \begin{table}[]
     \centering
@@ -157,13 +162,12 @@ Set this pin high and the LED wil light up.
 \subsection{EBI-BUS}
 The FPGA and the EFM is connected with a high speed parallel bus.
 20 addressable pins and 16 data lines.
-Se figure \ref{fig:EbiBus} and \ref{fig:EbiControl} for EFM pins.
-Both figures are found in apendix.
+See figure \ref{fig:EbiBus} and \ref{fig:EbiControl} for EFM pins.
 
 There has been one change in the layout, the EBI\_WEn pin as shown in figur \ref{fig:EbiControl} is connnected to U10 instead of J6.
 
 \subsection{Design faults}
-In this 1\textsuperscript{}st revision fo the pcb, we made a few design faults that we had to make small hacks to fix.
+In this first revision fo the PCB, we made a few design faults that we had to make small hacks to fix.
 
 \subsubsection{Voltage regulator}
 Our first encounter was the voltage regulator that was connected to ground, but through a 100 ohm resistor and a capacitor.
@@ -178,14 +182,14 @@ This was an acceptable fix for the mcu team.
 \subsubsection{MCU clock48mhz}
 There was a fail in the design of the 48mhz external clock pads for the MCU, this was due to failure of wiring the pads to the right pins on the external crystal.
 To fix this we bought a new type of crystall, that had a smaller surface, and only two pins.
-This flaw could have been avoided if we had printed out the pcb board on a A4 sheet, and tested the component fit on the pcb.
-Unfortunatly we did not have the components at the time of ordering the pcb.
+This flaw could have been avoided if we had printed out the PCB board on a A4 sheet, and tested the component fit on the PCB.
+Unfortunatly we did not have the components at the time of ordering the PCB.
 
 \subsubsection{Decoupling Capacitors}
 Because we used a 0603 footprint for capacitors and resistors.
 We then had to change to a bigger 0805 or 1208 footprint when mounting a capacitor larger then 10uF.
 This is because capasitors at this many uF does not exist in 0603 footprint.
-In the heat of the last few days, the pcb team forgot about this and we do not have 100uF capacitors decoupling on the pcb.
+In the heat of the last few days, the PCB team forgot about this and we do not have 100uF capacitors decoupling on the PCB.
 
 \subsubsection{HDMI connector}
 At the time of routing the HDMI connectors to the fpga, we had no plan to use the HDMI as input for video.
@@ -196,7 +200,7 @@ Because of later problems with the rpi camera we had to look for other input sol
 Unforturnatly the HDMI input clock $+$/$-$ needs to be connected to G\_CKLOCK pins on FPGA.
 And we had only connected TDMS 0/1/2 $+$/$-$ to G\_CLOCK.
 Because this wireing is impossible to change afterwards, we opened the HDMI cable and switched the cables internal pins to make it work.
-This error only exist when using HDMI as input, and therefore we where not aware of this at the early time of pcb design.
+This error only exist when using HDMI as input, and therefore we where not aware of this at the early time of PCB design.
 
 \paragraph{Data communication between devices}
 The HDMI has also a I2C interface, that it uses to communicate its display data.
@@ -213,5 +217,5 @@ And support a USB interface to the computer.
 This could have been done with a extra small microcontroller that enables flashing of the Silent Gecko.
 
 \subsubsection{List of components}
-Se table \ref{listofcomponents} in apendix for a list of components used on the board.
+See Table \ref{listofcomponents} in appendix for a list of components used on the board.
 

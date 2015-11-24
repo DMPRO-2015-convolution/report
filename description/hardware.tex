@@ -1,7 +1,5 @@
 \section{Hardware}
-This chapter targets the pcb design and the design specifications. The board is intended for use of camera input and to display a convoluted output to one of the HDMI connectors. It has several redundant headers, in case the 1\textsuperscript{st} revision should have any faults. The hardware that relates to the Xilinx Spartan 6 FPGA, and Giant Gecko 990 EFM is not covered here.
-
-\emph{TODO:} Mention and add appendix with schematics.
+This chapter targets the pcb design and the design discutions when making the pcb. The board is intended for use of camera input and to display a convoluted output to one of the HDMI connectors. It has several headers, in case the 1\textsuperscript{st} revision should have any faults. The hardware that relates to the Xilinx Spartan 6 FPGA, and Giant Gecko 990 EFM is not covered here.
 
 \begin{figure}
     \includegraphics[width=\linewidth]{img/OverviewCamvolutionKit}
@@ -52,110 +50,22 @@ The 5V is regulated with a 3.3V LDO regulator, which gives power to most of the 
 The EFM has internal and one external clock. The external clock source is 48MHz and can be set by using the guide from the EFM, on how to enable external clock source. 
 \subsection{Connectors}
 \subsubsection{HDMI}
-There are two HDMI connectors on the board, both of them HDMI1 and HDMI 2 must also be connected to 5V, and can be set with a jumper at header 8, and header 15 respectively at the upper right corner. The HDMI 2 is also connected to output pins at P18, this can be used for debugging.
-
-\begin{table}[]
-    \centering
-    \label{HDMI Connector}
-    \begin{tabular}{lllll}
-        HDMI Pin Name            & Header Pin Nr & FPGA HDMI 1 & FPGA HDMI 2 & External \\
-        \hline
-        TMDS Data2+              & 3             & B2              & B9              &          \\
-        TMDS Data2-              & 5             & A2              & A9              &          \\
-        TMDS Data1+              & 7             & D6              & D11             &          \\
-        TMDS Data1-              & 9             & C6              & C11             &          \\
-        TMDS Data0+              & 10            & B3              & C10             &          \\
-        TMDS Data0-              & 8             & A3              & A10             &          \\
-        TMDS Clock+              & 6             & B4              & G9              &          \\
-        TMDS Clock-              & 4             & A4              & F9              &          \\
-        CEC                      & N/C           & N/C             &                 &          \\
-        HEC Data (Opt)           & GND           & N/C             &                 &          \\
-        SCL                      & N/C           & N/C             &                 &          \\
-        SDA                      & N/C           & N/C             &                 &          \\
-        DDC                      & GND           & N/C             &                 &          \\
-        5+ Power                 & P15 Header    & N/C             &                 &          \\
-        Hot Plug Detect          & N/C           & N/C             &                 &          \\
-        HP Detect (HDMI1) & P9 Header     & N/C             &                 &          \\
-        GND & 1             &                 &                 & GND      \\
-        VCC & 2             &                 &                 & VCC      \\
-    \end{tabular}
-    \caption{HDMI Connector}
-\end{table}
+There are two HDMI connectors on the board, both of them HDMI1 and HDMI 2 must also be connected to 5V, and can be set with a jumper at header 8, and header 15 respectively at the upper right corner. The HDMI 2 is also connected to output pins at P18, this can be used for debugging. Se table \ref{HDMI_Connector} in apendix for pinouts.
 
 \subsubsection{FPC Raspberry Pi camera connector}
-There is 1 Raspberry Pi camera connector on the board. It is also connected to header P11, and can be used for debugging.
-
-\begin{figure}
-    \includegraphics[width=\linewidth]{img/fpc_header.jpg}
-    \caption{Raspberry Pi connector}
-    \label{fig:FpcHeader}
-\end{figure}
+There is 1 Raspberry Pi camera connector on the board. It is also connected to header P11, and can be used for debugging. Se figure \ref{fig:FpcHeader} in apendix for pin configuration.
 
 \subsection{Digital I/O}
 \subsubsection{Buttons}
 The board contains 7 buttons, and are all connected to pull-up resistors. When the button is pushed down the input pin will be grounded. 
 
 The FPGA has 2 buttons for control. These are connected to bank 1 on the P15, and P16 pin.
-The MCU has 4 buttons for control. These are connected to PD8, PD7, PD6 and PD5. Se table \ref{tab:Buttons} for info.
+The MCU has 4 buttons for control. These are connected to PD8, PD7, PD6 and PD5. Se table \ref{tab:Buttons} n apendix for info.
 The last buttons is connected to reset on EFM. 
 
-% Is the column with pull-up really necessary?
-\begin{table}[]
-    \centering
-    \begin{tabular}{llll}
-        Button & Connection & Pull-up/pull-down & Name     \\
-        \hline
-        SW6    & FPGA P15   & Pull-up          &          \\
-        SW7    & FPGA P16   & Pull-up          &          \\
-        SW1    & EFM PD8    & Pull-up          & BTN OK   \\
-        SW2    & EFM PD7    & Pull-up          & BTN Back \\
-        SW3    & EFM PD6    & Pull-up          & BTN Down \\
-        SW4    & EFM PD5    & Pull-up          & BTN Up   \\
-        SW5    & EFM K6     & Pull-up          & Reset
-    \end{tabular}
-    \caption{I/O Buttons}
-    \label{tab:Buttons}
-\end{table}
 
 \subsubsection{Header output}
-The EFM has spare pins that all are available on the P15 header pins. Pin 28 on P15 header is 3.3V VCC. The rest is pinouts from the EFM. Se table \ref{tab:HeaderOut} for location of pins.
-\begin{table}[]
-    \centering
-    \begin{tabular}{llll}
-        Pin number & EFM pin & Usage & Shared with \\
-        \hline
-        1       & PB4     & I/O   &             \\
-        2       & PA7     & I/O   &             \\
-        3       & PB5     & I/O   &             \\
-        4       & PA8     & I/O   &             \\
-        5       & PB6     & I/O   &             \\
-        6       & PA9     & I/O   &             \\
-        7       & PB7     & I/O   &             \\
-        8       & PA10    & I/O   &             \\
-        9       & PB8     & I/O   & INIT\_B     \\
-        10      & PA11    & I/O   &             \\
-        11      & PB11    & I/O   & Program\_B  \\
-        12      & PC0     & I/O   &             \\
-        13      & PB12    & I/O   & Done        \\
-        14      & PC1     & I/O   &             \\
-        15      & PB15    & I/O   &             \\
-        16      & PC9     & I/O   &             \\
-        17      & PD4     & I/O   &             \\
-        18      & PC10    & I/O   &             \\
-        19      & PD11    & I/O   &             \\
-        20      & PC11    & I/O   &             \\
-        21      & PD12    & I/O   &             \\
-        22      & PF11    & I/O   &             \\
-        23      & PD13    & I/O   &             \\
-        24      & PF10    & I/O   &             \\
-        25      & PF5     & I/O   &             \\
-        26      & PF7     & I/O   &             \\
-        27      & PF6     & I/O   &             \\
-        28      & 3.3V    &       &
-    \end{tabular}
-    \caption{Header Output}
-    \label{tab:HeaderOut}
-\end{table}
+The EFM has spare pins that all are available on the P15 header pins. Pin 28 on P15 header is 3.3V VCC. The rest is pinouts from the EFM. Se table \ref{tab:HeaderOut} in apendix for location of pins.
 
 \subsection{SRAM}
 \label{subsec:sram}
@@ -220,41 +130,32 @@ INIT\_B shares the same pin as the SRAM2 data line, but when programming the FPG
 \subsection{LED}
 There are 2 LEDs on the board. One is connected to power on the board and will light up if power is connected. The last LED is programmable from the FPGA on pin N11. Set this pin high and the LED wil light up.
 \subsection{EBI-BUS}
-The FPGA and the EFM is connected with a high speed parallel bus. 20 addressable pins and 16 data lines.  Se figure \ref{fig:EbiBus} and \ref{fig:EbiControl} for EFM pins.
+The FPGA and the EFM is connected with a high speed parallel bus. 20 addressable pins and 16 data lines.  Se figure \ref{fig:EbiBus} and \ref{fig:EbiControl} for EFM pins. Both figures are found in apendix.
 
 
-\begin{figure}
-    \includegraphics[width=\linewidth]{img/EBI-bus.png}
-    \caption{EBI-Bus input}
-    \label{fig:EbiBus}
-\end{figure}
+There has been one change in the layout, the EBI\_WEn pin as shown in figur \ref{fig:EbiControl} is connnected to U10 instead of J6.
 
-\begin{figure}
-    \includegraphics[width=\linewidth]{img/EBI-bus_2.png}
-    \caption{EBI-Bus control signals}
-    \label{fig:EbiControl}
-\end{figure}
-
-There has been a change in the layout, so the EBI\_WEn pin is connnected to U10 instead of J6.
-
-
-\section{Design faults}
+\subsection{Design faults}
 In this 1\textsuperscript{}st revision fo the pcb, we made a few design faults that we had to make small hacks to fix. 
-\subsection{Voltage regulator}
+\subsubsection{Voltage regulator}
 Our first encounter was the voltage regulator that was connected to ground, but through a 100 ohm resistor and a capacitor. This forced the voltage output up to 4.15v and may have bricked our fpga that has a voltage maximum at 3.95v.
 The reason for this flaw was a failure to read the full specs of the datasheet.
-\subsection{Memory card}
+\subsubsection{Memory card}
 After mounting the SdCard-connector we found that all the pinouts on the sdcard was inverted. The easiest solution was to the turn the SdCard-connector 180 degrees and mount part of it outside the board. This was an acceptable fix for the mcu team. 
-\subsection{MCU clock48mhz}
+\subsubsection{MCU clock48mhz}
 There was a fail in the design of the 48mhz external clock pads for the MCU, this was due to failure of wiring the pads to the right pins on the external crystal. To fix this we bought a new type of crystall, that had a smaller surface, and only two pins. This flaw could have been avoided if we had printed out the pcb board on a A4 sheet, and tested the component fit on the pcb. Unfortunatly we did not have the components at the time of ordering the pcb.
-\subsection{Decoupling Capacitors}
+\subsubsection{Decoupling Capacitors}
 Because we used a 0603 footprint for capacitors and resistors. We then had to change to a bigger 0805 or 1208 footprint when mounting a capacitor larger then 10uF. This is because capasitors at this many uF does not exist in 0603 footprint. In the heat of the last few days, the pcb team forgot about this and we do not have 100uF capacitors decoupling on the pcb.
-\subsection{HDMI connector}
+\subsubsection{HDMI connector}
 At the time of routing the HDMI connectors to the fpga, we had no plan to use the HDMI as input for video. Still we made an extra HDMI connector in case one should fail. 
-\subsubsection{GCKLOCK problems on input}
-Because of later problems with the rpi camera we had to look for other input solutions. Unforturnatly the HDMI input clock +/- needs to be connected to G\_CKLOCK pins on FPGA. And we had only connected TDMS 0/1/2 +/- to G\_CLOCK. Because this wireing is impossible to change afterwards, we opened the HDMI cable and switched the cables internal pins to make it work. This error only exist when using HDMI as input, and therefore we where not aware of this at the early time of pcb design. 
-\subsubsection{Data communication between devices}
-The HDMI has also a I2C interface, that it uses to communicate its display data. Such as supported devices, monitor parameters etc. This is not required for HDMI to actually work, but on most computers the HDMI will not output anything unless you force output HDMI signals. To make this job easier we could have added some routing to the I2C cables connectors on the HDMI connector. \cite{wikiddc}
-\subsection{Comments on design faults}
-The amount of design faults on this board is not that many, the few we had was not that difficult to make workarounds for. 
+
+\paragraph{GCKLOCK problems on input}
+Because of later problems with the rpi camera we had to look for other input solutions. Unforturnatly the HDMI input clock $+$/$-$ needs to be connected to G\_CKLOCK pins on FPGA. And we had only connected TDMS 0/1/2 $+$/$-$ to G\_CLOCK. Because this wireing is impossible to change afterwards, we opened the HDMI cable and switched the cables internal pins to make it work. This error only exist when using HDMI as input, and therefore we where not aware of this at the early time of pcb design. 
+\paragraph{Data communication between devices}
+The HDMI has also a I2C interface, that it uses to communicate its display data. Such as supported devices, monitor parameters etc. This is not required for HDMI to actually work, but on most computers the HDMI will not output anything unless you force output HDMI signals, or send in this display data. To make this job easier we could have added some routing to the I2C cables connectors on the HDMI connector. // link to wiki https://en.wikipedia.org/wiki/Display\_Data\_Channel.
+\subsubsection{Comments on design faults}
+The amount of design faults on this board is not that many, the few we had was not that difficult to make workarounds for. If we could make a second revision of the board, we would fix the design faults. Add more leds, to make it easier for debugging. And support a USB interface to the computer. This could have been done with a extra small microcontroller that enables flashing of the Silent Gecko.
+
+\subsubsection{List of components}
+Se table \ref{listofcomponents} in apendix for a list of components used on the board.
 

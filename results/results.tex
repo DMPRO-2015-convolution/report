@@ -52,6 +52,15 @@ These values wrap around and is offset by the maximum value, causing an otherwis
 
 \end{figure}
 
+\subsection{HDMI Channel Path}
+After the first test of HDMI output from HDMI input, the HDMI input pins for R and B were swapped in the FPGA constraints to produce a picture with correct color values. The underlying problem were the HDMI output channels being swapped in the constraints. This led to the HDMI channel path for R and B through the FPGA to be remapped twice as shown in Figure \ref{fig:hdmiChannelPath}. The image will have the correct colors at the output, but since VSYNC and HSYNC signals are only sent over channel B, information used to synchronize the image is lost. By swapping the corresponding output channels instead of the input channel, we managed to get a picture with correct colors aswell as VSYNC and HSYNC signals.
+
+\begin{figure}[h!]
+    \includegraphics[width=\linewidth]{img/hdmi_channel_path.pdf}
+    \caption{HDMI channels being swapped in the FPGA contrsaints, VSYNC and HSYNC is lost}
+    \label{fig:hdmiChannelPath}
+\end{figure}
+
 \subsection{Scalability}
 What convolution kernel matrix sizes can we handle, what image resolutions and depths... TODO: Add more text.
 As stated in section \ref{sec:processor}, the processor has several parameters, some of which are hard coded into the final design.

@@ -4,15 +4,13 @@ This section introduces convolution from a more mathematical perspective and the
 \subsection{Definition}
 Conceptually, the convolution operation gives the overlap between two functions as a function of the offset between the functions.
 
-Mathematically, convolution is defined by an integral:
-
-TODO: Citation.
+Mathematically, convolution is defined by an integral \cite{convolution1}:
 
 \[
     (f * g)(t) = \int^{\infty}_{-\infty}{f(\tau)g(t-\tau) d\tau}
 \]
 
-The discrete counterpart to this is:
+The discrete counterpart to this is \cite{convolution2}:
 
 \[
     (f * g)(n) = \sum^{\infty}_{i=-\infty}{f(i)g(n-i)}
@@ -32,7 +30,8 @@ Notice how the corresponding values from the input functions are multiplied befo
 \end{figure}
 
 Convolution can also be extended to multiple dimensions by summing across the additional dimensions.
-For the discrete case, a two-dimensional convolution is expressed as:
+For the discrete case, a two-dimensional convolution is expressed as \cite{convolution2}:
+
 \[
     (f * g)(n, m) = \sum^{\infty}_{i=-\infty}\sum^{\infty}_{j=-\infty}{f(i, j)g(n-i, m-j)}
 \]

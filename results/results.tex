@@ -4,6 +4,50 @@ In this section, the results of our work is presented.
 All the individual components worked when tested independently and a demonstration bit file assembled with a slimmed down version of the convolution processor successfully outputted processed data.
 This is presented in more detail below.
 
+\subsection{HDMI Timing}
+When sending HDMI data directly from input to output without delaying the signal, the control signal from the input HDMI signals can be used as output control signals.
+This results in perfect synchronization with the top left corner of the input being displayed in the top left corner on the screen.
+
+When processing the data, the data is delayed and arrives too late compared to the control signals. This results in a image shifted slightly to the right as can be seen in Figure \ref{fig:SyncDelay}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=10cm]{img/red_green_test.jpg}
+    \caption{
+        The delayed data stream shows up as a shifted image.
+        The laptop displays the original input signal and the screen behind displays the output.
+        A 3x3 matrix of ones is used as kernel.
+    }
+    \label{fig:SyncDelay}
+\end{figure}
+
+\subsection{Slimmed Down Processor}
+The processor implemented in the final design does not do true convolution as the chisel design gave no output when used to configure the FPGA.
+Due to time constraints, the bug was never found, but a simpler kernel without the input and output handlers was found to be working.
+
+As the input and output handlers take care of reordering the input data before performing the convolution.
+In practice this results in the convolution being applied to 9 consecutive pixels instead of a 3x3 square.
+This can also be seen in Figure \ref{fig:SyncDelay} as a yellow regions between the red and blue squares in the output image.
+Notice that this does not happen in the vertical direction as the image is sent through the processor in a row-major order.
+
+\subsection{Overflow}
+Another artefact in the design is especially visible when gradients are displayed, as demonstrated in Figure \ref{fig:Overflow}.
+As the data width is the same through the entire processor, the values generated when adding several pixels together exceeds the maximum value that can be represented by the data format used.
+
+These values wrap around and is offset by the maximum value, causing an otherwise wide spectrum to be split into several spectrum with the same dynamic range as the original.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=10cm]{img/gradient_test}
+    \caption{
+        The laptop displays the input image, the screen behind displays the output.
+        The original gradient is turned into several shorter periods due to overflow when accumulating the final values.
+        A 3x3 matrix of ones is used as kernel.
+    }
+    \label{fig:Overflow}
+
+\end{figure}
+
 \subsection{Scalability}
 What convolution kernel matrix sizes can we handle, what image resolutions and depths... TODO: Add more text.
 As stated in section \ref{sec:processor}, the processor has several parameters, some of which are hard coded into the final design.

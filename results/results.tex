@@ -4,6 +4,15 @@ In this section we present TODO.
 
 \subsection{Scalability}
 What convolution kernel matrix sizes can we handle, what image resolutions and depths... TODO: Add more text.
+As stated in section \ref{sub:processor}, the processor has several parameters, some of which are hard coded into the final design.
+These parameters can be adjusted, but many are limited by the available hardware.
+
+According to the reports produced by Xilinx ISE during building of the FPGA bit file, our design for 3x3 convolution utilized around \unit[16]{\%} of the total number of available slices.
+This includes many slices with unused components.
+
+TODO:
+
+The same report states the processor can be clocked at a maximum frequency of \emph{<insert frequency>}. This was however tested in practice as the processor was expected to deliver data quickly enough at lower frequencies.
 
 \subsection{Performance}
 Performance was the main focus of our project.
@@ -26,8 +35,3 @@ During SRAM testing, several clock rates were tried to determine the speed achie
 After some binary search through the frequency spectrum, $\unit[49]{MHz}$ proved to be working.
 This gives a throughput of $\unit[49]{MHz}\cdot\unit[16]{bit} = \unit[784]{Mbps}$ for reading.
 During writing however, this number must be halved as a write requires two cycles (one for address set-up and one for writing), giving a throughput for writing of $\unit[392]{Mbps}$.
-
-TODO: Make this fit in (taken from SRAM section in PCB Design chapter):
-
-This is more than sufficient for our application as can be seen in Table \ref{tab:BitRates}, but we do expect this number to be significantly less due to latencies introduced on the FPGA and by the wires in between.
-

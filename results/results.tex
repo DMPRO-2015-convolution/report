@@ -12,7 +12,7 @@ When processing the data, the data is delayed and arrives too late compared to t
 
 \begin{figure}
     \centering
-    \includegraphics[width=10cm]{img/red_green_test.jpg}
+    \includegraphics[width=14cm]{img/red_green_test.jpg}
     \caption{
         The delayed data stream shows up as a shifted image.
         The laptop displays the original input signal and the screen behind displays the output.
@@ -30,6 +30,10 @@ In practice this results in the convolution being applied to 9 consecutive pixel
 This can also be seen in Figure \ref{fig:SyncDelay} as a yellow regions between the red and blue squares in the output image.
 Notice that this does not happen in the vertical direction as the image is sent through the processor in a row-major order.
 
+Visible in Figure \ref{fig:Overflow} is vertical lines not present in the input.
+These lines are caused by the processor not being able to deliver all pixels required without the buffers.
+At other resolutions, this may not be as visible as horizontal synchronization period is not a multiple of the time between each missing pixel from the processor.
+
 \subsection{Overflow}
 Another artefact in the design is especially visible when gradients are displayed, as demonstrated in Figure \ref{fig:Overflow}.
 As the data width is the same through the entire processor, the values generated when adding several pixels together exceeds the maximum value that can be represented by the data format used.
@@ -38,7 +42,7 @@ These values wrap around and is offset by the maximum value, causing an otherwis
 
 \begin{figure}
     \centering
-    \includegraphics[width=10cm]{img/gradient_test}
+    \includegraphics[width=14cm]{img/gradient_test}
     \caption{
         The laptop displays the input image, the screen behind displays the output.
         The original gradient is turned into several shorter periods due to overflow when accumulating the final values.

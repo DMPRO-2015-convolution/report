@@ -1,23 +1,6 @@
 \section{Discussion}
 \input{results/camera}
-\subsection{Image Compression}
-TODO: Verify this; not final
-
-The bottleneck in our system is not the image processing itself, but how to ensure enough data is available at all times.
-There are several ways we could have mitigated this problem.
-
-First of all we could have increased the dimensions, that is, increase the width of our buses. Second, we could have tried to increase the clock rate. This is not easy to do on the EFM, but the processor implementation can always be pipelined more until we reach the limit of what the FPGA can manage.
-
-A third, less obvious option, is to compress the data. We could have employed both lossy and lossless encodings to reduce the size of the data and thus increase the effective throughput. The indexed colours can be viewed as a form of lossy compression.
-More advanced methods can be applied, but these would obviously require more work.
-In addition, there is no guarantee the MCU can do more advanced compression at the rate required.
-
-\subsection{EBI and SRAM Throughput}
-As stated in section \ref{subsec:EbiThroughput}, we achieved a throughput of \unit[384]{Mbps}.
-This must be considered to be an absolute maximum as there is no guarantee the MCU is capable of delivering this amount of data anyway.
-
-When it comes to SRAM, the throughput measured in section \ref{subsec:SramThroughput} is obviously limited by the achievable write speed.
-Even though the chip has an access time of \unit[10]{ns}, writing requires a write pulse width of minimum \unit[8]{ns}, and since we have a duty cycle of \unit[50]{\%}, the lower bound on a write is \unit[16]{ns}.
-Thus the specifications for the SRAM chips guarantees a write speed of $(2\cdot\unit[8]{ns})^{-1} \cdot \unit[16]{bits} / 2 = \unit[500]{Mbps}$.
-
-Our speed being lower may be due to latencies in the FPGA as the signals have to propagate from the registers, through logic and some multiplexers before reaching the bus and finally the SRAM chips them selves. In addition, more experimenting with the write and read cycles could probably have improved the clock rate slightly giving a slightly higher throughput.
+\input{results/image_compression}
+\input{results/ebi_sram_throughput}
+\input{results/hardware}
+\input{results/fpga}

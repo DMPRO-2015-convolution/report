@@ -21,4 +21,72 @@ The backup solution presented in \ref{subsec:RiskAssessment} where input from th
 Our decision to send the data through the MCU on its way to the FPGA was based on the wrong assumptions;
 It was rather hard to find a camera module that interfaced easily with the MCU.
 
+\subsection{MCU as Camera Controller}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{img/MCU_CameraMaster}
+    \caption{MCU as input controller. Hardware components in green, software components in blue.}
+    \label{fig:MCU_CameraMaster}
+\end{figure}
+
+The first option explored was to have the MCU be the camera controller and receive the video stream.
+This idea was abandoned eventually as the EFM32GG does not have hardware to receive the differential bus data,
+so the FPGA would be more appropriate for this role.
+
+\subsection{FPGA as Camera Controller}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{img/FPGA_CameraMaster}
+    \caption{FPGA with input controller module. Hardware components in green, FPGA submodules in red.}
+    \label{fig:FPGA_CameraMaster}
+\end{figure}
+
+With a snapshot of the I2C communication procured,
+a VHDL module was written that could output the same sequence,
+and this was tested with the Spartan-6 development board and the PiCamera.
+While the FPGA was able to output the I2C sequence,
+the camera would not send acknowledgements for any of the transmissions.
+Efforts into figuring out why the PiCamera wouldn't respond were fruitless, so the idea was eventually abandoned.
+
+\subsubsection{Using the Raspberry Pi}
+An option to reverse-engineering the camera control protocol was to use a Raspberry Pi to control the camera,
+then transfer the video stream to the Camvolution board.
+The provided software on the Pi makes it very easy to have full control of the camera,
+but transferring video out of the Pi at high rates is more challenging.
+
+\subsubsection{GPIO Pins}
+The Raspberry Pi has GPIO pins that are controllable in software.
+A script was written which could output pixel data to the GPIO pins as a parallel bus with one clock pin and 8 data pins.
+This was very simple to implement, however it was also very slow.
+With a Raspberry Pi 2 the best clock frequency achieved was ca. $600kHz$.
+This would only allow sending very small frames of video at low framerates,
+so the idea was put on hold and other options explored.
+
+The Raspberry Pi also has hardware support for SPI over some of the GPIO pins.
+Directing the video stream to this instead was more promising,
+since the frequency of the clock in this mode was able to go up to a $32MHz$\footnote{\url{http://elinux.org/index.php?title=RPi\_SPI\#Speed\_2}},
+which would be a massive improvement even if the transfer was serial instead of 8-bit parallel.
+Unfortunately what was observed was that while the transfer of chunks of data was fast,
+there were long delays between chunks.
+At 240x240 resolution, 6 frames per second was the best transfer rate that was able to keep up with the recording.
+Figures \ref{fig:Logic7fps} and \ref{fig:Logic1Frame} shows the logic analyzer output for SPI transfers.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{img/logic/7fps}
+    \caption{At 7 FPS recorded, the SPI transmission is unable to keep up and sends the seventh frame too late.}
+    \label{fig:Logic7fps}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{img/logic/1frame}
+    \caption{Inspecting a single frame transmission closer reveals a lot of idle time.}
+    \label{fig:Logic1Frame}
+\end{figure}
+
+\subsubsection{HDMI Output}
+Seeing that all efforts into using the camera were either failing or at best offering a tiny stream of data,
+we decided to concentrate on the HDMI input of the Camvolution system.
+The Raspberry Pi has HDMI out, so it would definently be possible to use the PiCamera with this setup.
 

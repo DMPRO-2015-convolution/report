@@ -1,49 +1,54 @@
 \section{Testing}
 
+In this section we present the tests performed to verify the functionality of the different components that makes up the system, and also some of the connections between them.
+Some tests were performed on the physical hardware, while others were pure software simulations.
 
 \subsection{FPGA}
+First of all, the SRAM and EBI managers were tested using VHDL test benches before being implemented on the FPGA.
 
+When it comes to the processor core, Chisel test benches was used as testing is quite well supported by the language itself.
 
 \subsection{Hardware}
-After soldering the board, different components were tested to ensure proper operation of components and set of components.
-This is advantageous because potential bugs can be found before all components are combined into a complex system that is hard to debug.
+After soldering the board, each component is singled out and tested to ensure proper functionality.
+We made the board as easy to debug as possible, by adding headers to almost every pin.
+This proved to be helpful.
 
 \subsubsection{SRAM Connection}
 The resistance between SRAM pins and the corresponding header pins was measured to ensure all wires were connected properly.
 It was discovered that two of the address pins for the second memory chip was exchanged, but we concluded this must be due to a swapping of the labels on the board, not the actual wires.
 Nevertheless, this would not make a difference even if the wires were swapped as the data would be swapped twice, first when writing, then when reading, resulting in the correct data being read.
 
-Furthermore, the chips were confirmed to be working by configuring the FPGA with a image that performed the following steps:
+Furthermore, the chips were confirmed to be working by configuring the FPGA with an image that performed the following steps:
 \begin{enumerate}
     \item Iterate through all memory addresses and write the lower 16 bits of the address XOR some random values (in our case, 0xDEAD and 0xBEEF for SRAM1 and SRAM2 respectively).
     \item Start over at the lowest address, read the data and compare to the expected value.
     \item Light the LED with a light characteristic dependent on the result:
         \begin{itemize}
-            \item Fixed on success
-            \item Occulting on SRAM1 failure
-            \item Flashing on SRAM2 failure (if SRAM1 was successfully read)
+            \item Fixed on success.
+            \item Occulting on SRAM1 failure.
+            \item Flashing on SRAM2 failure (if SRAM1 was successfully read).
         \end{itemize}
 \end{enumerate}
 
 After fixing some malfunctioning solder points not detected during initial measuring, the test passed.
 
 \subsubsection{Flashing the MCU}
-The ARM Debug header on the computer was connected to the corresponding header on an EFM32GG development kit. The MCU was successfully flashed, verified by inspecting variables in the debug mode of Simplicity Studio.
+The ARM Debug header on the computer was connected to the corresponding header on an EFM32GG development kit. The MCU was successfully flashed, and verified by inspecting variables in the debug mode of Simplicity Studio.
 
 \subsubsection{SD Card}
-Reads and writes to the MicroSD card through the MCU was tested by reading a small file from the card into a buffer and inspecting it with the debug mode of Simplicity Studio. It turned out the wires for the connector had been flipped, but the test passed after rotating the SD card slot 180 degrees to make the connections align.
+Reading and writing to the MicroSD card through the MCU was tested by reading a small file from the card into a buffer and inspecting it with the debug mode of Simplicity Studio. It turned out the wires for the connector had been flipped, but the test passed after rotating the SD card slot 180 degrees to make the connections align.
 
 \subsubsection{Configuring the FPGA}
-The FPGA was configured both using JTAG and through the MCU with a bit file. The file contained a configuration for the FPGA that would allow us to control the on-board LED using one of the buttons. The button controlled the led after configuration, thus we concluded the configuration was successful.
+The FPGA was configured both using JTAG and through the MCU with a bit file. The file contained a configuration for the FPGA that would allow us to control the on-board LED using one of the buttons. The button controlled the LED after configuration, thus we concluded the configuration was successful.
 
 \subsubsection{HDMI Output}
 HDMI output was confirmed to be working by configuring the FPGA with bit files outputting an image generated on the fly.
 Several images were tried, some filled with a single colour, and some with a repeating gradient pattern.
 
-The image showed up on a connected screen, thus we concluded our HDMI output was working.
+The image showed up on a connected display, thus we concluded our HDMI output was working.
 
 \subsection{HDMI Input}
 When trying to configure the FPGA for receiving HDMI through the second port it was discovered that the pins used for the incoming clock signal was connected to a non-clock input pin.
 Ironically, all other pins used for the given HDMI connector were clock pins, and we therefore modified a regular HDMI cable and exchanged one of the colour wire pairs with the clock pair.
 
-HDMI input was confirmed to be working by outputting the received image on the other HDMI connector and displaying the image on a screen.
+HDMI input was confirmed to be working by forwarding the HDMI input to the HDMI output.

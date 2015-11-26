@@ -38,6 +38,7 @@ Before the data from memory arrives is used by the HDMI module, it passes throug
 \end{itemize}
 
 That is, we may be able to hide the speed difference between the memory and the HDMI because there is a pause between each frame that the memory can use to catch up with the HDMI data consumption.
+To make things worse, the HDMI clocks out a 24 bit pixel on each cycle while the memory only reads 16 bits each cycle.
 
 \section{Convolution Engine}
 \label{sec:processor}

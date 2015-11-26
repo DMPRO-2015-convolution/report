@@ -13,7 +13,7 @@ Too many pixels gives a huge performance penalty as higher resolutions require m
 \subsection{Colours}
 Each element stored must provide the colour of the pixel it represents.
 
-\subsubsection{Separate Component}
+\subsubsection{Separate Components}
 One way of achieving this goal is to separate the colour into three components and store each individually.
 A common choice of components is red, green and blue, giving rise to the RGB colour model.
 
@@ -28,11 +28,11 @@ This is especially useful when reducing the size of an image by reducing the num
 With an index colour representation, the most commonly used colours can be selected and assigned numbers, thus reducing the error introduced by forcing the colours into a smaller space.
 
 \subsection{Bit Rates}
-An important measure in determining the efficiency of a given video format is the bit rate, the rate at which bits needs to be provided in order to display the video.
+An important measure in determining the efficiency of a given video format is the bit rate; the rate at which bits needs to be provided in order to display the video.
 For uncompressed video, we need to know the frame rate in addition to the image resolution and colour representation to be able to determine the bit rate of the video.
 
 Table \ref{tab:BitRates} displays the bit rate required at some common resolutions, depths/index sizes and frame rates.
-\begin{table}[]
+\begin{table}[h]
     \centering
     \begin{tabular}{ccrrr}
         Resolution & Depth/index size & Bit rate @ 15Hz & Bit rate @ 30Hz & Bit rate @ 60Hz \\

@@ -10,9 +10,10 @@ It consists of reconfigurable logic blocks and configurable connections between 
 FPGAs are a good compromise between software and ASICs; the FPGA implementation runs considerably faster than software for many operations, and as the configuration can be changed at any time, the resources can be used for many different purposes without doing changes to the actual hardware.
 For example, the very same FPGA can be used to decode video in one moment, and to perform convolution in the blink of an eye in the next.
 
-This approach has in fact already been implemented by Intel on their Xeon processors. \cite{intelxeonfpga}
+This approach has in fact already been implemented by Intel on some of their Xeon processors \cite{intelxeonfpga}, and is expected to launch in early 2016 \cite{PCWorldIntelFPGA}.
 
 \subsection{Chisel}
+\label{sec:chisel}
 Another drawback of hardware implementation is the time required for development \cite{fpgaprosandcons}. 
 Even though the hardware can be reconfigured, the configurations still need to be coded using techniques similar to the ones used for developing ASICs.
 One attempt to reduce the development time is the hardware description language Chisel, which aims to be a flexible alternative to VHDL and Verilog \cite{chiselpaper}, and thereby reduce development time.

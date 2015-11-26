@@ -101,9 +101,8 @@ it then becomes possible to substitute other mapping and reducing operations.
 A generalized convolution operation is therefore fully defined by two input matrices and two operations.
 
 In the realm of image processing, this paves the way for new filters, such as the median, minimum and maximum filters.
-These filters are commonly used to remove noise in images and consists of a convolution kernel matrix filled with ones (the multiplicative identity),
-the multiplication operation for the map stage
-and the minimum, maximum or mean operations respectively for the reduce operations.
+These filters are commonly used to remove noise in images and consists of a convolution kernel matrix of ones (the multiplicative identity for scalars),
+the multiplication operation for the map stage and the minimum, maximum or mean operations respectively for the reduce operations.
 The resulting images created by applying the effect to the \textit{Lena} test image can be seen in Table \ref{tab:GeneralizedKernelMatrices}.
 
 \begin{table}

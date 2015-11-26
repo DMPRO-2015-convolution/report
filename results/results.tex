@@ -22,10 +22,10 @@ When processing the data, the data is delayed and arrives too late compared to t
 \end{figure}
 
 \subsection{Slimmed Down Processor}
-The processor implemented in the final design does not do true convolution as the chisel design gave no output when used to configure the FPGA.
-Due to time constraints, the bug was never found, but a simpler kernel without the input and output handlers was found to be working.
+The processor implemented in the final design does not do true convolution as the chisel design gave no output on the display when used to configure the FPGA.
+Due to time constraints, the bug was never found, but a simpler version of the processor, without the input and output handlers, was found to be working.
 
-As the input and output handlers take care of reordering the input data before performing the convolution.
+As the input and output handlers take care of reordering the input data before performing the convolution, the data is fed through the processor in an incorrect order.
 In practice this results in the convolution being applied to 9 consecutive pixels instead of a 3x3 square.
 This can also be seen in Figure \ref{fig:SyncDelay} as a yellow regions between the red and blue squares in the output image.
 Notice that this does not happen in the vertical direction as the image is sent through the processor in a row-major order.

@@ -20,7 +20,7 @@ Figure \ref{fig:BoardLayout} shows an overview of the board with various compone
             \item MicroSD
         \end{itemize}
     \item 120MHz Oscillator for FPGA
-    \item 48MHz Crystal for EFM
+    \item 48MHz Crystal for MCU
     \item Digital I/O
         \begin{itemize}
             \item 7 Mechanical Buttons
@@ -48,13 +48,13 @@ This 3.3V is also connected to a 1.2V LDO regulator which powers the minimum req
 
 \subsection{Clock Generation}
 \subsubsection{FPGA Oscillator}
-The oscillator is connected to an enable signal on the EFM32.
+The oscillator is connected to an enable signal on the MCU.
 To enable the 120MHz oscillator, the signal must be set to output and driven high.
 The oscillator enable pin is also connected to an external input and can be set high by connecting this pin to VCC.
 The easiest way of enabling the oscillator is to add a jumper on the FPGA\_OSC\_EN header.
 
-\subsubsection{EFM External Crystal}
-The EFM has one internal and one external clock.
+\subsubsection{MCU External Crystal}
+The MCU has one internal and one external clock.
 The external clock source is 48MHz.
 
 \subsection{Connectors}
@@ -77,10 +77,10 @@ When the button is pushed down, the input pin will be grounded.
 
 The FPGA has two buttons for control, and the MCU has four buttons for control.
 See Table \ref{tab:Buttons} for info.
-The last buttons is connected to reset on the EFM.
+The last buttons is connected to reset on the MCU.
 
 \subsubsection{Header Output}
-The EFM has spare pins that all are available on the P15 header pins.
+The MCU has spare pins that all are available on the P15 header pins.
 Pin 28 on P15 header is 3.3V VCC.
 See Table \ref{tab:HeaderOut} for location of pins.
 
@@ -93,10 +93,10 @@ This is more than sufficient for our application as can be seen in Table \ref{ta
 To make debugging easier, all wires connecting the FPGA and SRAM chips have been placed on headers.
 
 \subsection{JTAG}
-Both the FPGA and the EFM is connected to a JTAG header.
-The EFM is connected to a 20 pin JTAG header that can be used with the generic programming header from the EFM development kit.
+Both the FPGA and the MCU is connected to a JTAG header.
+The MCU is connected to a 20 pin JTAG header that can be used with the generic programming header from the MCU development kit.
 The FPGA is connected to a 8 pin JTAG header. This can be routed to a debugger used for FPGA programming.
-See Table \ref{tab:EfmProgrammer} for EFM JTAG header, see Figure \ref{fig:FpgaProgrammer} for FPGA JTAG header.
+See Table \ref{tab:EfmProgrammer} for MCU JTAG header, see Figure \ref{fig:FpgaProgrammer} for FPGA JTAG header.
 
 \begin{table}[]
     \centering
@@ -116,7 +116,7 @@ See Table \ref{tab:EfmProgrammer} for EFM JTAG header, see Figure \ref{fig:FpgaP
         4,6,8,10,12,14,16,18,20 & GND       \\
         2                       & N/C
     \end{tabular}
-    \caption{Programming Output for EFM}
+    \caption{Programming Output for MCU}
     \label{tab:EfmProgrammer}
 \end{table}
 
@@ -126,15 +126,15 @@ See Table \ref{tab:EfmProgrammer} for EFM JTAG header, see Figure \ref{fig:FpgaP
     \label{fig:FpgaProgrammer}
 \end{figure}
 
-\subsection{Programming FPGA Using EFM SPI}
-The FPGA can also be programmed using SPI from the EFM.
+\subsection{Programming FPGA Using MCU SPI}
+The FPGA can also be programmed using SPI from the MCU.
 INIT\_B shares the same pin as the SRAM2 data line, but when programming the FPGA the SRAM will not be active.
 See Table \ref{tab:SpiProgrammer}.
 
 \begin{table}[]
     \centering
     \begin{tabular}{lll}
-        EFM pin & FPGA & Usage   \\
+        MCU pin & FPGA & Usage   \\
         \hline
         PB8     & U3   & INIT\_B \\
         PD3     & U15  & CS      \\
@@ -142,7 +142,7 @@ See Table \ref{tab:SpiProgrammer}.
         PD1     & V16  & RX      \\
         PD0     & R13  & TX
     \end{tabular}
-    \caption{Programming FPGA using EFM SPI}
+    \caption{Programming FPGA using MCU SPI}
     \label{tab:SpiProgrammer}
 \end{table}
 
@@ -152,9 +152,8 @@ One is connected to power on the board and will light up if power is connected.
 The last LED is programmable from the FPGA.
 
 \subsection{EBI Bus}
-The FPGA and the EFM is connected with a high speed parallel bus with 20 addressable pins and 16 data lines.
+The FPGA and the MCU is connected with a high speed External Bus Interface (EBI) bus with 20 addressable pins and 16 data lines.
 See Appendix \ref{app:pinouts}, Figure \ref{fig:EbiBus} and \ref{fig:EbiControl} for EBI bus.
 
 \subsection{List of Components}
 See Table \ref{listofcomponents} in Appendix \ref{app:components} for a list of components used on the board.
-

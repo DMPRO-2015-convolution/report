@@ -59,7 +59,7 @@ If the MCU is unable to read a configuration file and thus unable to flash the F
 Being able to change the convolution kernels while the system is running is considered an important functionality. To support this, the MCU is able to read convolution kernels from MicrodSD or the internal flash memory. 
 In order to make the process of changing kernels for the system easy, the kernel files has a simple file structure. The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits us to a maximum size of 15x15 kernels. The rest of the bytes in the files are the elements of the kernel.
 
-\subsection{External Bus Interface}
+\subsection{EBI}
 The FPGA and the MCU is connected through an EBI bus.
 This interface is supported natively by the EFM and can therefore be handled by its built-in direct memory access (DMA) unit, which hopefully makes streaming video from the MCU faster, more reliable and easier to implement.
 

@@ -4,8 +4,8 @@ In the early stages of the project,
 we looked at various camera modules online and tried to assess how they would work in our system.
 Some modules were very simple, and some had many features.
 The PiCamera was the most feature-complete module we looked at.
-We looked into the camera control protocol for the PiCamera,
-and found \textit{some} information about it,
+When we looked into the camera control protocol for the PiCamera,
+we found \textit{some} information about it,
 like the open source C and Python camera control libraries for the Raspberry Pi
 and the pinouts for the ribbon connector.
 From what we found, we interpreted that it shouldn't be too hard to implement camera control with the MCU or FPGA.
@@ -17,31 +17,27 @@ so the choice was easy.
 Had we looked for more information about the PiCamera online before this,
 we would have perhaps found the Raspberry Pi engineer recommending not using the PiCamera for an FPGA project\footnote{\url{https://www.raspberrypi.org/forums/viewtopic.php?t=119977&p=812191}} or the unclaimed \$1000 bounty for an open-source driver for the PiCamera\footnote{\url{https://parallella.org/forums/viewtopic.php?f=10&t=2514}}.
 
-The backup solution presented in \ref{subsec:RiskAssessment} where input from the camera is provided through HDMI directly to the FPGA might have been a better option from the start.
-Our decision to send the data through the MCU on its way to the FPGA was based on the wrong assumptions;
-It was rather hard to find a camera module that interfaced easily with the MCU.
-
 \subsection{MCU as Camera Controller}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{img/MCU_CameraMaster}
-    \caption{MCU as input controller. Hardware components in green, software components in blue.}
-    \label{fig:MCU_CameraMaster}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=\linewidth]{img/MCU_CameraMaster}
+%     \caption{MCU as input controller. Hardware components in green, software components in blue.}
+%     \label{fig:MCU_CameraMaster}
+% \end{figure}
 
 The first option explored was to have the MCU be the camera controller and receive the video stream.
 This idea was abandoned eventually as the EFM32GG does not have hardware to receive the differential bus data,
 so the FPGA would be more appropriate for this role.
 
 \subsection{FPGA as Camera Controller}
-\begin{figure}
-    \centering
-    \includegraphics[width=\linewidth]{img/FPGA_CameraMaster}
-    \caption{FPGA with input controller module. Hardware components in green, FPGA submodules in red.}
-    \label{fig:FPGA_CameraMaster}
-\end{figure}
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=\linewidth]{img/FPGA_CameraMaster}
+%     \caption{FPGA with input controller module. Hardware components in green, FPGA submodules in red.}
+%     \label{fig:FPGA_CameraMaster}
+% \end{figure}
 
-With a snapshot of the I2C communication procured,
+After aquiring a snapshot of the I2C communication between the Pi and the PiCamera with a logic analyzer,
 a VHDL module was written that could output the same sequence,
 and this was tested with the Spartan-6 development board and the PiCamera.
 While the FPGA was able to output the I2C sequence,
@@ -49,14 +45,15 @@ the camera would not send acknowledgements for any of the transmissions.
 Efforts into figuring out why the PiCamera wouldn't respond were fruitless, so the idea was eventually abandoned.
 
 \subsubsection{Using the Raspberry Pi}
-An option to reverse-engineering the camera control protocol was to use a Raspberry Pi to control the camera,
+Since reverse-engineering the camera control protocol was difficult,
+we tried to use a Raspberry Pi to control the camera,
 then transfer the video stream to the Camvolution board.
 The provided software on the Pi makes it very easy to have full control of the camera,
 but transferring video out of the Pi at high rates is more challenging.
 
 \subsubsection{GPIO Pins}
 The Raspberry Pi has GPIO pins that are controllable in software.
-A script was written which could output pixel data to the GPIO pins as a parallel bus with one clock pin and 8 data pins.
+A script was written which could output pixel data to the GPIO pins as a parallel bus with one clock pin and eight data pins.
 This was very simple to implement, however it was also very slow.
 With a Raspberry Pi 2 the best clock frequency achieved was ca. $600kHz$.
 This would only allow sending very small frames of video at low framerates,

@@ -153,9 +153,9 @@ To convolute the image the processor consists of the following components:
 \begin{description}
     \item[Conveyor] \hfill\\ 
         The conveyor is a special register file consisting of several rows of pixel registers, which holds the pixels currently in the sweep frontier.
-        % Each row holds a sweep slice, which means every pixel register in a row has a one to one correspondance to one of the rows of the sweep currently feeding the core.
     \item[The Kernel Buffer] \hfill\\
         The kernel buffer maintains the kernel data and must provide the correct kernel data for each map operation performed in the accumulators.
+        This module is also responsible for programming operators.
     \item[The accumulator] \hfill\\
         To convolute a pixel, we need one mapping unit which maps the neighbourhood of a pixel in sequence, and one reduction unit which performs a reduce operation with the input from its associated mapping unit, and a partially processed pixel.
         Together these two units forms a single accumulation unit, and by employing a row of these units together we can compute several pixels in parallel.
@@ -193,20 +193,36 @@ Row 1                   & \cellcolor{gray75} 4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellco
 Row 2                   & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \cellcolor{gray75}4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
 Row 3                   & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & \\
 \end{tabular}\\ \\ \\
-We see that the second leftmost pixel follows the same pattern, only shifted left by one cycle.
+We see that the second leftmost output pixel follows the same pattern, only shifted left by one cycle.
 When a register writes, it does so not only to make the register content available for the accumulation unit, but also to propagate its data to the row below it.
 Each register should read the register directly above, so the read keys must be issued such that a register only reads when the register above it is currently writing.
 For our conceptual design, this is easy, however in the actual implementation we move data using register balanced multiplexer trees which incur delays, so read keys has to be issued with this delay in mind.
 
-The accumulator consists of a row of accumulation units, each unit working on one output pixel independant of the other units.
-For the 3x3 kernel processor shown in \ref{fig:convolution_processor} we have 7 of these functional units.
-To see why, consider that each pixel on the middle row has access to its entire neighbourhood save for the leftmost and righmost pixel, leaving us with 7 full neighbourhoods.
-With a 5x5 kernel, we would use a width of 25, leaving us with 21 full neighbourhoods and 21 accumulation units.
-There two major concerns for the accumulator unit is:
-\begin{itemize}
-    \item Mapping the correct pixel with the correct kernel value for every accumulation unit
-    \item Make sure every accumulation unit that needs a pixel is ready to recieve it once it is available
-\end{itemize}
+\subsubsection{The accumulator}
+As each pixel register in the conveyor corresponds to a row in the sweep, each accumulation unit corresponds to an output pixel.
+For a 3x3 kernel each sweep consists of 9 rows, which provides 7 output rows since the top and bottom row of each sweep misses some of its neighbours.
+Each accumulation unit corresponds to one output row, and we thus have 7 accumuation units.
+Conversively, for a 5x5 convolution kernel we would use 25 input rows, and lose two rows in each end from missing neighbours, resulting in 21 output rows, and 21 accumulation units.
+From the table in the conveyor section, we see that each accumulation unit can map all the necessary pixels by correctly timing which row to read from.
+In the case of the first accumulator, it should read from row 3 at time $T0, T1 and T2$, row 2 at time $T3, T4 and T5$, and row 1 at time $T6, T7 and T8$, as shown in grey.
+At $T8$ all nescessary pixel data is read, and the accumulated result is driven and a new cycle begins.
+The second table in the conveyor section shows the same pattern for the accumulator corresponding to output row 2, only staggered by one cycle.
+Not only does this mean that each accumulator can access the data it needs from a single output wire per row, it also means that each accumulator needs the kernel value previously held by the
+accumulator corresponding to the output row above it, which means kernel values can be passed along just like read and write keys instead of being kept in a central repository.
+A special flush key is sent to the row of accumulation units, causing them to reset their contents after collecting a full pixel.
+
+\subsubsection{The Control unit}
+The control unit is responsible for issuing keys to the rows at periodic intervals such that reads, writes, flushing and selecting accumulator output is correctly synchronized.
+In addition to synchronizing the accumulators and conveyor, the control unit puts the processor to sleep when no data is available, and is responsible for sending the correct signals when in programming mode.
+The issuing of keys is done by a simple state machine, all the logic is calculated when synthesizing since it is dependant on kernel size alone, which lets the fairly complex key issuing to be represented in a very simple state machine.
+
+\subsubsection{The kernel buffer}
+The kernel buffer is responsible for collecting kernel data at programming time, and to supply the correct kernel at the correct time to the mapping unit.
+In \ref{fig:convolution_processor} we show the kernel buffer holding all the kernels in a separate buffer, but as described in the accumulator section this buffer is actually a chained set of registers very close to the accumulation units.
+When in programming mode a the kernel buffer gets instructions from the pixel stream rather than a separate channel.
+First, instructions are sent, which are then sent as kernels to the mappers instead of using a separate instruction channel.
+By piggybacking instructions on the kernel chain, we need to wait for the instructions to fully propagate, but this is an acceptable delay since programming is done only once per run.
+In addition to providing instructions, the kernel buffer is also responsible for realigning kernels when the processor goes to sleep, such that when a new feed cycle begins the system is always in the correct state.
 
 
 \begin{figure}[h!]
@@ -253,59 +269,3 @@ There two major concerns for the accumulator unit is:
     \label{fig:Convolution}
 \end{figure}
 
-\subsubsection{The Accumulator}
-Although the accumulator unit is the last unit in the data path of Daisy we will cover it first since it helps motivate the designs further up in the chain.
-The accumulator actually consists of seven accumulators, hereby referred to as pixel accumulators. Each pixel accumulator corresponds to a pixel in the middle row.
-The leftmost and the rightmost pixel in the middle row has no accumulator associated with it because it lacks three pixels necessary for a full convolution, necessetating the slight overlap in our feed pattern.
-% In Figure \ref{fig:DaisyView} the input from the conveyor is shown as three wires, one from each row.  
-Each accumulator is responsible to read from the correct row at the correct time, such that it accumulates only the subpixels of the source pixel.\\ \\ \\
-\\
-\begin{tabular}{l*{16}{c}r}
-    Time (cycle)        & $T_{0}$ & $T_{1}$ & $T_{2}$ & $T_{2}$ & $T_{4}$  & $T_{5}$ & $T_{6}$ & $T_{7}$ & $T_{8}$ & $T_{9}$ & $T_{10}$ & $T_{11}$ & $T_{12}$ & $T_{13}$ & $T_{14}$\\
-\hline
-Row 1                   & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \\
-Row 2                   & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
-Row 3                   & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & \\
-\end{tabular}\\ \\ \\
-We will first focus on the leftmost accumulator starting at time T0 doing the following reads. 
-It first reads three values from Row 3 which corresponds to its south-western sub pixel at $T_{0}$, its southern sub pixel at $T_{1}$, and its south eastern sub pixel at $T_{2}$, shown as the greyed out cells in row 3.
-At time $T_{3}$ it starts reading from Row 2, reading its western, middle and eastern sub pixels at respectively $T_{3}$, $T_{4}$, and $T_{5}$, shown as the greyed out cells in row 2.
-Finally it reads its north-western, northern and north-western sub pixel at time $T_{6}$ to $T_{8}$ from Row 1.
-What about the second leftmost accumulator then? By following the exact same read pattern, but waiting one cycle allows it to read all its values in the same manner as the leftmost accumulator!
-The second accumulator reads from Row 3 at time $T_{1}$, switches to Row 2 at $T_{4}$ and again to Row 1 from $T_{7}$ to $T_{9}$. 
-In fact, every accumulator starts one cycle later than its left neighbour, meaning every accumulator has accumulated its necessary pixels at different times.
-\\ \\
-\begin{tabular}{l*{16}{c}r}
-    Time (cycle)        & $T_{0}$ & $T_{1}$ & $T_{2}$ & $T_{2}$ & $T_{4}$  & $T_{5}$ & $T_{6}$ & $T_{7}$ & $T_{8}$ & $T_{9}$ & $T_{10}$ & $T_{11}$ & $T_{12}$ & $T_{13}$ & $T_{14}$\\
-\hline
-Row 1                   & \cellcolor{gray75} 4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & \\
-Row 2                   & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \cellcolor{gray75}4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
-Row 3                   & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & \\
-\end{tabular}\\ \\ \\
-
-\subsubsection{The Conveyor Belt}
-As established last section, the job of the conveyor is to feed data from each of its rows to the accumulator.
-In addition to serving data to the accumulator the conveyor must also feed new data to the belt and propogate that data downward which gives rise to its name.
-In order to both propagate data downward and feed correct data to the accumulator as efficently as possible the conveyor will utilize the data from a read operation to both feed the accumulator and to transfer data laterally.
-When a register is read, it is therefore the job of the register directly beneath it to read, conveying data downwards.
-By studying the tables in the previous section we see that reads are done in a wave pattern, and consequentially so is the data conveying, which has a very powerful implication:
-Since every accumulator and register will perform the same operation as its left neighbour offset by one cycle we can let each element be responsible for controlling the element to its right.
-Rather than using a central control module we can instead simply daisy chain the control signals and interface only with the leftmost components, which also explains the name of the convolution core, Daisy.
-An analogy to the read signals is a key. At time $T_{0}$ the control element gives the leftmost register the read key. 
-The register does as it is told and reads its new value from the register above, and hands the key over to its neighbour. 
-At $T_{1}$ the neighbour recieves the key, and reads from the register above it and sends the key further on.
-
-TODO: Figure out a succint way to explain this part
-
-\subsubsection{The Controller}
-We have established how control flows throughout the system, but we still need a module to give out keys to the leftmost accumulators and registers.
-The controller is responsible for sending out the keys in the correct order and at the correct time.
-Timing is everything, if we misalign read signals and write signals we may end up in a situation where a register fails to read when the register above it writes.
-For example, if the controller sends each read signal one cycle too late each register will read when the register to the right side of the one directly above it, causing the data to be sheared as it moves laterally!
-Other than issuing read and write keys to the registers, the controller also issues a flush key for the accumulators which tells accumulators to drive DATA\_OUT with its contents, and to reset.
-
-\subsubsection{The Kernel Buffer}
-In our schematic we present the kernel buffer as a separate submodule. 
-However, having already introduced how instructions are daisy chained it makes sense to do the same with kernels since seven different kernel values are in use at all times.
-Thus the kernel values are kept in a shift register queue living as close to the accumulators as possible, needing only two registers to hold the currently unused kernel values.
-The responsibilities of the kernel unit is thus to collect the first data values into the kernel buffer chain and to buffer the two kernel values which are not currently in use.

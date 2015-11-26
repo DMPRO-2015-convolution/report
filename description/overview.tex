@@ -15,12 +15,13 @@ Then our system performs the convolution and passes the image on to an external 
 As stated in the requirements, the system should handle streaming video from a camera, perform convolution and be able to provide the result as an output stream.
 
 \subsection{Implementation}
-The convolution is to be done on the FPGA using a custom processor implementation named \textit{Daisy}, described in Section \ref{sec:processor}.
+The convolution is to be done on the FPGA using a custom processor implementation described in Section \ref{sec:processor}.
 First of all, this satisfies non-functional requirement NFR1.
 Secondly, this allows us to do hardware accelerated convolution, which will hopefully make it possible to achieve the speeds we have in mind.
 Thirdly, this demonstrates how an FPGA can be used as reconfigurable hardware to accelerate application specific tasks.
 
-This reconfiguration is going to be done by the MCU which will fetch the configuration from an SD card so that the configuration can be easily exchanged for a different one to harvest the advantages of reconfigurable hardware.
+This configuration of the FPGA is going to be done by the MCU, which will fetch the configuration from an SD card so that the configuration can be easily exchanged for a different one to harvest the advantages of reconfigurable hardware.
+
 In addition to configuring the FPGA, the MCU should also handle the input stream arriving from a camera or another external video source.
 As convolution is done on the FPGA, the MCU should forward the video stream to the FPGA and possibly perform some preprocessing should the video format from the camera be unsuitable for our core on the FPGA.
 

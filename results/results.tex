@@ -13,7 +13,7 @@ When processing the data, the data is delayed and arrives too late compared to t
 \begin{figure}
     \centering
     \includegraphics[width=14cm]{img/red_green_test.jpg}
-    \caption{
+    \caption[The delayed data stream.]{
         The delayed data stream shows up as a shifted image.
         The laptop displays the original input signal and the screen behind displays the output.
         A 3x3 matrix of ones is used as kernel.
@@ -46,7 +46,7 @@ These values wrap around and is offset by the maximum value, causing an otherwis
 \begin{figure}
     \centering
     \includegraphics[width=14cm]{img/gradient_test}
-    \caption{
+    \caption[The laptop displays the input image, the screen behind displays the output.]{
         The laptop displays the input image, the screen behind displays the output.
         The original gradient is turned into several shorter periods due to overflow when accumulating the final values.
         A 3x3 matrix of ones is used as kernel.
@@ -64,7 +64,7 @@ By swapping the corresponding output channels instead of the input channel, we m
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/hdmi_channel_path.pdf}
-    \caption{HDMI channels being swapped in the FPGA constraints, VSYNC and HSYNC is lost}
+    \caption[HDMI channels being swapped in the FPGA constraints.]{HDMI channels being swapped in the FPGA constraints, VSYNC and HSYNC is lost}
     \label{fig:hdmiChannelPath}
 \end{figure}
 

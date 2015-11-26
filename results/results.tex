@@ -10,7 +10,7 @@
     \label{fig:systemRunning}
 \end{figure}
 
-In this section, the results of our work is presented.
+In this section, the results of the groups work is presented.
 All the individual components worked when tested independently and a demonstration bit file assembled with a slimmed down version of the convolution processor successfully outputted processed data, bypassing both EBI and SRAM completely.
 This is presented in more detail below.
 
@@ -71,7 +71,7 @@ After the first test of HDMI output from HDMI input, the HDMI input pins for R a
 The underlying problem were the HDMI output channels being swapped in the constraints. 
 This led to the HDMI channel path for R and B through the FPGA to be remapped twice as shown in Figure \ref{fig:hdmiChannelPath}.
 The image will have the correct colours at the output, but since VSYNC and HSYNC signals are only sent over channel B, information used to synchronize the image is lost.
-By swapping the corresponding output channels instead of the input channel, we managed to get a picture with correct colours as well as VSYNC and HSYNC signals.
+By swapping the corresponding output channels instead of the input channel, a picture with correct colours as well as VSYNC and HSYNC signals appeared on the display.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/hdmi_channel_path.pdf}
@@ -80,7 +80,7 @@ By swapping the corresponding output channels instead of the input channel, we m
 \end{figure}
 
 \subsection{Scalability}
-What convolution kernel matrix sizes can we handle, what image resolutions and depths... TODO: Add more text.
+What convolution kernel matrix sizes can be handled, what image resolutions and depths... TODO: Add more text.
 As stated in Section \ref{sec:processor}, the processor has several parameters, some of which are hard coded into the final design.
 These parameters can be adjusted, but many are limited by the available hardware.
 
@@ -88,11 +88,7 @@ According to the reports produced by Xilinx ISE during building of the FPGA bit 
 This includes many slices with unused components.
 
 TODO:
-
 The same report states the processor can be clocked at a maximum frequency of \emph{<insert frequency>}. This was however tested in practice as the processor was expected to deliver data quickly enough at lower frequencies.
 
 \subsection{Video Throughput}
-The highest correctly working resolution was found to be 1366x768. This worked in real time with no precieveable delay. We also tried 1600x900, and still got an image, but it was wrong. Finally, we tried 1920x1200, and got no output.
-
-TODO: Because I wrote "we", this section will have to be rewritten. 
-
+The highest correctly working resolution was found to be 1366x768. This worked in real time with no perceivable delay. 1600x900 was also tried and found to be working, but resulted in an unexpected image with more artefacts. Finally, 1920x1200 was tried, but no sensible output was detected by the display.

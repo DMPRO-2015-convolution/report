@@ -1,11 +1,12 @@
 \subsection{Image Compression}
-TODO: Verify this; not final
 
-The bottleneck in our system is not the image processing itself, but how to ensure enough data is available at all times.
-There are several ways we could have mitigated this problem.
+In the final implementation of the system the processor receives its input from HDMI exclusively.
+If the processor were to receive video from an SD card as described in Section \ref{section_video}, the bottleneck of the system would not be the image processing itself, but ensuring that the processor has sufficient data to work on.
 
-First of all we could have increased the dimensions, that is, increase the width of our buses. Second, we could have tried to increase the clock rate. This is not easy to do on the EFM, but the processor implementation can always be pipelined more until we reach the limit of what the FPGA can manage.
+There are several different ways that can reduce this bottleneck. First of all we could have increased the dimensions, that is, increase the width of our buses. On the EBI bus the address pins and the chip select signals could be used for data, which yields a 38-bit wide data bus, but at the same time loses addressing and DMA functionality. Second, we could have tried to increase the clock rate. This is not easy to do on the MCU as it already uses its maximum specified clock frequency. The processor implementation can always be pipelined more until we reach the limit of what the FPGA can manage.
 
-A third, less obvious option, is to compress the data. We could have employed both lossy and lossless encodings to reduce the size of the data and thus increase the effective throughput. The indexed colours can be viewed as a form of lossy compression.
+A third, less obvious option, is to compress the data. We could have employed both lossy and lossless encodings to reduce the size of the data and thus increase the effective throughput. A simple encoding could be to map 8-bit values sent from the MCU to 24-bit colors on the FPGA, which reduces the amount of data sent to a third of the original data. This can be viewed as a form of lossy compression.
+
 More advanced methods can be applied, but these would obviously require more work.
 In addition, there is no guarantee the MCU can do more advanced compression at the rate required.
+A faster solution might have been to store encoded video files on the SD card, read them on the MCU with DMA, send the data to the FPGA and let it handle the decoding of the video. 

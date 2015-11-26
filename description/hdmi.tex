@@ -12,7 +12,9 @@ The TMDS clock signals are sent to a differential buffer, a Spartan-6 primitive 
     \item   10x pixel clock, used as IO clock.
 \end{itemize}
 
-After the clock is retrieved from the TMDS signals, it sends the TMDS signals for each of the colours into their own instance of the decode sub-module, together with the PLL generated pixel clock that is based on the incoming TMDS signal clock. After the colour channel signals are decoded, we have the needed colour information about the pixel. This is written to a FIFO queue which is to be read by the convolution processor.
+After the clock is retrieved from the TMDS signals, it sends the TMDS signals for each of the colours into their own instance of the decode sub-module, together with the PLL generated pixel clock that is based on the incoming TMDS signal clock.
+After the colour channel signals are decoded, we have the needed colour information about the pixel.
+This is written to a FIFO queue which is to be read by the convolution processor.
 
 \subsection{Output}
 

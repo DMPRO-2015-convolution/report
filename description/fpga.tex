@@ -101,7 +101,7 @@ Figure \ref{fig:conv_engine} shows the top level schematic of the convolution en
 
 \begin{description}
     \item[Input buffer] \hfill\\
-        The input buffer is a double buffer resonsible for buffering rows of image data and feed it to the processor.
+        The input buffer is a double buffer responsible for buffering rows of image data and feed it to the processor.
         When a buffer is full it feeds data to the processor as a series of column slices while the other buffer is filled.
     \item[Output buffer] \hfill\\
         The output buffer retrieves data from the processor as a series of column slices and rearranges the output back to row format.
@@ -133,7 +133,7 @@ Having established how the convolution engine provides an interface for the proc
 \subsection{Convolution processor}
 This section provides a description of the heart of our architecture.
 Figure \ref{fig:convolution_processor} shows the contents of the processor which contains four modules:D
-To illustrate how the components work we describe how the first frame of a videostream is processed.
+To illustrate how the components work we describe how the first frame of a video stream is processed.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/processor.png}
@@ -145,7 +145,7 @@ From the outside, the processor is a module working on sweep slices as shown in 
 A good analogy for how the image is processed is how a window cleaner washes a window.
 If we let the dirty window be our original picture, and the clean image be the processed image, the process of convolution is akin to sweeping the squeegee over the window horizontally.
 In our analogy, a very small part of the window is under the squeegee at any time.
-Similarily, our processor works on a small part of the image at any time, called the \textit{sweep frontier}, shown in \ref{fig:frontier1} and \ref{fig:frontier2}.
+Similarly, our processor works on a small part of the image at any time, called the \textit{sweep frontier}, shown in \ref{fig:frontier1} and \ref{fig:frontier2}.
 To illustrate how data is fed we can view each row in the sweep as a stack.
 The rows then take turns popping one of its elements such that the core effectively gets column slices.
 To convolute the image the processor consists of the following components:
@@ -161,7 +161,7 @@ To convolute the image the processor consists of the following components:
         Together these two units forms a single accumulation unit, and by employing a row of these units together we can compute several pixels in parallel.
         The accumulator consists of a row of these functional units working on pixels in parallel.
     \item[The Control Unit] \hfill\\
-        In order for the accumulators and pixel conveyor to be in sync a control unit sends control signals periodically, which are then propogated throughout the system.
+        In order for the accumulators and pixel conveyor to be in sync a control unit sends control signals periodically, which are then propagated throughout the system.
 \end{description}
 
 Figure \ref{fig:convolution_processor} shows the insides of the processor. 
@@ -171,7 +171,7 @@ We will now explore each part of the processor in greater detail.
 \subsubsection{The Conveyor}
 The conveyor should maintain the sweep frontier, and feed pixel data to the accumulators.
 It consists of a grid of pixel registers, each row holding a sweep slice.
-Since each pixel in a slice corresponds to a different row, every pixel register in a row has a one to one correspondance to one of the rows of the sweep currently feeding the core.
+Since each pixel in a slice corresponds to a different row, every pixel register in a row has a one to one correspondence to one of the rows of the sweep currently feeding the core.
 Data management on the conveyor is done by sending keys which are passed from register to register which are issued by the control unit.
 At any time, there is on each row two keys held by different registers: a read key and a write key.
 Input to the conveyor is available to the entire top row, so in order to ensure that only the corresponding pixel register reads the data, the control module has to issue a key to the row at the right time.
@@ -198,14 +198,14 @@ When a register writes, it does so not only to make the register content availab
 Each register should read the register directly above, so the read keys must be issued such that a register only reads when the register above it is currently writing.
 For our conceptual design, this is easy, however in the actual implementation we move data using register balanced multiplexer trees which incur delays, so read keys has to be issued with this delay in mind.
 
-\subsubsection{The accumulator}
+\subsubsection{The Accumulator}
 As each pixel register in the conveyor corresponds to a row in the sweep, each accumulation unit corresponds to an output pixel.
 For a 3x3 kernel each sweep consists of 9 rows, which provides 7 output rows since the top and bottom row of each sweep misses some of its neighbours.
-Each accumulation unit corresponds to one output row, and we thus have 7 accumuation units.
-Conversively, for a 5x5 convolution kernel we would use 25 input rows, and lose two rows in each end from missing neighbours, resulting in 21 output rows, and 21 accumulation units.
+Each accumulation unit corresponds to one output row, and we thus have 7 accumulation units.
+Conversely, for a 5x5 convolution kernel we would use 25 input rows, and lose two rows in each end from missing neighbours, resulting in 21 output rows, and 21 accumulation units.
 From the table in the conveyor section, we see that each accumulation unit can map all the necessary pixels by correctly timing which row to read from.
 In the case of the first accumulator, it should read from row 3 at time $T0, T1 and T2$, row 2 at time $T3, T4 and T5$, and row 1 at time $T6, T7 and T8$, as shown in grey.
-At $T8$ all nescessary pixel data is read, and the accumulated result is driven and a new cycle begins.
+At $T8$ all necessary pixel data is read, and the accumulated result is driven and a new cycle begins.
 The second table in the conveyor section shows the same pattern for the accumulator corresponding to output row 2, only staggered by one cycle.
 Not only does this mean that each accumulator can access the data it needs from a single output wire per row, it also means that each accumulator needs the kernel value previously held by the
 accumulator corresponding to the output row above it, which means kernel values can be passed along just like read and write keys instead of being kept in a central repository.
@@ -219,7 +219,7 @@ The issuing of keys is done by a simple state machine, all the logic is calculat
 \subsubsection{The kernel buffer}
 The kernel buffer is responsible for collecting kernel data at programming time, and to supply the correct kernel at the correct time to the mapping unit.
 In \ref{fig:convolution_processor} we show the kernel buffer holding all the kernels in a separate buffer, but as described in the accumulator section this buffer is actually a chained set of registers very close to the accumulation units.
-When in programming mode a the kernel buffer gets instructions from the pixel stream rather than a separate channel.
+When in programming mode, the kernel buffer gets instructions from the pixel stream rather than a separate channel.
 First, instructions are sent, which are then sent as kernels to the mappers instead of using a separate instruction channel.
 By piggybacking instructions on the kernel chain, we need to wait for the instructions to fully propagate, but this is an acceptable delay since programming is done only once per run.
 In addition to providing instructions, the kernel buffer is also responsible for realigning kernels when the processor goes to sleep, such that when a new feed cycle begins the system is always in the correct state.
@@ -268,4 +268,3 @@ In addition to providing instructions, the kernel buffer is also responsible for
     \caption{Illustration of the processor.}
     \label{fig:Convolution}
 \end{figure}
-

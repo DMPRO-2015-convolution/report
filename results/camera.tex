@@ -1,20 +1,20 @@
 \subsection{Camera Input}
 \label{sec:camera_discussion}
 In the early stages of the project,
-we looked at various camera modules online and tried to assess how they would work in our system.
+we looked at various camera modules on-line and tried to assess how they would work in our system.
 Some modules were very simple, and some had many features.
 The PiCamera was the most feature-complete module we looked at.
 When we looked into the camera control protocol for the PiCamera,
 we found \textit{some} information about it,
 like the open source C and Python camera control libraries for the Raspberry Pi
-and the pinouts for the ribbon connector.
+and the pin-outs for the ribbon connector.
 From what we found, we interpreted that it shouldn't be too hard to implement camera control with the MCU or FPGA.
 
 When the time came to make a choice for the camera module and order it,
 the PiCamera was the only option that was available from the retailers we were using,
 so the choice was easy.
 
-Had we looked for more information about the PiCamera online before this,
+Had we looked for more information about the PiCamera on-line before this,
 we would have perhaps found the Raspberry Pi engineer recommending not using the PiCamera for an FPGA project\footnote{\url{https://www.raspberrypi.org/forums/viewtopic.php?t=119977&p=812191}} or the unclaimed \$1000 bounty for an open-source driver for the PiCamera\footnote{\url{https://parallella.org/forums/viewtopic.php?f=10&t=2514}}.
 
 \subsection{MCU as Camera Controller}
@@ -33,11 +33,11 @@ so the FPGA would be more appropriate for this role.
 % \begin{figure}
 %     \centering
 %     \includegraphics[width=\linewidth]{img/FPGA_CameraMaster}
-%     \caption{FPGA with input controller module. Hardware components in green, FPGA submodules in red.}
+%     \caption{FPGA with input controller module. Hardware components in green, FPGA sub-modules in red.}
 %     \label{fig:FPGA_CameraMaster}
 % \end{figure}
 
-After aquiring a snapshot of the I2C communication between the Pi and the PiCamera with a logic analyzer,
+After aquiring a snapshot of the I2C communication between the Pi and the PiCamera with a logic analyser,
 a VHDL module was written that could output the same sequence,
 and this was tested with the Spartan-6 development board and the PiCamera.
 While the FPGA was able to output the I2C sequence,
@@ -55,8 +55,8 @@ but transferring video out of the Pi at high rates is more challenging.
 The Raspberry Pi has GPIO pins that are controllable in software.
 A script was written which could output pixel data to the GPIO pins as a parallel bus with one clock pin and eight data pins.
 This was very simple to implement, however it was also very slow.
-With a Raspberry Pi 2 the best clock frequency achieved was ca. $600kHz$.
-This would only allow sending very small frames of video at low framerates,
+With a Raspberry Pi 2 the best clock frequency achieved was approximately $600kHz$.
+This would only allow sending very small frames of video at low frame rates,
 so the idea was put on hold and other options explored.
 
 The Raspberry Pi also has hardware support for SPI over some of the GPIO pins.
@@ -66,7 +66,7 @@ which would be a massive improvement even if the transfer was serial instead of 
 Unfortunately what was observed was that while the transfer of chunks of data was fast,
 there were long delays between chunks.
 At 240x240 resolution, 6 frames per second was the best transfer rate that was able to keep up with the recording.
-Figures \ref{fig:Logic7fps} and \ref{fig:Logic1Frame} shows the logic analyzer output for SPI transfers.
+Figures \ref{fig:Logic7fps} and \ref{fig:Logic1Frame} shows the logic analyser output for SPI transfers.
 
 \begin{figure}
     \centering
@@ -85,5 +85,4 @@ Figures \ref{fig:Logic7fps} and \ref{fig:Logic1Frame} shows the logic analyzer o
 \subsubsection{HDMI Output}
 Seeing that all efforts into using the camera were either failing or at best offering a tiny stream of data,
 we decided to concentrate on the HDMI input of the Camvolution system.
-The Raspberry Pi has HDMI out, so it would definently be possible to use the PiCamera with this setup.
-
+The Raspberry Pi has HDMI out, so it would definitely be possible to use the PiCamera with this set-up.

@@ -1,7 +1,7 @@
 \section{Results}
 
 In this section, the results of our work is presented.
-All the individual components worked when tested independently and a demonstration bit file assembled with a slimmed down version of the convolution processor successfully outputted processed data.
+All the individual components worked when tested independently and a demonstration bit file assembled with a slimmed down version of the convolution processor successfully outputted processed data, bypassing both EBI and SRAM completely.
 This is presented in more detail below.
 
 \subsection{HDMI Timing}
@@ -34,6 +34,9 @@ Visible in Figure \ref{fig:Overflow} is vertical lines not present in the input.
 These lines are caused by the processor not being able to deliver all pixels required without the buffers.
 At other resolutions, this may not be as visible as horizontal synchronization period is not a multiple of the time between each missing pixel from the processor.
 
+Also missing from the slimmed down version of the processor is the possibility of setting convolution kernel and operators on run-time.
+Instead the SD card for the MCU was filled with several versions of the bit file for testing, and buttons on the MCU set up to load the next bit file when pushed.
+
 \subsection{Overflow}
 Another artefact in the design is especially visible when gradients are displayed, as demonstrated in Figure \ref{fig:Overflow}.
 As the data width is the same through the entire processor, the values generated when adding several pixels together exceeds the maximum value that can be represented by the data format used.
@@ -53,11 +56,15 @@ These values wrap around and is offset by the maximum value, causing an otherwis
 \end{figure}
 
 \subsection{HDMI Channel Path}
-After the first test of HDMI output from HDMI input, the HDMI input pins for R and B were swapped in the FPGA constraints to produce a picture with correct color values. The underlying problem were the HDMI output channels being swapped in the constraints. This led to the HDMI channel path for R and B through the FPGA to be remapped twice as shown in Figure \ref{fig:hdmiChannelPath}. The image will have the correct colors at the output, but since VSYNC and HSYNC signals are only sent over channel B, information used to synchronize the image is lost. By swapping the corresponding output channels instead of the input channel, we managed to get a picture with correct colors aswell as VSYNC and HSYNC signals.
+After the first test of HDMI output from HDMI input, the HDMI input pins for R and B were swapped in the FPGA constraints to produce a picture with correct colour values.
+The underlying problem were the HDMI output channels being swapped in the constraints. 
+This led to the HDMI channel path for R and B through the FPGA to be remapped twice as shown in Figure \ref{fig:hdmiChannelPath}.
+The image will have the correct colours at the output, but since VSYNC and HSYNC signals are only sent over channel B, information used to synchronize the image is lost.
+By swapping the corresponding output channels instead of the input channel, we managed to get a picture with correct colours as well as VSYNC and HSYNC signals.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/hdmi_channel_path.pdf}
-    \caption{HDMI channels being swapped in the FPGA contrsaints, VSYNC and HSYNC is lost}
+    \caption{HDMI channels being swapped in the FPGA constraints, VSYNC and HSYNC is lost}
     \label{fig:hdmiChannelPath}
 \end{figure}
 

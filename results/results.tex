@@ -40,12 +40,13 @@ In practice this results in the convolution being applied to 9 consecutive pixel
 This can also be seen in Figure \ref{fig:SyncDelay} as a yellow regions between the red and blue squares in the output image.
 Notice that this does not happen in the vertical direction as the image is sent through the processor in a row-major order.
 
-Visible in Figure \ref{fig:Overflow} is vertical lines not present in the input.
+Visible in Figure \ref{fig:Overflow} are vertical lines not present in the input.
 These lines are caused by the processor not being able to deliver all pixels required without the buffers.
 At other resolutions, this may not be as visible as horizontal synchronization period is not a multiple of the time between each missing pixel from the processor.
 
 Also missing from the slimmed down version of the processor is the possibility of setting convolution kernel and operators on run-time.
-Instead the SD card for the MCU was filled with several versions of the bit file for testing, and buttons on the MCU set up to load the next bit file when pushed.
+Instead, several versions of the bit file was stored to the SD card for testing.
+Buttons on the MCU were set up to load the next bit file when pushed.
 
 \subsection{Overflow}
 Another artefact in the design is especially visible when gradients are displayed, as demonstrated in Figure \ref{fig:Overflow}.
@@ -56,8 +57,8 @@ These values wrap around and is offset by the maximum value, causing an otherwis
 \begin{figure}
     \centering
     \includegraphics[width=14cm]{img/gradient_test}
-    \caption[The laptop displays the input image, the screen behind displays the output.]{
-        The laptop displays the input image, the screen behind displays the output.
+    \caption[The laptop displays the input image, the display behind displays the output.]{
+        The laptop displays the input image, the display behind displays the output.
         The original gradient is turned into several shorter periods due to overflow when accumulating the final values.
         A 3x3 matrix of ones is used as kernel.
     }
@@ -83,31 +84,15 @@ What convolution kernel matrix sizes can we handle, what image resolutions and d
 As stated in Section \ref{sec:processor}, the processor has several parameters, some of which are hard coded into the final design.
 These parameters can be adjusted, but many are limited by the available hardware.
 
-According to the reports produced by Xilinx ISE during building of the FPGA bit file, our design for 3x3 convolution utilized around \unit[16]{\%} of the total number of available slices.
+According to the reports produced by Xilinx ISE during building of the FPGA bit file, the design for 3x3 convolution utilized around \unit[16]{\%} of the total number of available slices.
 This includes many slices with unused components.
 
 TODO:
 
 The same report states the processor can be clocked at a maximum frequency of \emph{<insert frequency>}. This was however tested in practice as the processor was expected to deliver data quickly enough at lower frequencies.
 
-\subsection{Performance}
-Performance was the main focus of our project.
+\subsection{Video Throughput}
+The highest correctly working resolution was found to be 1366x768. This worked in real time with no precieveable delay. We also tried 1600x900, and still got an image, but it was wrong. Finally, we tried 1920x1200, and got no output.
 
-TODO: Add more info on achieved throughput given image format, convolution kernel matrix size...
+TODO: Because I wrote "we", this section will have to be rewritten. 
 
-\subsubsection{EBI Throughput} \label{subsec:EbiThroughput}
-During the project, the throughput over EBI between a EFM MCU and a Spartan-6 FPGA was tested by sending a sequence of increasing number which were verified on the FPGA.
-A set-up time of 1 cycle was required in addition to the mandatory cycle always introduced by the MCU EBI controller for data to be transferred correctly.
-
-Since the MCU is running with a clock speed of 48MHz, this resulted in a maximum throughput of $\unit[16]{bits} \cdot \unit[48]{MHz} / 2 = \unit[384]{Mbps}$.
-From Table \ref{tab:BitRates}, we can conclude this is sufficient to accommodate all options listed except the most data intensive.
-
-During the testing, a default FIFO queue implementation from Xilinx was used to cross the clock domain.
-As EBI is asynchronous and therefore does not provide a clock, the last value sent was not received on the FPGA.
-As a workaround, a final \textit{don't care} value was sent over the bus to push the final data value through the FIFO at the FPGA.
-
-\subsubsection{SRAM Throughput} \label{subsec:SramThroughput}
-During SRAM testing, several clock rates were tried to determine the speed achievable to SRAM.
-After some binary search through the frequency spectrum, $\unit[49]{MHz}$ proved to be working.
-This gives a throughput of $\unit[49]{MHz}\cdot\unit[16]{bit} = \unit[784]{Mbps}$ for reading.
-During writing however, this number must be halved as a write requires two cycles (one for address set-up and one for writing), giving a throughput for writing of $\unit[392]{Mbps}$.

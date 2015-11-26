@@ -4,21 +4,36 @@ In this section we present the tests performed to verify the functionality of th
 Some tests were performed on the physical hardware, while others were pure software simulations.
 
 \subsection{FPGA}
-First of all, the SRAM and EBI managers were tested using VHDL test benches before being implemented on the FPGA.
+The SRAM and EBI managers were tested using VHDL test benches before being implemented on the FPGA.
 
-When it comes to the processor core, Chisel test benches was used as testing is quite well supported by the language itself.
+For the processor core, Chisel test benches were used, as testing is quite well supported by the language itself.
+
+\subsubsection{EBI Throughput} \label{subsec:EbiThroughput}
+During the project, the throughput over EBI between a EFM MCU and a Spartan-6 FPGA was tested by sending a sequence of increasing numbers which were verified on the FPGA.
+A set-up time of one cycle was required in addition to the mandatory cycle always introduced by the MCU EBI controller for data to be transferred correctly.
+
+Since the MCU is running with a clock speed of 48MHz, this resulted in a maximum throughput of $\unit[16]{bits} \cdot \unit[48]{MHz} / 2 = \unit[384]{Mbps}$.
+From Table \ref{tab:BitRates}, we can conclude this is sufficient to accommodate all options listed except the most data intensive.
+
+During the testing, a default FIFO queue implementation from Xilinx was used to cross the clock domain.
+As EBI is asynchronous and therefore does not provide a clock, the last value sent was not received on the FPGA.
+As a workaround, a final \textit{don't care} value was sent over the bus to push the final data value through the FIFO at the FPGA.
+
+\subsubsection{SRAM Throughput} \label{subsec:SramThroughput}
+During SRAM testing, several clock rates were tried to determine the speed achievable to SRAM.
+After some binary search through the frequency spectrum, $\unit[49]{MHz}$ was found to be the highest working frequency.
+This gives a throughput of $\unit[49]{MHz}\cdot\unit[16]{bit} = \unit[784]{Mbps}$ for reading.
+During writing however, this number must be halved as a write requires two cycles (one for address set-up and one for writing), giving a throughput for writing of $\unit[392]{Mbps}$.
 
 \subsection{Hardware}
-After soldering the board, each component is singled out and tested to ensure proper functionality.
-We made the board as easy to debug as possible, by adding headers to almost every pin.
-This proved to be helpful.
+After soldering the board, each component was singled out and tested to ensure proper functionality.
 
 \subsubsection{SRAM Connection}
-The resistance between SRAM pins and the corresponding header pins was measured to ensure all wires were connected properly.
-It was discovered that two of the address pins for the second memory chip was exchanged, but we concluded this must be due to a swapping of the labels on the board, not the actual wires.
+The resistance between each SRAM pin and the corresponding header pin was measured to ensure all wires were connected properly.
+It was discovered that two of the address pins for the second memory chip had been exchanged, but we concluded this must be due to a swapping of the labels on the board, not the actual wires.
 Nevertheless, this would not make a difference even if the wires were swapped as the data would be swapped twice, first when writing, then when reading, resulting in the correct data being read.
 
-Furthermore, the chips were confirmed to be working by configuring the FPGA with an image that performed the following steps:
+The chips were confirmed to be working by configuring the FPGA with an image that performed the following steps:
 \begin{enumerate}
     \item Iterate through all memory addresses and write the lower 16 bits of the address XOR some random values (in our case, 0xDEAD and 0xBEEF for SRAM1 and SRAM2 respectively).
     \item Start over at the lowest address, read the data and compare to the expected value.
@@ -36,7 +51,7 @@ After fixing some malfunctioning solder points not detected during initial measu
 The ARM Debug header on the computer was connected to the corresponding header on an EFM32GG development kit. The MCU was successfully flashed, and verified by inspecting variables in the debug mode of Simplicity Studio.
 
 \subsubsection{SD Card}
-Reading and writing to the MicroSD card through the MCU was tested by reading a small file from the card into a buffer and inspecting it with the debug mode of Simplicity Studio. It turned out the wires for the connector had been flipped, but the test passed after rotating the SD card slot 180 degrees to make the connections align.
+Reading and writing to the MicroSD card through the MCU was tested by reading a small file from the card into a buffer and inspecting it with the debug mode of Simplicity Studio. It turned out the wires for the connector had been flipped, but the test passed after rotating the SD card slot $180^{\circ}$ to make the connections align.
 
 \subsubsection{Configuring the FPGA}
 The FPGA was configured both using JTAG and through the MCU with a bit file. The file contained a configuration for the FPGA that would allow us to control the on-board LED using one of the buttons. The button controlled the LED after configuration, thus we concluded the configuration was successful.
@@ -45,7 +60,7 @@ The FPGA was configured both using JTAG and through the MCU with a bit file. The
 HDMI output was confirmed to be working by configuring the FPGA with bit files outputting an image generated on the fly.
 Several images were tried, some filled with a single colour, and some with a repeating gradient pattern.
 
-The image showed up on a connected display, thus we concluded our HDMI output was working.
+The image showed up on a connected display, thus we concluded the HDMI output was working.
 
 \subsection{HDMI Input}
 When trying to configure the FPGA for receiving HDMI through the second port it was discovered that the pins used for the incoming clock signal was connected to a non-clock input pin.

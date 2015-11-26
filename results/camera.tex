@@ -8,7 +8,7 @@ When we looked into the camera control protocol for the PiCamera,
 we found \textit{some} information about it,
 like the open source C and Python camera control libraries for the Raspberry Pi
 and the pin-outs for the ribbon connector.
-From what we found, we interpreted that it shouldn't be too hard to implement camera control with the MCU or FPGA.
+From what found, it was assumed that it would be possible to implement camera control with the MCU or FPGA.
 
 When the time came to make a choice for the camera module and order it,
 the PiCamera was the only option that was available from the retailers we were using,
@@ -16,8 +16,9 @@ so the choice was easy.
 
 Had we looked for more information about the PiCamera on-line before this,
 we would have perhaps found the Raspberry Pi engineer recommending not using the PiCamera for an FPGA project\footnote{\url{https://www.raspberrypi.org/forums/viewtopic.php?t=119977&p=812191}} or the unclaimed \$1000 bounty for an open-source driver for the PiCamera\footnote{\url{https://parallella.org/forums/viewtopic.php?f=10&t=2514}}.
+This would have indicatived that we should have looked for another camera module.
 
-\subsection{MCU as Camera Controller}
+\subsubsection{MCU as Camera Controller}
 % \begin{figure}
 %     \centering
 %     \includegraphics[width=\linewidth]{img/MCU_CameraMaster}
@@ -29,7 +30,7 @@ The first option explored was to have the MCU be the camera controller and recei
 This idea was abandoned eventually as the EFM32GG does not have hardware to receive the differential bus data,
 so the FPGA would be more appropriate for this role.
 
-\subsection{FPGA as Camera Controller}
+\subsubsection{FPGA as Camera Controller}
 % \begin{figure}
 %     \centering
 %     \includegraphics[width=\linewidth]{img/FPGA_CameraMaster}
@@ -44,24 +45,23 @@ While the FPGA was able to output the I2C sequence,
 the camera would not send acknowledgements for any of the transmissions.
 Efforts into figuring out why the PiCamera wouldn't respond were fruitless, so the idea was eventually abandoned.
 
-\subsubsection{Using the Raspberry Pi}
+\paragraph{Using the Raspberry Pi}
 Since reverse-engineering the camera control protocol was difficult,
 we tried to use a Raspberry Pi to control the camera,
 then transfer the video stream to the Camvolution board.
 The provided software on the Pi makes it very easy to have full control of the camera,
 but transferring video out of the Pi at high rates is more challenging.
 
-\subsubsection{GPIO Pins}
+\paragraph{GPIO Pins}
 The Raspberry Pi has GPIO pins that are controllable in software.
 A script was written which could output pixel data to the GPIO pins as a parallel bus with one clock pin and eight data pins.
 This was very simple to implement, however it was also very slow.
-With a Raspberry Pi 2 the best clock frequency achieved was approximately $600kHz$.
-This would only allow sending very small frames of video at low frame rates,
-so the idea was put on hold and other options explored.
+With a Raspberry Pi 2 the best clock frequency achieved on this bus was approximately $600kHz$.
+This would only allow sending very small frames of video at low frame rates.
 
 The Raspberry Pi also has hardware support for SPI over some of the GPIO pins.
 Directing the video stream to this instead was more promising,
-since the frequency of the clock in this mode was able to go up to a $32MHz$\footnote{\url{http://elinux.org/index.php?title=RPi\_SPI\#Speed\_2}},
+since the frequency of the clock in this mode would be able to go up to $32MHz$\footnote{\url{http://elinux.org/index.php?title=RPi\_SPI\#Speed\_2}},
 which would be a massive improvement even if the transfer was serial instead of 8-bit parallel.
 Unfortunately what was observed was that while the transfer of chunks of data was fast,
 there were long delays between chunks.
@@ -82,7 +82,7 @@ Figures \ref{fig:Logic7fps} and \ref{fig:Logic1Frame} shows the logic analyser o
     \label{fig:Logic1Frame}
 \end{figure}
 
-\subsubsection{HDMI Output}
+\paragraph{HDMI Output}
 Seeing that all efforts into using the camera were either failing or at best offering a tiny stream of data,
 we decided to concentrate on the HDMI input of the Camvolution system.
 The Raspberry Pi has HDMI out, so it would definitely be possible to use the PiCamera with this set-up.

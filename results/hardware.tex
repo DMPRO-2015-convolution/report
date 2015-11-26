@@ -1,5 +1,5 @@
 \subsection{Design Faults}
-In this first revision of the PCB, we made a few design faults that we had to make small hacks to fix.
+In this first revision of the PCB, we made a few design faults, and had to make small hacks to compensate.
 
 \subsubsection{Voltage Regulator}
 The first flaw encountered was the voltage regulator that was connected to ground, but through a 100$\Omega$ resistor and a capacitor.
@@ -8,12 +8,12 @@ The reason for this flaw was a failure to read the full specs of the datasheet.
 
 \subsubsection{SD Card Connector}
 After mounting the SD Card connector we found that all the pinouts on the SD card were inverted.
-The easiest solution was to the turn the SD Card connector 180 degrees and mount part of it outside the board.
+The easiest solution was to the turn the SD Card connector $180^{\circ}$ and mount part of it outside the board.
 
 \subsubsection{MCU Clock}
 There was a fault in the design of the 48MHz external clock pads for the MCU. This was due to failure of wiring the pads to the right pins on the external crystal.
 To fix this we bought a new type of crystal that had a smaller surface, and only two pins.
-This flaw could have been avoided if we had printed out the PCB on a A4 sheet, and tested the component fit on the PCB.
+This flaw could have been avoided if we had printed out the PCB on an A4 sheet, and tested the component fit on the PCB.
 Unfortunately we did not have the components at the time of ordering the PCB.
 
 \subsubsection{Decoupling Capacitors}
@@ -34,13 +34,8 @@ Because this wiring is impossible to change afterwards, we opened an HDMI cable 
 This error only exist when using HDMI as input, and therefore we were not aware of this at the early time of PCB design.
 
 \paragraph{Data Communication Between Devices}
-HDMI also has an I2C interface, that it uses to communicate its display data.
+HDMI also has an I2C interface that it uses to communicate its display data \cite{wikiddc}.
 This includes supported devices, monitor parameters, etc.
 This is not required for HDMI video transfer to actually work, but on most computers the HDMI will not output anything unless you send in display data or force output.
-To make this job easier we could have added some routing to the I2C pins on the HDMI connector. \cite{wikiddc}
-
-\subsubsection{Comments on Design Faults}
-The amount of design faults on this board is not that many, and the few we had was not that difficult to make workarounds for.
-If we could make a second revision of the board, we would fix the design faults.
-We would also add more LEDs, to make it easier for debugging, and support a USB interface to the computer.
+To make this job easier we could have added some routing to the I2C pins on the HDMI connector.
 

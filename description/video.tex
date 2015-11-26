@@ -53,12 +53,12 @@ and some options that were explored are briefly outlined below:
 
 The Raspberry Pi controls the PiCamera by sending signals over a two-wire serial bus (I2C).
 In order to make use of the PiCamera, it is necessary to reimplement the control system.
-Since there is little documentation online, this must be reverse-engineered.
-An attempt was made to use a logic analyzer to "listen in" on the communication between the Raspberry Pi and PiCamera.
+Since there is little documentation on-line, this must be reverse-engineered.
+An attempt was made to use a logic analyser to "listen in" on the communication between the Raspberry Pi and PiCamera.
 A screenshot of this can be seen in Figure \ref{fig:PiCamI2C}.
 
 \subsection{Using the Raspberry Pi To Control the Camera}
 Another possibility is to drop using the PiCamera connected to the board,
 and instead use the Raspberry Pi with its provided software to control the camera.
-The video data can then be transfered from the Pi to Camvolution using one of the possible outputs of the Pi, including parallel GPIO, SPI or HDMI.
+The video data can then be transferred from the Pi to Camvolution using one of the possible outputs of the Pi, including parallel GPIO, SPI or HDMI.
 

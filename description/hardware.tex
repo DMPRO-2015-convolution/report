@@ -77,8 +77,8 @@ See Table \ref{tab:HeaderOut} for location of pins.
 \subsection{SRAM}
 \label{subsec:sram}
 The FPGA is connected to two SRAM chips, one on bank 1 and another on bank 2.
-The chps support a data width of 16 bits and have an access time of \unit[10]{ns} \cite{sramdatasheet}, which means we have a maximum throughput of $(\unit[10]{ns})^{-1} = \unit[1,6]{Gbps}$ to each chip.
-This is more than sufficient for our application as can be seen in Table \ref{tab:BitRates}.
+The chps support a data width of 16 bits and have an access time of \unit[10]{ns} \cite{sramdatasheet}, which gives a maximum throughput of $(\unit[10]{ns})^{-1} = \unit[1,6]{Gbps}$ to each chip.
+This is more than sufficient for this projects' application as can be seen in Table \ref{tab:BitRates}.
 
 To make debugging easier, all wires connecting the FPGA and SRAM chips have been placed on headers. 
 

@@ -2,7 +2,7 @@
 Our implementation of HDMI on the FPGA was based on the Xilinx application note 495 \cite{xapp495} and its reference design files.
 
 We used an HDMI input as the source for the picture to be convolved, and an HDMI output to show the result.
-HDMI uses TMDS at the physical layer, and our implementation uses the native TMDS I/O interface that is featured by the Spartan-6 FPGAs.
+HDMI uses TMDS at the physical layer, and the implementation uses the native TMDS I/O interface that is featured by the Spartan-6 FPGAs.
 
 \subsection{Input}
 The TMDS clock signals are sent to a differential buffer, a Spartan-6 primitive called BUFIO2, and then into a PLL to get the required clocks. The required clocks for making HDMI signals into 10 bit words are:

@@ -57,7 +57,7 @@ If the MCU is unable to read a configuration file and thus unable to flash the F
 
 \subsection{Kernels}
 Being able to change the convolution kernels while the system is running is considered an important functionality. To support this, the MCU is able to read convolution kernels from MicrodSD or the internal flash memory. 
-In order to make the process of changing kernels for the system easy, the kernel files has a simple file structure. The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits us to a maximum size of 15x15 kernels. The rest of the bytes in the files are the elements of the kernel.
+In order to make the process of changing kernels for the system easy, the kernel files has a simple file structure. The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits the system to a maximum size of 15x15 kernels. The rest of the bytes in the files are the elements of the kernel.
 
 \subsection{EBI}
 The FPGA and the MCU is connected through an EBI bus.
@@ -121,7 +121,7 @@ The system provides four buttons for the user interface:
 	\item OK
 \end{itemize}
 
-\subsubsection{Startup and Reset}
+\subsubsection{Start-up and Reset}
 When the MCU is first started up or reset, it reconfigures the FPGA with a default binary file. After configuration of the FPGA, the MCU configures the processor with default values for the convolution kernel, map operation and reduce operation. The processor's image input is then configured to the default input, which can be the camera input or HDMI input.
 
 \subsubsection{Main Menu}

@@ -6,7 +6,7 @@
     \label{fig:FpgaOverview}
 \end{figure}
 
-On the FPGA we must handle an incoming video stream and the configuration data arriving from the MCU before we perform the actual convolution and output the final video stream. In addition, some of the different components run at different clock speeds, thus we need to introduce queues to synchronize data on the boundaries between clock domains.
+The FPGA must handle an incoming video stream and the configuration data arriving from the MCU before the actual convolution is performed and the final video stream outputted. In addition, some of the different components run at different clock speeds, thus queues are needed to synchronize data on the boundaries between clock domains.
 
 In Figure \ref{fig:FpgaOverview}, the top components on the FPGA are depicted.
 
@@ -46,9 +46,9 @@ In this section we will describe the convolution engine which is at the heart of
 We will first describe the convolution engine as a stream processor seen from the outside system before showing the inner workings.
 
 \subsection{The Convolution Engine as a Component}
-A design goal for our system was to reconfigure the FPGA depending on the task, which necessitates synthesizing several versions of our architecture so that the correct architecture may be chosen at run time.
+A design goal for the system was to reconfigure the FPGA depending on the task, which necessitates synthesizing several versions of the architecture so that the correct architecture may be chosen at run time.
 In addition to using several architectures, each version is also programmable, allowing the kernel values, map operators and reduce operators to be programmed at runtime.
-In order to achieve this we parametrized our design, allowing us to generate different architectures by simply changing a parameter once.
+In order to achieve this we parametrized the design, allowing us to generate different architectures by simply changing a parameter once.
 The parameters available are:
 
 \begin{description}

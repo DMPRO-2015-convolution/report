@@ -24,12 +24,13 @@ This configuration of the FPGA is going to be done by the MCU, which will fetch 
 
 In addition to configuring the FPGA, the MCU should also handle the input stream arriving from a camera or another external video source.
 As convolution is done on the FPGA, the MCU should forward the video stream to the FPGA and possibly perform some preprocessing should the video format from the camera be unsuitable for our core on the FPGA.
+This may include indexing the colours or reducing the colour depth to a different colour representation as described in Section \ref{sec:DigitalVideo} which may be necessary to speed up the processing and reduce throughput.
 
 Connected to the FPGA is also some extra memory as the internal memory on the FPGA is limited in size.
 This memory in supposed to work as a buffer to make the system more tolerable to variable data bit rates and to allow the output to read old data while waiting for the processed input to arrive.
 
 As HDMI output is not available on the MCU and the bus between the MCU and FPGA is already assumed to be a bottleneck, the HDMI output is placed on the FPGA.
-This the final data flow through the system can be seen in Figure \ref{fig:SystemArchitecture}.
+The final data flow through the system can be seen in Figure \ref{fig:SystemArchitecture}.
 
 Figure \ref{fig:SystemArchitecture} displays the overall data flow between the components in the system.
 Notice that most of the data flows from the left to the right. Video arrives through the camera and flows through the system all the way to the HDMI output, FPGA configurations flow from the SD card through the MCU to the FPGA on configuration.

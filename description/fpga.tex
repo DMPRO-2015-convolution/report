@@ -131,7 +131,8 @@ Having established how the convolution engine provides an interface for the proc
 
 \subsection{Convolution processor}
 This section provides a description of the heart of our architecture.
-Figure \ref{fig:convolution_processor} shows the contents of the processor which contains four modules:
+Figure \ref{fig:convolution_processor} shows the contents of the processor which contains four modules:D
+To illustrate how the components work we describe how the first frame of a videostream is processed.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/processor.png}
@@ -154,7 +155,7 @@ To convolute the image the processor consists of the following components:
     \item[The Kernel Buffer] \hfill\\
         The kernel buffer maintains the kernel data and must provide the correct kernel data for each map operation performed in the accumulators.
     \item[The accumulator] \hfill\\
-        To convolute a pixel, we need one mapping unit which maps the neighbourhood of a pixel in sequence, and one reduction unit which performs a reduce operation with the input from its associated mapping unit, and a partially processed pixel.
+To convolute a pixel, we need one mapping unit which maps the neighbourhood of a pixel in sequence, and one reduction unit which performs a reduce operation with the input from its associated mapping unit, and a partially processed pixel.
         Together these two units forms a single accumulation unit, and by employing a row of these units together we can compute several pixels in parallel.
         The accumulator consists of a row of these functional units working on pixels in parallel.
     \item[The Control Unit] \hfill\\
@@ -162,9 +163,16 @@ To convolute the image the processor consists of the following components:
 \end{description}
 
 Figure \ref{fig:convolution_processor} shows the insides of the processor. Notice that the conveyor is mirroring the sweep frontier shown in \ref{fig:frontier1}.
-We will start with the accumulator and work our way backwards to explain how the processor works.
+We will now explore each part of the processor in greater detail.
 
-\subsubsection{The Accumulator}
+\subsubsection{The Conveyor}
+The conveyor is tasked with maintaining the sweep frontier, and to feed pixel data to the accumulators.
+To maintain the frontier, the conveyor reads input from the convolution engine and writes to the correct slot in the top row.
+Recall that the sweep frontier corresponds to column slices, which means data should only be moved directly downwards. Thus a pixel is never moved horizontally, only to the same slot on the column below.
+From fig \ref{fig:convolution_processor} we see how each row #########
+
+
+
 The accumulator consists of a row of accumulation units, each unit working on one output pixel independant of the other units.
 For the 3x3 kernel processor shown in \ref{fig:convolution_processor} we have 7 of these functional units.
 To see why, consider that each pixel on the middle row has access to its entire neighbourhood save for the leftmost and righmost pixel, leaving us with 7 full neighbourhoods.
@@ -225,9 +233,6 @@ By accepting a new pixel in the conveyor every cycle we can now only keep a pixe
     \label{fig:Convolution}
 \end{figure}
 
-<<<<<<< HEAD
-To illustrate how the components work we describe how the first frame of a videostream is processed.
-=======
 \begin{description}
     \item[Input Handler] \hfill\\ 
         The interface between the data stream and our processor is responsible for gathering data from a wide variety of input streams of different bandwidths and speeds and present this data to the processor as a continuous data stream with a fixed width.

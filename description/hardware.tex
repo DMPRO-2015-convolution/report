@@ -39,26 +39,26 @@ Figure \ref{fig:BoardLayout} shows an overview of the board with various compone
 The board is powered by a 5V MiniUSB connector.
 
 The input voltage is regulated with a 3.3V low-dropout (LDO) regulator, which gives power to most of the board.
-This 3.3V is also connected to a 1.2V LDO regulator which powers the minimum required power pins on the FPGA.
+This 3.3V is also connected to a 1.2V LDO regulator which powers the minimum required power pins on the FPGA. There is one additional power connection, this is here for backup.
 
 \subsection{Clock Generation}
 The FPGA oscillator is connected to an enable signal on the MCU.
 To enable the 120MHz oscillator, the signal must be set to output and driven high.
 The oscillator enable pin is also connected to an external input and can be set high by connecting this pin to VCC.
-This can be done by adding a jumper to on the FPGA\_OSC\_EN header.
+This can be done by adding a jumper to on the FPGA\_OSC\_EN header. If at any time one wish to power down the fpga, stopping this clock will reduce the power consumption.
 
 In addition to the oscillator, the MCU has one internal and one external clock.
 
 \subsection{Connectors}
 \subsubsection{HDMI}
 There are two HDMI connectors on the board.
-Both of them must be connected to 5V with jumpers.
-The port labelled HDMI 2 is connected to header pins.
+Both of them can be connected to 5V with jumpers. It is not specified for HDMI to work, but is added if required by other devices.
+The port labelled HDMI 2 is connected to header pins if needed.
 See Table \ref{HDMI_Connector} for pin-outs.
 
 \subsubsection{FPC Camera Connector}
 There is one flexible printed circuit (FPC) connector on the board intended for the Raspberry Pi Camera.
-It is also connected to header pins.
+It is also connected to header pins if needed by the developer.
 See Figure \ref{fig:FpcHeader} for pin configuration.
 
 \subsection{Digital I/O}
@@ -71,7 +71,7 @@ The last button is connected to reset on the MCU.
 See Table \ref{tab:Buttons} for info.
 
 \subsubsection{Header Output}
-The MCU has spare pins that all are available on header pins.
+The MCU has spare I/O pins that all are available on header pins.
 See Table \ref{tab:HeaderOut} for location of pins.
 
 \subsection{SRAM}
@@ -80,7 +80,7 @@ The FPGA is connected to two SRAM chips, one on bank 1 and another on bank 2.
 The chps support a data width of 16 bits and have an access time of \unit[10]{ns} \cite{sramdatasheet}, which means we have a maximum throughput of $(\unit[10]{ns})^{-1} = \unit[1,6]{Gbps}$ to each chip.
 This is more than sufficient for our application as can be seen in Table \ref{tab:BitRates}.
 
-To make debugging easier, all wires connecting the FPGA and SRAM chips have been placed on headers.
+To make debugging easier, all wires connecting the FPGA and SRAM chips have been placed on headers. 
 
 \subsection{JTAG}
 Both the FPGA and the MCU is connected to a JTAG header.
@@ -143,6 +143,6 @@ One is connected to power on the board and will light up if power is connected.
 The second is programmable from the FPGA.
 
 \subsection{External Bus Interface (EBI)}
-The FPGA and the MCU is connected with a high speed EBI bus with 20 addressable pins and 16 data lines.
+The FPGA and the MCU is connected with a high speed EBI bus with 20 addressable pins and 16 data lines. They are not connected to header pins. If any wire design error had occured, there would not be any purpos of having them on headers, as it could be manually changed in the FPGA.
 See Appendix \ref{app:pinouts}, Figure \ref{fig:EbiBus} and \ref{fig:EbiControl} for EBI pin outs.
 

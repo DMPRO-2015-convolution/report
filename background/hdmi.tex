@@ -16,10 +16,14 @@ Control tokens are also used to identify word boundaries for synchronization pur
 
 The technology is based on twisted pairs of cables transferring data using a differential encoding.
 This encoding uses two cables for each bit and inverts the voltage difference between the cables in a pair whenever the bit represented by the pair should change.
-Notice that for the same voltage, this doubles the distance between the high and low states compared to using only a single cable and ground.
-The lack of a need for a common ground also eliminates problems related to ground offset.
+Electromagnetic interference tends to affect both conductors identically, and the receiving circuit will only detect the difference beetwen the wires (see Figure \ref{fig:differential_signal}). The advantage of this this technique is that it resists electromagnetic noise better than single-ended conductors \cite{diffsig}.
 
-\emph{TODO: Here there could be a figure of the differential encoding}
+\begin{figure}[h]
+    \centering
+    \includegraphics{img/DiffSignaling.png}
+    \caption[Resistance of electromagnetic noise by using differential signaling.]{Resistance of electromagnetic noise by using differential signaling. Credit to Wikipedia contributor Linear77.}
+    \label{fig:differential_signal}
+\end{figure}
 
 \subsubsection{TMDS Receiver}
 The TMDS receiver needs to do clock and data recovery (CDR) to convert the serial data stream back into the 10-bit words.

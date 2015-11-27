@@ -1,14 +1,14 @@
 \section{FPGA}
+The FPGA must handle an incoming video stream and the configuration data arriving from the MCU before the actual convolution is performed and the final video stream outputted. In addition, since some of the different components run at different clock speeds, queues are needed to synchronize data on the boundaries between clock domains.
+
+In Figure \ref{fig:FpgaOverview}, the top level modules on the FPGA are depicted.
+
 \begin{figure}
     \centering
     \includegraphics{img/FpgaOverview}
     \caption{FPGA Overview.}
     \label{fig:FpgaOverview}
 \end{figure}
-
-The FPGA must handle an incoming video stream and the configuration data arriving from the MCU before the actual convolution is performed and the final video stream outputted. In addition, some of the different components run at different clock speeds, thus queues are needed to synchronize data on the boundaries between clock domains.
-
-In Figure \ref{fig:FpgaOverview}, the top components on the FPGA are depicted.
 
 \subsection{EBI}
 As EBI is asynchronous, the incoming data for the FPGA must be synchronized to the processor clock domain before being used by clocked logic in the FPGA.
@@ -33,12 +33,12 @@ Similarly, data read from the memory must be resized back to 24 bits before bein
 \subsection{HDMI}
 Before the data from memory arrives is used by the HDMI module, it passes through a FIFO queue which has two functions:
 \begin{itemize}
-    \item Synchronize the data to the clock domain of the HDMI
-    \item Act as a buffer in case the memory is too slow
+    \item Synchronize the data to the clock domain of the HDMI.
+    \item Act as a buffer in case the memory is too slow.
 \end{itemize}
 
-That is, we may be able to hide the speed difference between the memory and the HDMI because there is a pause between each frame that the memory can use to catch up with the HDMI data consumption.
-To make things worse, the HDMI clocks out a 24 bit pixel on each cycle while the memory only reads 16 bits each cycle.
+This way, it may be possible to hide the speed difference between the memory and the HDMI because there is a pause between each frame that the memory can use to catch up with the HDMI data consumption.
+An additional challenge is that the HDMI clocks out a 24-bit pixel on each cycle while the memory only reads 16 bits each cycle.
 
 \section{Processor}
 \label{sec:processor}
@@ -95,12 +95,12 @@ By parametrizing the processor it can be viewed as any other module with the inp
 To the outside system the processor is now a module that once programmed operates on a data stream of an image and outputting a processed stream. 
 By using valid signals the outside system can provide data at any pace, and throttle the output by requesting data when the processor indicates that data is ready. 
 
-\subsection{Architecture of the processor}
+\subsection{Architecture of the Processor}
 
 Figure \ref{fig:conv_engine} shows the top level schematic of the processor with the following components:
 
 \begin{description}
-    \item[Input and output buffers] \hfill\\
+    \item[Input and Output Buffers] \hfill\\
         The input buffer is a double buffer resonsible for buffering rows of image data and feed it to the processor.
         The buffer holds several rows of image data, and when it is full it feeds data to the processor as a series of column slices while the other buffer is filled.\\
         The output buffer retrieves data from the processor as a series of column slices and rearranges the output back to row format.
@@ -135,7 +135,7 @@ This section provides a description of the heart of the architecture of Camvolut
     \label{fig:convolution_processor}
 \end{figure}
 
-From the outside, the core is a module working on sweep slices as shown in \ref{fig:sweep_feed}.
+From the outside, the core is a module working on sweep slices as shown in Figure \ref{fig:sweep_feed}.
 A good analogy for how the image is processed is how a window cleaner washes a window.
 If we let the dirty window be the original picture, and the clean image be the processed image, the process of convolution is akin to sweeping a squeegee over the window horizontally.
 In this analogy, a very small part of the window is under the squeegee at any time.
@@ -205,26 +205,26 @@ Additionally a secondary write key is issued since the register balanced multipl
 
 \subsubsection{Accumulator}
 As each pixel register in the conveyor corresponds to a row in the sweep, each accumulation unit corresponds to an output pixel.
-For a 3x3 kernel each sweep consists of 9 rows, which provides 7 output rows since the top and bottom row of each sweep misses some of its neighbours.
-Each accumulation unit corresponds to one output row, requiring 7 accumulation units in total.\\
+For a 3x3 kernel each sweep consists of nine rows, which provides seven output rows since the top and bottom row of each sweep misses some of its neighbours.
+Each accumulation unit corresponds to one output row, requiring seven accumulation units in total.\\
 Conversely, for a 5x5 convolution kernel would use 25 input rows, and lose two rows in each end from missing neighbours, resulting in 21 output rows, and 21 accumulation units.
 Table \ref{tbl:timing1} shows that each accumulation unit can map all the necessary pixels by correctly timing which row to read from.
 In the case of the first accumulator, it reads from row 3 at time $T0, T1$ and $T2$, row 2 at time $T3, T4$ and $T5$, and row 1 at time $T6, T7$ and $T8$, as shown in grey.
-At $T8$ all necessary pixel data is read, and the accumulated result is output and a new cycle begins.
+At $T8$ all necessary pixel data has been read, and the accumulated result is output and a new cycle begins.
 The second table in the conveyor section shows the same pattern for the accumulator corresponding to output row 2, only delayed by one cycle.
 This delay means that every accumulator can access the data it needs by simply timing when it reads output from the rows.
 Additionally, since each accumulator is delayed one cycle relative to its neighbour, the access patter for kernel values is similarily delayed.
 This kernel access pattern means every accumulator needs the kernel used by its predecessor last cycle, meaning that rather than keeping kernels in a central repository they can keep in a shift register with each element very close to an accumulator.
 Rather than keeping track of their progress, each accumulator passes a special flush key akin to how registers use read and write keys. Upon recieving a flush key an accumulation unit resets its content and its finished data is written on the output wire.
 
-\subsubsection{The Control unit}
+\subsubsection{The Control Unit}
 The control unit is responsible for issuing keys to the rows at periodic intervals such that reads, writes, flushing and selecting accumulator output is correctly synchronized.
 In addition to synchronizing the accumulators and conveyor, the control unit puts the core to sleep when no data is available, and is responsible for sending signals indicating that the accumulators should read instruction data.
-The issuing of keys is done by a simple state machine, for which the logic can be calculated at synthesiz time, since it is dependant on kernel size alone. 
+The issuing of keys is done by a simple state machine, for which the logic can be calculated at synthesis time, since it is dependant on kernel size alone. 
 
-\subsubsection{Kernel buffer}
+\subsubsection{Kernel Buffer}
 The kernel buffer is responsible for collecting kernel data at programming time, and to supply the correct kernel at the correct time to the mapping unit.
-In figure \ref{fig:convolution_processor} we show the kernel buffer holding all the kernels in a separate buffer, but as described in the accumulator section this buffer is actually a chained set of registers where each register is close to one of the accumulation units.
+Figure \ref{fig:convolution_processor} shows the kernel buffer holding all the kernels in a separate buffer, but as described in the Accumulator Section this buffer is actually a chained set of registers where each register is close to one of the accumulation units.
 When in programming mode, the kernel buffer gets instructions from the pixel stream rather than a separate channel.
 First, instructions are sent, which are then sent as kernels to the mappers instead of using a separate instruction channel.
 When piggybacking instructions on the kernel chain, it is nescessary to wait for the instructions to fully propagate, but this is an acceptable delay since programming is done only once per run.
@@ -239,20 +239,20 @@ In addition to providing instructions, the kernel buffer is also responsible for
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/daisy_processing.pdf}
-    \caption[Buffering and feeding of sweeps.]{A full sweep has been buffered, and is being fed to the processor. Meanwhile a new sweep is being buffered.}
+    \caption[Buffering and feeding of sweeps.]{A full sweep has been buffered, and is being fed to the processor. Meanwhile, a new sweep is being buffered.}
     \label{fig:sweep_feed}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=10cm]{img/frontier1.png}
-    \caption[The frontier.]{The frontier. The three rightmost pixels are shown with its full neighbourhood, which overlaps with its neighbours.}
+    \includegraphics[width=\linewidth]{img/frontier1_small.png}
+    \caption[The frontier.]{The frontier. The three rightmost pixels are shown with their full neighbourhoods, which overlap with their neighbours.}
     \label{fig:frontier1}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=10cm]{img/frontier2.png}
+    \includegraphics[width=\linewidth]{img/frontier2_small.png}
     \caption{The image from which the frontier in Figure \ref{fig:frontier1} is taken.}
     \label{fig:frontier2}
 \end{figure}

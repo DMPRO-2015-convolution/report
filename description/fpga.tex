@@ -167,14 +167,16 @@ Figure \ref{fig:convolution_processor} shows the insides of the core.
 The conveyor belt shows three rows, each row keeping a column slice from the sweep frontier shown in \ref{fig:frontier1} and \ref{fig:frontier2}.
 We will now explore each part of the core in greater detail.
 
-\subsubsection{The Conveyor}
-The conveyor should maintain the sweep frontier, and feed pixel data to the accumulators.
+\subsubsection{Conveyor}
+The conveyor maintains the sweep frontier, and feeds pixel data to the accumulators.
 It consists of a grid of pixel registers, each row holding a sweep slice.
 Since each pixel in a slice corresponds to a different row, every pixel register in a row has a one to one correspondence to one of the rows of the sweep currently feeding the core.
-Data management on the conveyor is done by sending keys which are passed from register to register which are issued by the control unit.
+To reiterate on this, a row in the conveyor corresponds to one of the slices in the input buffer, not a row in the input image.
+Data management on the conveyor is done by sending keys which are are issued from the control unit, and passed from register to register within a row.
 At any time, there is on each row two keys held by different registers: a read key and a write key.
+When holding a write key the register is write enabled and should read data from the row above it, while a read key tells the register that its content should be driven its content to an interconnect which the accumulator and the row below it can read from.
 Input to the conveyor is available to the entire top row, so in order to ensure that only the corresponding pixel register reads the data, the control module has to issue a key to the row at the right time.
-To illustrate, in \ref{tbl:timing1} and \ref{tbl:timing2} we show when each row has access to a write key for a 3x3 kernel:
+To illustrate, in \ref{tbl:timing1} and \ref{tbl:timing2} we show when each row has access to a read key for a 3x3 kernel:
 \begin{table}[h]
     \begin{tabular}{l*{16}{c}r}
     Time (cycle)        & $T_{0}$ & $T_{1}$ & $T_{2}$ & $T_{2}$ & $T_{4}$  & $T_{5}$ & $T_{6}$ & $T_{7}$ & $T_{8}$ & $T_{9}$ & $T_{10}$ & $T_{11}$ & $T_{12}$ & $T_{13}$ & $T_{14}$\\
@@ -200,9 +202,11 @@ To illustrate, in \ref{tbl:timing1} and \ref{tbl:timing2} we show when each row 
 \end{table}
 \\ \\
 We see that the second leftmost output pixel follows the same pattern, only shifted left by one cycle.
-When a register writes, it does so not only to make the register content available for the accumulation unit, but also to propagate its data to the row below it.
-Each register should read the register directly above, so the read keys must be issued such that a register only reads when the register above it is currently writing.
-For our conceptual design, this is easy, however in the actual implementation we move data using register balanced multiplexer trees which incur delays, so read keys has to be issued with this delay in mind.
+A register is given a read key not only to make its content available to the accumulators, but also so that the row below may have its content written to it in order to propagate data downwards.
+Each register should read the register directly above, so the write keys must be issued such that a register only has write enabled when the register above it is currently driving the interconnect.
+For our conceptual design, this is easy, however in the actual implementation we move data using register balanced multiplexer trees rather than simply driving a bus.
+This means a write key is not really given to the register, but to a multiplexer deciding which register should currently be read.
+Additionally we use a secondary write key since the mux tree has two stages, but we will not elaborate further on this since it adds unescessary detail.
 
 \subsubsection{The Accumulator}
 As each pixel register in the conveyor corresponds to a row in the sweep, each accumulation unit corresponds to an output pixel.

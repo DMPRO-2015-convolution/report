@@ -82,17 +82,33 @@ By swapping the corresponding output channels instead of the input channel, a pi
 \end{figure}
 
 \subsection{Scalability}
+% TODO 
+% TODO What convolution kernel matrix sizes can be handled, what image resolutions and depths... TODO: Add more text.
+
+As stated in Section \ref{sec:processor}, the processor has several parameters, some of which are hard coded into the final design.
+These parameters can be adjusted, but many are limited by the available hardware.
+
+In the final implementation the kernel values, map operands and reduce operands were hard coded for each configuration file.
+This does not scale well with multiple configurations, as a small change in any of these parameters would need its own configuration file.
+The time it takes for the MCU to program the FPGA with a new configuration file is about \unit[3]{seconds}.
+
+In the final implementation HDMI frame synchronization signals are being passed from input to output without going through the processor.
+This means thatthe resolution of the image output is dependent on the input.
+
+The size of the kernel matrices are hard coded both in the final design and in the final implementation.
+To use larger kernel matrix sizes, it is possible to generate new configuration files capable of processing these.
+
+According to the reports produced by Xilinx ISE during building of the FPGA bit file, the design for 3x3 convolution utilized around \unit[16]{\%} of the total number of available slices.
+
 Since each component in the core of the processor only relies on its neighbours the processor can tackle large kernels without sacrificing clock speed.
 The limiting factor is fast memory since data has to be buffered in order to be delivered as sweep slices.
 The modularity of the processor allows it to be duplicated, letting as many cores as feasible work in parallel since convolution has no data dependency issues.
 On our available hardware block ram and input bandwidth was the limiting factor, however on different hardware we believe instantiating many cores with different parameters should be a simple task.
 
-According to the reports produced by Xilinx ISE during building of the FPGA bit file, the design for 3x3 convolution utilized around \unit[16]{\%} of the total number of available slices.
-    This includes many slices with unused components.
+%    TODO:
+ %   The same report states the processor can be clocked at a maximum frequency of \emph{<insert frequency>}. This was however tested in practice as the processor was expected to deliver data quickly enough at lower frequencies.
 
-    TODO:
-    The same report states the processor can be clocked at a maximum frequency of \emph{<insert frequency>}. This was however tested in practice as the processor was expected to deliver data quickly enough at lower frequencies.
-
-    \subsection{Video Throughput}
-    The highest correctly working resolution was found to be 1366x768. This worked in real time with no perceivable delay. 1600x900 was also tried and found to be working, but resulted in an unexpected image with more artefacts. Finally, 1920x1200 was tried, but no sensible output was detected by the display.
+\subsection{Video Throughput}
+The highest correctly working resolution was found to be 1366x768.
+This worked in real time with no perceivable delay. 1600x900 was also tried and found to be working, but resulted in an unexpected image with more artefacts. Finally, 1920x1200 was tried, but no sensible output was detected by the display.
 

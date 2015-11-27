@@ -1,6 +1,6 @@
 \subsection{EBI and SRAM Throughput}
 As stated in Section \ref{subsec:EbiThroughput}, a throughput of \unit[384]{Mbps} was achieved over EBI.
-This must be considered to be an absolute maximum as there is no guarantee the MCU is capable of delivering this amount of data anyway, but since the final design did not utilize EBI for video transfers, the throughput over EBI is not a limiting factor.
+This must be considered to be an absolute maximum as there is no guarantee the MCU is capable of delivering this amount of data anyway, but since the final design did not utilise EBI for video transfers, the throughput over EBI is not a limiting factor.
 
 When it comes to SRAM, the throughput measured in Section \ref{subsec:SramThroughput} is limited by the achievable write speed.
 Even though the chip has an access time of \unit[10]{ns}, writing requires a write pulse width of minimum \unit[8]{ns}, and since the computer uses a duty cycle of \unit[50]{\%}, the real lower bound on a write is \unit[16]{ns}.

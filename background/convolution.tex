@@ -1,5 +1,5 @@
 \section{Convolution}
-This section introduces convolution from a more mathematical perspective and then gives some less traditional applications of a more generalized version.
+This section introduces convolution from a more mathematical perspective and then gives some less traditional applications of a more generalised version.
 
 \subsection{Definition}
 Conceptually, the convolution operation gives the overlap between two functions as a function of the offset between the functions.
@@ -16,7 +16,7 @@ The discrete counterpart to this is \cite{convolution2}:
     (f * g)(n) = \sum^{\infty}_{i=-\infty}{f(i)g(n-i)}
 \]
 
-This discrete variant is visualized in Figure \ref{fig:VisualConvolution} where only three of the values in the input functions have been highlighted.
+This discrete variant is visualised in Figure \ref{fig:VisualConvolution} where only three of the values in the input functions have been highlighted.
 Notice how the corresponding values from the input functions are multiplied before the products are summed.
 
 \begin{figure}
@@ -91,19 +91,19 @@ A small selection of possible kernel matrices and the results when applied to th
 As the matrices in Table \ref{tab:KernelMatrices} are good examples of, the kernel matrices used for image processing is usually small compared to the images, and often of a constant size.
 This means each output pixel is a function of the same pixel in the original image and its neighbourhood.
 
-\subsection{Generalized Convolution}
+\subsection{Generalised Convolution}
 The convolution described above can be separated into two stages: first multiplication, then a summation.
 The multiplication stage simply maps a set of input values to a set of output values by using the kernel matrix values as factors.
 These products are then reduced into a single value by summation.
 
-By recognizing that the process consists of mapping and reduction,
+By recognising that the process consists of mapping and reduction,
 it then becomes possible to substitute other mapping and reducing operations.
-A generalized convolution operation is therefore fully defined by two input matrices and two operations.
+A generalised convolution operation is therefore fully defined by two input matrices and two operations.
 
 In the realm of image processing, this paves the way for new filters, such as the median, minimum and maximum filters.
 These filters are commonly used to remove noise in images and consists of a convolution kernel matrix of ones (the multiplicative identity for scalars),
 the multiplication operation for the map stage and the minimum, maximum or mean operations respectively for the reduce operations.
-The resulting images created by applying the effect to the \textit{Lena} test image can be seen in Table \ref{tab:GeneralizedKernelMatrices}.
+The resulting images created by applying the effect to the \textit{Lena} test image can be seen in Table \ref{tab:GeneralisedKernelMatrices}.
 
 \begin{table}
     \centering
@@ -115,8 +115,8 @@ The resulting images created by applying the effect to the \textit{Lena} test im
         Median & \includegraphics[width=3cm]{img/LenaMedian}
     \end{tabular}
 
-    \caption{Some image processing filters using a generalized form of convolution.}
-    \label{tab:GeneralizedKernelMatrices}
+    \caption{Some image processing filters using a generalised form of convolution.}
+    \label{tab:GeneralisedKernelMatrices}
 \end{table}
 
-Generalized convolution can also be used in other areas, such as to calculate the next iteration of cellular automatons. This requires a more advanced reduce operation.
+Generalised convolution can also be used in other areas, such as to calculate the next iteration of cellular automatons. This requires a more advanced reduce operation.

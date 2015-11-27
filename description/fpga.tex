@@ -1,5 +1,5 @@
 \section{FPGA}
-The FPGA must handle an incoming video stream and the configuration data arriving from the MCU before the actual convolution is performed and the final video stream outputted. In addition, since some of the different components run at different clock speeds, queues are needed to synchronize data on the boundaries between clock domains.
+The FPGA must handle an incoming video stream and the configuration data arriving from the MCU before the actual convolution is performed and the final video stream outputted. In addition, since some of the different components run at different clock speeds, queues are needed to synchronise data on the boundaries between clock domains.
 
 In Figure \ref{fig:FpgaOverview}, the top level modules on the FPGA are depicted.
 
@@ -11,10 +11,10 @@ In Figure \ref{fig:FpgaOverview}, the top level modules on the FPGA are depicted
 \end{figure}
 
 \subsection{EBI}
-As EBI is asynchronous, the incoming data for the FPGA must be synchronized to the processor clock domain before being used by clocked logic in the FPGA.
+As EBI is asynchronous, the incoming data for the FPGA must be synchronised to the processor clock domain before being used by clocked logic in the FPGA.
 This is done by sending the data through a first-in first-out (FIFO) queue immediately after arrival.
 
-After being synchronized, the EBI manager checks the addresses to determine what action to perform. In some cases, the data is resized from 16 to 24 bits and forwarded to the processor. In other cases, the data sets a control bit in the EBI manager which turns on EFM mode for the FPGA.
+After being synchronised, the EBI manager checks the addresses to determine what action to perform. In some cases, the data is resized from 16 to 24 bits and forwarded to the processor. In other cases, the data sets a control bit in the EBI manager which turns on EFM mode for the FPGA.
 
 In EFM mode, EBI is routed to one of the memory chips to allow the MCU to read and write data and the HDMI output module is locked to the very same chip.
 This allows the MCU to paint user interfaces on the screen so that the system can be controlled through buttons.
@@ -33,7 +33,7 @@ Similarly, data read from the memory must be resized back to 24 bits before bein
 \subsection{HDMI}
 Before the data from memory arrives is used by the HDMI module, it passes through a FIFO queue which has two functions:
 \begin{itemize}
-    \item Synchronize the data to the clock domain of the HDMI.
+    \item synchronise the data to the clock domain of the HDMI.
     \item Act as a buffer in case the memory is too slow.
 \end{itemize}
 
@@ -46,9 +46,9 @@ In this section describes the processor which lies at the heart of the architect
 The processor will first be described as seen from an outside perspective before each component inside is explored.
 
 \subsection{The Processor as a Component}
-A design goal for the system was to reconfigure the FPGA depending on the task, which necessitates synthesizing several versions of the architecture so that the correct architecture may be chosen at run time.
+A design goal for the system was to reconfigure the FPGA depending on the task, which necessitates synthesising several versions of the architecture so that the correct architecture may be chosen at run time.
 In addition to using several architectures, each version is also programmable, allowing the kernel values, map operators and reduce operators to be programmed at runtime.
-To facilitate generating different versions of the architecture, the design was parametrized, allowing the generation of different architectures by simply changing a parameter once.
+To facilitate generating different versions of the architecture, the design was parameterised, allowing the generation of different architectures by simply changing a parameter once.
 The parameters available are:
 
 \begin{description}
@@ -65,7 +65,7 @@ The parameters available are:
         The data width that the processor should output. As with input, translating widths is necessary.
 \end{description}
 
-By parametrizing the processor it can be viewed as any other module with the inputs and outputs shown in Table \ref{tbl:ConvolutionEngineIO}.
+By parameterising the processor it can be viewed as any other module with the inputs and outputs shown in Table \ref{tbl:ConvolutionEngineIO}.
 
 \begin{table}[h]
     \begin{tabular}{l | l | l | l }
@@ -218,8 +218,8 @@ This kernel access pattern means every accumulator needs the kernel used by its 
 Rather than keeping track of their progress, each accumulator passes a special flush key akin to how registers use read and write keys. Upon recieving a flush key an accumulation unit resets its content and its finished data is written on the output wire.
 
 \subsubsection{The Control Unit}
-The control unit is responsible for issuing keys to the rows at periodic intervals such that reads, writes, flushing and selecting accumulator output is correctly synchronized.
-In addition to synchronizing the accumulators and conveyor, the control unit puts the core to sleep when no data is available, and is responsible for sending signals indicating that the accumulators should read instruction data.
+The control unit is responsible for issuing keys to the rows at periodic intervals such that reads, writes, flushing and selecting accumulator output is correctly synchronised.
+In addition to synchronising the accumulators and conveyor, the control unit puts the core to sleep when no data is available, and is responsible for sending signals indicating that the accumulators should read instruction data.
 The issuing of keys is done by a simple state machine, for which the logic can be calculated at synthesis time, since it is dependant on kernel size alone. 
 
 \subsubsection{Kernel Buffer}

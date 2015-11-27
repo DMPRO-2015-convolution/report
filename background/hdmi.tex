@@ -1,18 +1,18 @@
 \section{High-Definition Multimedia Interface (HDMI)}
 HDMI is a standard for transferring digital video between devices and is commonly used to connect video sources to displays.
-The cable can carry audio, Ethernet and other information in addition to the video stream itself, but only the video stream was utilized for this project.
+The cable can carry audio, Ethernet and other information in addition to the video stream itself, but only the video stream was utilised for this project.
 
-\subsection{Transition-Minimized Differential Signaling}
-Transition-Minimized Differential Signaling (TMDS) is a standard used for transmitting video data over HDMI.
+\subsection{Transition-Minimised Differential Signaling}
+Transition-Minimised Differential Signaling (TMDS) is a standard used for transmitting video data over HDMI.
 HDMI uses it at the physical layer.
 Four channels of serial data establish the HDMI video transmission.
 It has three channels for the RBG colour information and one for the pixel data rate clock.
 Each pixel has a 24-bit colour depth, with each colour being 8 bits each.
-These are separately convertered into 10-bit symbols before being serialized and transmitted onto the TMDS data channels.
-It is this 10:1 serialization ratio that makes the bit rate 10x faster than the actual pixel rate.
+These are separately convertered into 10-bit symbols before being serialised and transmitted onto the TMDS data channels.
+It is this 10:1 serialisation ratio that makes the bit rate 10x faster than the actual pixel rate.
 During the video transmission the pixel symbol is periodically interlaced with four distinct control tokens representing blanking intervals.
 These control tokens provide accurate video line scan (HSYNC) and frame update (VSYNC) information.
-Control tokens are also used to identify word boundaries for synchronization purposes.
+Control tokens are also used to identify word boundaries for synchronisation purposes.
 
 The technology is based on twisted pairs of cables transferring data using a differential encoding.
 This encoding uses two cables for each bit and inverts the voltage difference between the cables in a pair whenever the bit represented by the pair should change.

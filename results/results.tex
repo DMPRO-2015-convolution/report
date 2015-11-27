@@ -16,7 +16,7 @@ This is presented in more detail below.
 
 \subsection{HDMI Timing}
 When sending HDMI data directly from input to output without delaying the signal, the control signal from the input HDMI signals can be used as output control signals.
-This results in perfect synchronization with the top left corner of the input being displayed in the top left corner on the screen.
+This results in perfect synchronisation with the top left corner of the input being displayed in the top left corner on the screen.
 
 When processing the data, the data is delayed and arrives too late compared to the control signals. This results in a image shifted slightly to the right as can be seen in Figure \ref{fig:SyncDelay}.
 
@@ -42,7 +42,7 @@ Notice that this does not happen in the vertical direction as the image is sent 
 
 Visible in Figure \ref{fig:Overflow} are vertical lines not present in the input.
 These lines are caused by the processor not being able to deliver all pixels required without the buffers.
-At other resolutions, this may not be as visible as horizontal synchronization period is not a multiple of the time between each missing pixel from the processor.
+At other resolutions, this may not be as visible as horizontal synchronisation period is not a multiple of the time between each missing pixel from the processor.
 
 Also missing from the slimmed down version of the processor is the possibility of setting convolution kernel and operators on run-time.
 Instead, several versions of the bit file was stored to the SD card for testing.
@@ -70,7 +70,7 @@ These values wrap around and is offset by the maximum value, causing an otherwis
 After the first test of HDMI output from HDMI input, the HDMI input pins for R and B were swapped in the FPGA constraints to produce a picture with correct colour values.
 The underlying problem were the HDMI output channels being swapped in the constraints. 
 This led to the HDMI channel path for R and B through the FPGA to be remapped twice as shown in Figure \ref{fig:hdmiChannelPath}.
-The image will have the correct colours at the output, but since VSYNC and HSYNC signals are only sent over channel B, information used to synchronize the image is lost.
+The image will have the correct colours at the output, but since VSYNC and HSYNC signals are only sent over channel B, information used to synchronise the image is lost.
 By swapping the corresponding output channels instead of the input channel, a picture with correct colours as well as VSYNC and HSYNC signals appeared on the display.
 
 \begin{figure}[h!]
@@ -98,7 +98,7 @@ This means thatthe resolution of the image output is dependent on the input.
 The size of the kernel matrices are hard coded both in the final design and in the final implementation.
 To use larger kernel matrix sizes, it is possible to generate new configuration files capable of processing these.
 
-According to the reports produced by Xilinx ISE during building of the FPGA bit file, the design for 3x3 convolution utilized around \unit[16]{\%} of the total number of available slices.
+According to the reports produced by Xilinx ISE during building of the FPGA bit file, the design for 3x3 convolution utilised around \unit[16]{\%} of the total number of available slices.
 
 Since each component in the core of the processor only relies on its neighbours the processor can tackle large kernels without sacrificing clock speed.
 The limiting factor is fast memory since data has to be buffered in order to be delivered as sweep slices.

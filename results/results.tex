@@ -3,9 +3,9 @@
 \begin{figure}
     \centering
     \includegraphics[width=14cm]{img/camvolution_running.jpg}
-    \caption[The implemented system running.]{
+    \caption[The implemented system running]{
         An image of a flower is sent from a laptop using HDMI.
-				The image is convolved by the Camvolution board and sent to a screen.
+        The image is convolved by the Camvolution board and sent to a screen.
     }
     \label{fig:systemRunning}
 \end{figure}
@@ -23,7 +23,7 @@ When processing the data, the data is delayed and arrives too late compared to t
 \begin{figure}
     \centering
     \includegraphics[width=14cm]{img/red_green_test.jpg}
-    \caption[The delayed data stream.]{
+    \caption[The delayed data stream]{
         The delayed data stream shows up as a shifted image.
         The laptop displays the original input signal and the screen behind displays the output.
         A 3x3 matrix of ones is used as kernel.
@@ -57,7 +57,7 @@ These values wrap around and is offset by the maximum value, causing an otherwis
 \begin{figure}
     \centering
     \includegraphics[width=14cm]{img/gradient_test}
-    \caption[The laptop displays the input image, the display behind displays the output.]{
+    \caption[Gradient Output]{
         The laptop displays the input image, the display behind displays the output.
         The original gradient is turned into several shorter periods due to overflow when accumulating the final values.
         A 3x3 matrix of ones is used as kernel.
@@ -75,7 +75,9 @@ By swapping the corresponding output channels instead of the input channel, a pi
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/hdmi_channel_path.pdf}
-    \caption[HDMI channels being swapped in the FPGA constraints.]{HDMI channels being swapped in the FPGA constraints, VSYNC and HSYNC is lost}
+    \caption[HDMI channels being swapped in the FPGA constraints]{
+        HDMI channels being swapped in the FPGA constraints, VSYNC and HSYNC is lost
+    }
     \label{fig:hdmiChannelPath}
 \end{figure}
 
@@ -85,10 +87,10 @@ As stated in Section \ref{sec:processor}, the processor has several parameters, 
 These parameters can be adjusted, but many are limited by the available hardware.
 
 According to the reports produced by Xilinx ISE during building of the FPGA bit file, the design for 3x3 convolution utilized around \unit[16]{\%} of the total number of available slices.
-This includes many slices with unused components.
+    This includes many slices with unused components.
 
-TODO:
-The same report states the processor can be clocked at a maximum frequency of \emph{<insert frequency>}. This was however tested in practice as the processor was expected to deliver data quickly enough at lower frequencies.
+    TODO:
+    The same report states the processor can be clocked at a maximum frequency of \emph{<insert frequency>}. This was however tested in practice as the processor was expected to deliver data quickly enough at lower frequencies.
 
-\subsection{Video Throughput}
-The highest correctly working resolution was found to be 1366x768. This worked in real time with no perceivable delay. 1600x900 was also tried and found to be working, but resulted in an unexpected image with more artefacts. Finally, 1920x1200 was tried, but no sensible output was detected by the display.
+    \subsection{Video Throughput}
+    The highest correctly working resolution was found to be 1366x768. This worked in real time with no perceivable delay. 1600x900 was also tried and found to be working, but resulted in an unexpected image with more artefacts. Finally, 1920x1200 was tried, but no sensible output was detected by the display.

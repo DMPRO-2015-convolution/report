@@ -89,53 +89,10 @@ The FPGA is connected to a 8 pin JTAG header.
 This can be routed to a debugger used for FPGA programming.
 See Table \ref{tab:EfmProgrammer} for MCU JTAG header and Figure \ref{fig:FpgaProgrammer} for FPGA JTAG header.
 
-\begin{table}[]
-    \centering
-    \begin{tabular}{ll}
-        Pin                     & USAGE     \\
-        \hline
-        1                       & VCC       \\
-        3                       & N/C       \\
-        5                       & N/C       \\
-        7                       & CS / PF0  \\
-        9                       & CLK / PF1 \\
-        11                      & N/C       \\
-        13                      & PF2       \\
-        15                      & RESET     \\
-        17                      & N/C       \\
-        19                      & N/C       \\
-        4,6,8,10,12,14,16,18,20 & GND       \\
-        2                       & N/C
-    \end{tabular}
-    \caption{Programming Output for MCU}
-    \label{tab:EfmProgrammer}
-\end{table}
-
-\begin{figure}
-    \includegraphics[width=\linewidth]{img/FPGA_Programmer}
-    \caption{Programming output for FPGA}
-    \label{fig:FpgaProgrammer}
-\end{figure}
-
 \subsection{Programming FPGA Using MCU SPI}
 The FPGA can also be programmed using serial peripheral interface (SPI) from the MCU.
 INIT\_B shares the same pin as the SRAM2 data line, but when programming the FPGA the SRAM will not be active.
 See Table \ref{tab:SpiProgrammer}.
-
-\begin{table}[]
-    \centering
-    \begin{tabular}{lll}
-        MCU pin & FPGA & Usage   \\
-        \hline
-        PB8     & U3   & INIT\_B \\
-        PD3     & U15  & CS      \\
-        PD2     & R15  & CLK     \\
-        PD1     & V16  & RX      \\
-        PD0     & R13  & TX
-    \end{tabular}
-    \caption{Programming FPGA using MCU SPI}
-    \label{tab:SpiProgrammer}
-\end{table}
 
 \subsection{LED}
 There are two LEDs on the board.

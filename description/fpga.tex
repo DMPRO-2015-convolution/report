@@ -2,7 +2,7 @@
 \begin{figure}
     \centering
     \includegraphics{img/FpgaOverview}
-    \caption{FPGA Overview}
+    \caption{FPGA Overview.}
     \label{fig:FpgaOverview}
 \end{figure}
 
@@ -54,11 +54,11 @@ The parameters available are:
 \begin{description}
     \item[Kernel Dimensions] \hfill \\
         The most fundamental parameter in our design, the kernel dimension dictates how many pixels we need to calculate a single output pixel.
-        This is very fundamental parameter, and we will see how setting the kernel dimension will effect other important sizes in our system as we explore the system.
+        This is very fundamental parameter, and we will see how setting the kernel dimension will effect other important sizes in our system as we explore it.
     \item[Image Data Input Width] \hfill \\
-        The width which input image data is presented 
+        The width which input image data is presented.
     \item[Pixel Width] \hfill \\
-        The width of each pixel. When image input width and pixel width does not match, for instance with 16 bit input width and 24 bit pixel width, the processor must buffer and translate the input stream 
+        The width of each pixel. When image input width and pixel width does not match, for instance with 16 bit input width and 24 bit pixel width, the processor must buffer and translate the input stream.
     \item[Control Data Input Width] \hfill \\
         As with input data width, the processor must know the width of the incoming control data.
     \item[Image Data Output Width] \hfill \\
@@ -88,7 +88,7 @@ By parametrizing the processor we can view it as any other processor module with
         &   Image data out          & Image input width     & The processed image data on row format\\
         &   Image data valid        & 1                     & Current output data is valid
     \end{tabular}
-    \caption{The interface of the processor, specified by its parameters}
+    \caption{The interface of the processor, specified by its parameters.}
     \label{tbl:ConvolutionEngineIO}
 \end{table}
 
@@ -185,7 +185,7 @@ To illustrate, in \ref{tbl:timing1} and \ref{tbl:timing2} we show when each row 
     Row 2                   & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
     Row 3                   & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & \\
     \end{tabular}
-    \caption{A sequence diagram showing which registers in each row is being read at each timestep. Greyed out cells shows the pixels in the neighbourhood of the output pixel corresponding to output row 1}
+    \caption{A sequence diagram showing which registers in each row is being read at each timestep. Greyed out cells shows the pixels in the neighbourhood of the output pixel corresponding to output row 1.}
     \label{tbl:timing1}
 \end{table}
 \\ \\
@@ -197,7 +197,7 @@ To illustrate, in \ref{tbl:timing1} and \ref{tbl:timing2} we show when each row 
         Row 2                   & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \cellcolor{gray75}4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
         Row 3                   & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & \\
     \end{tabular}
-    \caption{A sequence diagram showing which registers in each row is being read at each timestep. Greyed out cells shows the pixels in the neighbourhood of the output pixel corresponding to output row 1}
+    \caption{A sequence diagram showing which registers in each row is being read at each timestep. Greyed out cells shows the pixels in the neighbourhood of the output pixel corresponding to output row 1.}
     \label{tbl:timing2}
 \end{table}
 \\ \\
@@ -244,7 +244,7 @@ In addition to providing instructions, the kernel buffer is also responsible for
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/daisy_processing.pdf}
-    \caption[Buffering and feeding of sweeps.]{A full sweep has been buffered, and is being fed to the processor. Meanwhile a new sweep is being buffered}
+    \caption[Buffering and feeding of sweeps.]{A full sweep has been buffered, and is being fed to the processor. Meanwhile a new sweep is being buffered.}
     \label{fig:sweep_feed}
 \end{figure}
 

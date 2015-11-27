@@ -42,8 +42,8 @@ To make things worse, the HDMI clocks out a 24 bit pixel on each cycle while the
 
 \section{Processor}
 \label{sec:processor}
-In this section describes the processor which lies at the heart of the FPGA architecture.
-We will first describe the processor by  outside system before showing the inner workings.
+In this section describes the processor which lies at the heart of the architecture of Camvolution.
+The processor will first be described as seen from an outside perspective before each component inside is explored.
 
 \subsection{The Processor as a Component}
 A design goal for the system was to reconfigure the FPGA depending on the task, which necessitates synthesizing several versions of the architecture so that the correct architecture may be chosen at run time.
@@ -152,7 +152,7 @@ Figure \ref{fig:convolution_processor} shows an overview of the core which conta
         The kernel buffer maintains the kernel data and must provide the correct kernel data for each map operation performed in the accumulators.
         This module is also responsible for programming operators.
     \item[Accumulator] \hfill\\
-        To convolute a pixel, a mapping unit which maps the neighbourhood of a pixel is employed, paired with a reducing unit working exclusively with the mapping unit it is paired with.
+        To convolve a pixel, a mapping unit which maps the neighbourhood of a pixel is employed, paired with a reducing unit working exclusively with the mapping unit it is paired with.
         The mapping unit reads the pixels of a pixel neighbourhood in sequence, and each mapped pixel is processed by the reduction unit which performs a reduce operation with the new pixel and the already accumulated pixel data.
         Together these two units forms a single accumulation unit, and by employing a row of these units together several pixels may be computed in parallel.
     \item[Control Unit] \hfill\\
@@ -160,8 +160,7 @@ Figure \ref{fig:convolution_processor} shows an overview of the core which conta
 \end{description}
 
 Figure \ref{fig:convolution_processor} shows the insides of the core. 
-The conveyor belt shows three rows, each row keeping a column slice from the sweep frontier shown in \ref{fig:frontier1} and \ref{fig:frontier2}.
-We will now explore each part of the core in greater detail.
+The conveyor belt shows three rows, each row keeping a column slice from the sweep frontier shown in Figures \ref{fig:frontier1} and \ref{fig:frontier2}.
 
 \subsubsection{Conveyor}
 The conveyor maintains the sweep frontier, and feeds pixel data to the accumulators.
@@ -172,7 +171,7 @@ Data management on the conveyor is done by sending keys which are are issued fro
 At any time, there is on each row two keys held by different registers: a read key and a write key.
 When holding a write key the register is write enabled and should read data from the row above it, while a read key tells the register that its content should be driven its content to an interconnect which the accumulator and the row below it can read from.
 Input to the conveyor is available to the entire top row, so in order to ensure that only the corresponding pixel register reads the data, the control module has to issue a key to the row at the right time.
-To illustrate, in \ref{tbl:timing1} and \ref{tbl:timing2} we show when each row has access to a read key for a 3x3 kernel:
+To illustrate, Tables \ref{tbl:timing1} and \ref{tbl:timing2} show when each row has access to a read key for a 3x3 kernel:
 \begin{table}[h]
     \begin{tabular}{l*{16}{c}r}
     Time (cycle)        & $T_{0}$ & $T_{1}$ & $T_{2}$ & $T_{2}$ & $T_{4}$  & $T_{5}$ & $T_{6}$ & $T_{7}$ & $T_{8}$ & $T_{9}$ & $T_{10}$ & $T_{11}$ & $T_{12}$ & $T_{13}$ & $T_{14}$\\
@@ -197,12 +196,12 @@ To illustrate, in \ref{tbl:timing1} and \ref{tbl:timing2} we show when each row 
     \label{tbl:timing2}
 \end{table}
 \\ \\
-We see that the second leftmost output pixel follows the same pattern, only shifted left by one cycle.
+The second leftmost output pixel follows the same pattern, only shifted left by one cycle.
 A register is given a read key not only to make its content available to the accumulators, but also so that the row below may have its content written to it in order to propagate data downwards.
 Each register should read the register directly above, so the write keys must be issued such that a register only has write enabled when the register above it is currently driving the interconnect.
 For the conceptual design, this is easy, however in the actual implementation data is moved using register balanced multiplexer trees rather than simply driving a bus.
 This means a write key is not really given to the register, but to a multiplexer deciding which register should currently be read.
-Additionally a secondary write key is issued since the mux tree has two stages, but this will not be elaborated further upon in order to not clutter the report with implementation details.
+Additionally a secondary write key is issued since the register balanced multiplexer tree has two stages, but this will not be elaborated further upon in order to not clutter the report with implementation details.
 
 \subsubsection{Accumulator}
 As each pixel register in the conveyor corresponds to a row in the sweep, each accumulation unit corresponds to an output pixel.

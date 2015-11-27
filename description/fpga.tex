@@ -40,21 +40,21 @@ Before the data from memory arrives is used by the HDMI module, it passes throug
 That is, we may be able to hide the speed difference between the memory and the HDMI because there is a pause between each frame that the memory can use to catch up with the HDMI data consumption.
 To make things worse, the HDMI clocks out a 24 bit pixel on each cycle while the memory only reads 16 bits each cycle.
 
-\section{Convolution Engine}
+\section{Processor}
 \label{sec:processor}
-In this section we will describe the processor which is at the heart of the FPGA architecture.
-We will first describe the processor as a stream processor seen from the outside system before showing the inner workings.
+In this section describes the processor which lies at the heart of the FPGA architecture.
+We will first describe the processor by  outside system before showing the inner workings.
 
-\subsection{The Convolution Engine as a Component}
+\subsection{The Processor as a Component}
 A design goal for the system was to reconfigure the FPGA depending on the task, which necessitates synthesizing several versions of the architecture so that the correct architecture may be chosen at run time.
 In addition to using several architectures, each version is also programmable, allowing the kernel values, map operators and reduce operators to be programmed at runtime.
-To facilitate generating different versions of the architecture we parametrized our design, allowing us to generate different architectures by simply changing a parameter once.
+To facilitate generating different versions of the architecture, the design was parametrized, allowing the generation of different architectures by simply changing a parameter once.
 The parameters available are:
 
 \begin{description}
     \item[Kernel Dimensions] \hfill \\
-        The most fundamental parameter in our design, the kernel dimension dictates how many pixels we need to calculate a single output pixel.
-        This is very fundamental parameter, and we will see how setting the kernel dimension will effect other important sizes in our system as we explore it.
+        The most fundamental parameter in the design, the kernel dimension dictates how many pixels are needed to calculate a single output pixel.
+        This is very fundamental parameter, and setting the kernel dimension will effect other important sizes in the system.
     \item[Image Data Input Width] \hfill \\
         The width which input image data is presented.
     \item[Pixel Width] \hfill \\
@@ -65,7 +65,7 @@ The parameters available are:
         The data width that the processor should output. As with input, translating widths is necessary.
 \end{description}
 
-By parametrizing the processor we can view it as any other processor module with the inputs and outputs shown in Table \ref{tbl:ConvolutionEngineIO}.
+By parametrizing the processor it can be viewed as any other module with the inputs and outputs shown in Table \ref{tbl:ConvolutionEngineIO}.
 
 \begin{table}[h]
     \begin{tabular}{l | l | l | l }
@@ -106,7 +106,7 @@ Figure \ref{fig:conv_engine} shows the top level schematic of the processor with
         The output buffer retrieves data from the processor as a series of column slices and rearranges the output back to row format.
         Figure \ref{fig:sweep_feed} shows how the input buffer feeds the processor with data from a buffered set of rows.
         When data is fed on a column major format within its set of rows we call the data stream a \textit{sweep}, inspired by the way a window is washed by sweeping it with a squeegee.
-        The column slices in the sweep are called \textit{sweep columns}.
+        The column slices in the sweep are called \textit{sweep slices}.
     \item[Control] \hfill\\
         The control unit is responsible for keeping track of the input and output buffers, waking the processor once an input buffer is ready and making sure the output buffer is empty before a new feeding cycle is started.
         The control unit is also responsible for programming the processor after a reset.
@@ -120,8 +120,6 @@ The processor does the following tasks:
     \item Once the input buffer is ready, wake up the core and provide data as an uninterrupted column major image stream, essentially working as a wrapper for the core.
 \end{itemize}
 
-Having established how the processor provides an interface for the core, we will now see how the core works internally.
-
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/convolution_engine.png}
     \caption{The top level schematic of the processor.}
@@ -129,9 +127,7 @@ Having established how the processor provides an interface for the core, we will
 \end{figure}
 
 \subsection{Core}
-This section provides a description of the heart of our architecture.
-Figure \ref{fig:convolution_processor} shows an overview of the core which contains four modules:
-To illustrate how the components work we describe how the first frame of a videostream is processed.
+This section provides a description of the heart of the architecture of Camvolution.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/processor_small.png}
@@ -141,12 +137,12 @@ To illustrate how the components work we describe how the first frame of a video
 
 From the outside, the core is a module working on sweep slices as shown in \ref{fig:sweep_feed}.
 A good analogy for how the image is processed is how a window cleaner washes a window.
-If we let the dirty window be our original picture, and the clean image be the processed image, the process of convolution is akin to sweeping the squeegee over the window horizontally.
-In our analogy, a very small part of the window is under the squeegee at any time.
-Similarily, our core works on a small part of the image at any time, only large enough to contain enough pixels to calculate a single slice of output pixels, called the \textit{sweep frontier}, as shown in figures \ref{fig:frontier1} and \ref{fig:frontier2}.
-To illustrate how data is fed we can view each row in the sweep as a stack.
-The rows then take turns popping one of its elements such that the core effectively gets column slices.
-The core consists of the following components:
+If we let the dirty window be the original picture, and the clean image be the processed image, the process of convolution is akin to sweeping a squeegee over the window horizontally.
+In this analogy, a very small part of the window is under the squeegee at any time.
+Similarily, the core works on a small part of the image at any time, only large enough to contain enough pixels to calculate a single slice of output pixels, called the \textit{sweep frontier}, as shown in figures \ref{fig:frontier1} and \ref{fig:frontier2}.
+To illustrate how data is fed each row in the sweep can be viewed as a stack.
+Each stack is filled with a row from the input image, and once all rows are full they take turns popping one of their elements such that the core recieves sweep slices.
+Figure \ref{fig:convolution_processor} shows an overview of the core which contains four modules:
 
 \begin{description}
     \item[Conveyor] \hfill\\ 
@@ -156,9 +152,9 @@ The core consists of the following components:
         The kernel buffer maintains the kernel data and must provide the correct kernel data for each map operation performed in the accumulators.
         This module is also responsible for programming operators.
     \item[Accumulator] \hfill\\
-        To convolute a pixel, we need one mapping unit which maps the neighbourhood of a pixel in sequence, and one reduction unit which performs a reduce operation with the input from its associated mapping unit, and a partially processed pixel.
-        Together these two units forms a single accumulation unit, and by employing a row of these units together we can compute several pixels in parallel.
-        The accumulator consists of a row of these functional units working on pixels in parallel.
+        To convolute a pixel, a mapping unit which maps the neighbourhood of a pixel is employed, paired with a reducing unit working exclusively with the mapping unit it is paired with.
+        The mapping unit reads the pixels of a pixel neighbourhood in sequence, and each mapped pixel is processed by the reduction unit which performs a reduce operation with the new pixel and the already accumulated pixel data.
+        Together these two units forms a single accumulation unit, and by employing a row of these units together several pixels may be computed in parallel.
     \item[Control Unit] \hfill\\
         In order for the accumulators and pixel conveyor to be in sync a control unit sends control signals periodically, which are then propogated throughout the system.
 \end{description}
@@ -185,7 +181,7 @@ To illustrate, in \ref{tbl:timing1} and \ref{tbl:timing2} we show when each row 
     Row 2                   & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
     Row 3                   & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & \\
     \end{tabular}
-    \caption{A sequence diagram showing which registers in each row is being read at each timestep. Greyed out cells shows the pixels in the neighbourhood of the output pixel corresponding to output row 1.}
+    \caption[Sequence diagram for write keys]{A sequence diagram showing which registers in each row is being read at each timestep. Greyed out cells shows the pixels in the neighbourhood of the output pixel corresponding to output row 1.}
     \label{tbl:timing1}
 \end{table}
 \\ \\
@@ -197,29 +193,29 @@ To illustrate, in \ref{tbl:timing1} and \ref{tbl:timing2} we show when each row 
         Row 2                   & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \cellcolor{gray75}4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
         Row 3                   & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & \\
     \end{tabular}
-    \caption{A sequence diagram showing which registers in each row is being read at each timestep. Greyed out cells shows the pixels in the neighbourhood of the output pixel corresponding to output row 1.}
+    \caption[Sequence diagram for write keys, delayed one cycle]{A sequence diagram showing which registers in each row is being read at each timestep. Greyed out cells shows the pixels in the neighbourhood of the output pixel corresponding to output row 1.}
     \label{tbl:timing2}
 \end{table}
 \\ \\
 We see that the second leftmost output pixel follows the same pattern, only shifted left by one cycle.
 A register is given a read key not only to make its content available to the accumulators, but also so that the row below may have its content written to it in order to propagate data downwards.
 Each register should read the register directly above, so the write keys must be issued such that a register only has write enabled when the register above it is currently driving the interconnect.
-For our conceptual design, this is easy, however in the actual implementation we move data using register balanced multiplexer trees rather than simply driving a bus.
+For the conceptual design, this is easy, however in the actual implementation data is moved using register balanced multiplexer trees rather than simply driving a bus.
 This means a write key is not really given to the register, but to a multiplexer deciding which register should currently be read.
-Additionally we use a secondary write key since the mux tree has two stages, but we will not elaborate further on this since it adds unescessary detail.
+Additionally a secondary write key is issued since the mux tree has two stages, but this will not be elaborated further upon in order to not clutter the report with implementation details.
 
 \subsubsection{Accumulator}
 As each pixel register in the conveyor corresponds to a row in the sweep, each accumulation unit corresponds to an output pixel.
 For a 3x3 kernel each sweep consists of 9 rows, which provides 7 output rows since the top and bottom row of each sweep misses some of its neighbours.
-Each accumulation unit corresponds to one output row, and we thus have 7 accumulation units.\\
-Conversely, for a 5x5 convolution kernel we would use 25 input rows, and lose two rows in each end from missing neighbours, resulting in 21 output rows, and 21 accumulation units.
-From the table in the conveyor section, we see that each accumulation unit can map all the necessary pixels by correctly timing which row to read from.
-In the case of the first accumulator, it should read from row 3 at time $T0, T1$ and $T2$, row 2 at time $T3, T4$ and $T5$, and row 1 at time $T6, T7$ and $T8$, as shown in grey.
+Each accumulation unit corresponds to one output row, requiring 7 accumulation units in total.\\
+Conversely, for a 5x5 convolution kernel would use 25 input rows, and lose two rows in each end from missing neighbours, resulting in 21 output rows, and 21 accumulation units.
+Table \ref{tbl:timing1} shows that each accumulation unit can map all the necessary pixels by correctly timing which row to read from.
+In the case of the first accumulator, it reads from row 3 at time $T0, T1$ and $T2$, row 2 at time $T3, T4$ and $T5$, and row 1 at time $T6, T7$ and $T8$, as shown in grey.
 At $T8$ all necessary pixel data is read, and the accumulated result is output and a new cycle begins.
 The second table in the conveyor section shows the same pattern for the accumulator corresponding to output row 2, only delayed by one cycle.
 This delay means that every accumulator can access the data it needs by simply timing when it reads output from the rows.
 Additionally, since each accumulator is delayed one cycle relative to its neighbour, the access patter for kernel values is similarily delayed.
-This kernel access pattern means every accumulator needs the kernel used by its predecessor last cycle, meaning that rather than keeping kernels in a central repository we can keep them in a shift register with each element very close to an accumulator.
+This kernel access pattern means every accumulator needs the kernel used by its predecessor last cycle, meaning that rather than keeping kernels in a central repository they can keep in a shift register with each element very close to an accumulator.
 Rather than keeping track of their progress, each accumulator passes a special flush key akin to how registers use read and write keys. Upon recieving a flush key an accumulation unit resets its content and its finished data is written on the output wire.
 
 \subsubsection{The Control unit}
@@ -232,7 +228,7 @@ The kernel buffer is responsible for collecting kernel data at programming time,
 In figure \ref{fig:convolution_processor} we show the kernel buffer holding all the kernels in a separate buffer, but as described in the accumulator section this buffer is actually a chained set of registers where each register is close to one of the accumulation units.
 When in programming mode, the kernel buffer gets instructions from the pixel stream rather than a separate channel.
 First, instructions are sent, which are then sent as kernels to the mappers instead of using a separate instruction channel.
-When piggybacking instructions on the kernel chain, we need to wait for the instructions to fully propagate, but this is an acceptable delay since programming is done only once per run.
+When piggybacking instructions on the kernel chain, it is nescessary to wait for the instructions to fully propagate, but this is an acceptable delay since programming is done only once per run.
 In addition to providing instructions, the kernel buffer is also responsible for realigning kernels when the core goes to sleep, such that when a new feed cycle begins the system is in the state that the control state machine expects.
 
 
@@ -258,7 +254,6 @@ In addition to providing instructions, the kernel buffer is also responsible for
 \begin{figure}[h!]
     \centering
     \includegraphics[width=10cm]{img/frontier2.png}
-    \caption{The image from which the frontier in the previous figure is taken.}
+    \caption{The image from which the frontier in Figure \ref{fig:frontier1} is taken.}
     \label{fig:frontier2}
 \end{figure}
-

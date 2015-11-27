@@ -42,30 +42,30 @@ To make things worse, the HDMI clocks out a 24 bit pixel on each cycle while the
 
 \section{Convolution Engine}
 \label{sec:processor}
-In this section we will describe the convolution engine which is at the heart of the FPGA architecture.
-We will first describe the convolution engine as a stream processor seen from the outside system before showing the inner workings.
+In this section we will describe the processor which is at the heart of the FPGA architecture.
+We will first describe the processor as a stream processor seen from the outside system before showing the inner workings.
 
 \subsection{The Convolution Engine as a Component}
 A design goal for our system was to reconfigure the FPGA depending on the task, which necessitates synthesizing several versions of our architecture so that the correct architecture may be chosen at run time.
 In addition to using several architectures, each version is also programmable, allowing the kernel values, map operators and reduce operators to be programmed at runtime.
-In order to achieve this we parametrized our design, allowing us to generate different architectures by simply changing a parameter once.
+To facilitate generating different versions of the architecture we parametrized our design, allowing us to generate different architectures by simply changing a parameter once.
 The parameters available are:
 
 \begin{description}
     \item[Kernel Dimensions] \hfill \\
         The most fundamental parameter in our design, the kernel dimension dictates how many pixels we need to calculate a single output pixel.
         This is very fundamental parameter, and we will see how setting the kernel dimension will effect other important sizes in our system as we explore the system.
-    \item[Image Input Width] \hfill \\
+    \item[Image Data Input Width] \hfill \\
         The width which input image data is presented 
     \item[Pixel Width] \hfill \\
-        The width of each pixel. When image input width and pixel width does not match, for instance with 16 bit input width and 24 bit pixel width, the convolution engine must buffer and translate the input stream 
-    \item[Control Input Width] \hfill \\
-        As with input data width, the convolution engine must know the width of the incoming control data.
-    \item[Image Output Width] \hfill \\
-        The data width that the convolution engine should output. As with input, translating widths is necessary.
+        The width of each pixel. When image input width and pixel width does not match, for instance with 16 bit input width and 24 bit pixel width, the processor must buffer and translate the input stream 
+    \item[Control Data Input Width] \hfill \\
+        As with input data width, the processor must know the width of the incoming control data.
+    \item[Image Data Output Width] \hfill \\
+        The data width that the processor should output. As with input, translating widths is necessary.
 \end{description}
 
-By parametrizing the convolution engine we can view it as any other processor module with the inputs and outputs shown in Table \ref{tbl:ConvolutionEngineIO}.
+By parametrizing the processor we can view it as any other processor module with the inputs and outputs shown in Table \ref{tbl:ConvolutionEngineIO}.
 
 \begin{table}[h]
     \begin{tabular}{l | l | l | l }
@@ -82,91 +82,90 @@ By parametrizing the convolution engine we can view it as any other processor mo
         \\
         &   Request image data      & 1                     & Current output data is received
         \\
-        &   Reset                   & 1                     & Convolution engine should reset
+        &   Reset                   & 1                     & Processor should reset
         \\\hline
         \multirow{2}{*}{Output}
         &   Image data out          & Image input width     & The processed image data on row format\\
         &   Image data valid        & 1                     & Current output data is valid
     \end{tabular}
-    \caption{The interface of the convolution engine, specified by its parameters}
+    \caption{The interface of the processor, specified by its parameters}
     \label{tbl:ConvolutionEngineIO}
 \end{table}
 
-To the outside system the convolution engine is now a module that once programmed operates on a data stream of an image and outputting a processed stream. 
-By using valid signals the outside system can provide data at any pace, and throttle the output by requesting data when the convolution engine indicates that data is ready. 
+To the outside system the processor is now a module that once programmed operates on a data stream of an image and outputting a processed stream. 
+By using valid signals the outside system can provide data at any pace, and throttle the output by requesting data when the processor indicates that data is ready. 
 
-\subsection{Architecture of the convolution engine}
+\subsection{Architecture of the processor}
 
-Figure \ref{fig:conv_engine} shows the top level schematic of the convolution engine with the following components:
+Figure \ref{fig:conv_engine} shows the top level schematic of the processor with the following components:
 
 \begin{description}
-    \item[Input buffer] \hfill\\
+    \item[Input and output buffers] \hfill\\
         The input buffer is a double buffer resonsible for buffering rows of image data and feed it to the processor.
-        When a buffer is full it feeds data to the processor as a series of column slices while the other buffer is filled.
-    \item[Output buffer] \hfill\\
+        The buffer holds several rows of image data, and when it is full it feeds data to the processor as a series of column slices while the other buffer is filled.\\
         The output buffer retrieves data from the processor as a series of column slices and rearranges the output back to row format.
         Figure \ref{fig:sweep_feed} shows how the input buffer feeds the processor with data from a buffered set of rows.
         When data is fed on a column major format within its set of rows we call the data stream a \textit{sweep}, inspired by the way a window is washed by sweeping it with a squeegee.
-        The column slices in the sweep are called \textit{sweep slices}.
+        The column slices in the sweep are called \textit{sweep columns}.
     \item[Control] \hfill\\
-        The control unit is responsible for keeping track of the input and output buffers, waking the processor once an input buffer is ready and making sure the output buffer is empty.
-        before a new feeding cycle is started.
+        The control unit is responsible for keeping track of the input and output buffers, waking the processor once an input buffer is ready and making sure the output buffer is empty before a new feeding cycle is started.
         The control unit is also responsible for programming the processor after a reset.
     \item[Processor] \hfill\\
         The heart of the convolution design, where the actual convolution happens
 \end{description}
 
-The convolution engine serves two purposes:
+The processor does the following tasks:
 \begin{itemize}
-    \item Provide a clean interface to the outside system, accepting an image stream and providing an output stream on row major format, tolerating interrupts both ways.
-    \item Provide data to the processor as an uninterrupted column major image stream, essentially working as a wrapper for the processor.
+    \item Provide a clean interface to the outside system, accepting an image stream and providing an output stream on row major format, adding tolerance for input streams which may come at uneven intervals. 
+    \item Once the input buffer is ready, wake up the core and provide data as an uninterrupted column major image stream, essentially working as a wrapper for the core.
 \end{itemize}
 
-Having established how the convolution engine provides an interface for the processor, we will now see how the processor works internally.
+Having established how the processor provides an interface for the core, we will now see how the core works internally.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/convolution_engine.png}
-    \caption{The top level schematic of the convolution engine for a 3x3 kernel.}
+    \caption{The top level schematic of the processor.}
     \label{fig:conv_engine}
 \end{figure}
 
-\subsection{Convolution processor}
+\subsection{Core}
 This section provides a description of the heart of our architecture.
-Figure \ref{fig:convolution_processor} shows the contents of the processor which contains four modules:D
+Figure \ref{fig:convolution_processor} shows an overview of the core which contains four modules:
 To illustrate how the components work we describe how the first frame of a videostream is processed.
 
 \begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/processor.png}
-    \caption{The four main components of the processor.}
+    \includegraphics[width=\linewidth]{img/processor_small.png}
+    \caption{The four main components of the core.}
     \label{fig:convolution_processor}
 \end{figure}
 
-From the outside, the processor is a module working on sweep slices as shown in \ref{fig:sweep_feed}.
+From the outside, the core is a module working on sweep slices as shown in \ref{fig:sweep_feed}.
 A good analogy for how the image is processed is how a window cleaner washes a window.
 If we let the dirty window be our original picture, and the clean image be the processed image, the process of convolution is akin to sweeping the squeegee over the window horizontally.
 In our analogy, a very small part of the window is under the squeegee at any time.
-Similarily, our processor works on a small part of the image at any time, called the \textit{sweep frontier}, shown in \ref{fig:frontier1} and \ref{fig:frontier2}.
+Similarily, our core works on a small part of the image at any time, only large enough to contain enough pixels to calculate a single slice of output pixels, called the \textit{sweep frontier}, as shown in figures \ref{fig:frontier1} and \ref{fig:frontier2}.
 To illustrate how data is fed we can view each row in the sweep as a stack.
 The rows then take turns popping one of its elements such that the core effectively gets column slices.
-To convolute the image the processor consists of the following components:
+The core consists of the following components:
 
 \begin{description}
     \item[Conveyor] \hfill\\ 
         The conveyor is a special register file consisting of several rows of pixel registers, which holds the pixels currently in the sweep frontier.
-    \item[The Kernel Buffer] \hfill\\
+        Data is delivered to the accumulator in a pattern controlled by the control unit, it is however never explicitly requested.
+    \item[Kernel Buffer] \hfill\\
         The kernel buffer maintains the kernel data and must provide the correct kernel data for each map operation performed in the accumulators.
         This module is also responsible for programming operators.
-    \item[The accumulator] \hfill\\
+    \item[Accumulator] \hfill\\
         To convolute a pixel, we need one mapping unit which maps the neighbourhood of a pixel in sequence, and one reduction unit which performs a reduce operation with the input from its associated mapping unit, and a partially processed pixel.
         Together these two units forms a single accumulation unit, and by employing a row of these units together we can compute several pixels in parallel.
         The accumulator consists of a row of these functional units working on pixels in parallel.
-    \item[The Control Unit] \hfill\\
+    \item[Control Unit] \hfill\\
         In order for the accumulators and pixel conveyor to be in sync a control unit sends control signals periodically, which are then propogated throughout the system.
 \end{description}
 
-Figure \ref{fig:convolution_processor} shows the insides of the processor. 
+Figure \ref{fig:convolution_processor} shows the insides of the core. 
 The conveyor belt shows three rows, each row keeping a column slice from the sweep frontier shown in \ref{fig:frontier1} and \ref{fig:frontier2}.
-We will now explore each part of the processor in greater detail.
+We will now explore each part of the core in greater detail.
 
 \subsubsection{The Conveyor}
 The conveyor should maintain the sweep frontier, and feed pixel data to the accumulators.
@@ -175,24 +174,31 @@ Since each pixel in a slice corresponds to a different row, every pixel register
 Data management on the conveyor is done by sending keys which are passed from register to register which are issued by the control unit.
 At any time, there is on each row two keys held by different registers: a read key and a write key.
 Input to the conveyor is available to the entire top row, so in order to ensure that only the corresponding pixel register reads the data, the control module has to issue a key to the row at the right time.
-To illustrate we show when each row has access to a write key for a 3x3 kernel:
-\\
-\begin{tabular}{l*{16}{c}r}
+To illustrate, in \ref{tbl:timing1} and \ref{tbl:timing2} we show when each row has access to a write key for a 3x3 kernel:
+\begin{table}[h]
+    \begin{tabular}{l*{16}{c}r}
     Time (cycle)        & $T_{0}$ & $T_{1}$ & $T_{2}$ & $T_{2}$ & $T_{4}$  & $T_{5}$ & $T_{6}$ & $T_{7}$ & $T_{8}$ & $T_{9}$ & $T_{10}$ & $T_{11}$ & $T_{12}$ & $T_{13}$ & $T_{14}$\\
-\hline
-Row 1                   & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \\
-Row 2                   & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
-Row 3                   & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & \\
-\end{tabular}\\ \\ \\
-The greyed out cells show the timesteps which the register holding the values needed to calculate the leftmost output pixel. The next table shows the same table, only with the values needed for the second leftmost output pixel.
+    \hline
+    Row 1                   & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \\
+    Row 2                   & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
+    Row 3                   & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & 7 & 8 & 9 & \cellcolor{gray75} 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4 & 5 & 6 & \\
+    \end{tabular}
+    \caption{A sequence diagram showing which registers in each row is being read at each timestep. Greyed out cells shows the pixels in the neighbourhood of the output pixel corresponding to output row 1}
+    \label{tbl:timing1}
+\end{table}
 \\ \\
-\begin{tabular}{l*{16}{c}r}
-    Time (cycle)        & $T_{0}$ & $T_{1}$ & $T_{2}$ & $T_{2}$ & $T_{4}$  & $T_{5}$ & $T_{6}$ & $T_{7}$ & $T_{8}$ & $T_{9}$ & $T_{10}$ & $T_{11}$ & $T_{12}$ & $T_{13}$ & $T_{14}$\\
-\hline
-Row 1                   & \cellcolor{gray75} 4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & \\
-Row 2                   & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \cellcolor{gray75}4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
-Row 3                   & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & \\
-\end{tabular}\\ \\ \\
+\begin{table}[h]
+    \begin{tabular}{l*{16}{c}r}
+            Time (cycle)        & $T_{0}$ & $T_{1}$ & $T_{2}$ & $T_{2}$ & $T_{4}$  & $T_{5}$ & $T_{6}$ & $T_{7}$ & $T_{8}$ & $T_{9}$ & $T_{10}$ & $T_{11}$ & $T_{12}$ & $T_{13}$ & $T_{14}$\\
+        \hline
+        Row 1                   & \cellcolor{gray75} 4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & \\
+        Row 2                   & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \cellcolor{gray75}4 & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & \\
+        Row 3                   & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & 7 & 8 & 9 & 1 & \cellcolor{gray75} 2 & \cellcolor{gray75} 3 & 4\cellcolor{gray75} & 5 & 6 & \\
+    \end{tabular}
+    \caption{A sequence diagram showing which registers in each row is being read at each timestep. Greyed out cells shows the pixels in the neighbourhood of the output pixel corresponding to output row 1}
+    \label{tbl:timing2}
+\end{table}
+\\ \\
 We see that the second leftmost output pixel follows the same pattern, only shifted left by one cycle.
 When a register writes, it does so not only to make the register content available for the accumulation unit, but also to propagate its data to the row below it.
 Each register should read the register directly above, so the read keys must be issued such that a register only reads when the register above it is currently writing.
@@ -213,7 +219,7 @@ A special flush key is sent to the row of accumulation units, causing them to re
 
 \subsubsection{The Control unit}
 The control unit is responsible for issuing keys to the rows at periodic intervals such that reads, writes, flushing and selecting accumulator output is correctly synchronized.
-In addition to synchronizing the accumulators and conveyor, the control unit puts the processor to sleep when no data is available, and is responsible for sending the correct signals when in programming mode.
+In addition to synchronizing the accumulators and conveyor, the control unit puts the core to sleep when no data is available, and is responsible for sending the correct signals when in programming mode.
 The issuing of keys is done by a simple state machine, all the logic is calculated when synthesizing since it is dependant on kernel size alone, which lets the fairly complex key issuing to be represented in a very simple state machine.
 
 \subsubsection{The kernel buffer}
@@ -222,11 +228,11 @@ In \ref{fig:convolution_processor} we show the kernel buffer holding all the ker
 When in programming mode a the kernel buffer gets instructions from the pixel stream rather than a separate channel.
 First, instructions are sent, which are then sent as kernels to the mappers instead of using a separate instruction channel.
 By piggybacking instructions on the kernel chain, we need to wait for the instructions to fully propagate, but this is an acceptable delay since programming is done only once per run.
-In addition to providing instructions, the kernel buffer is also responsible for realigning kernels when the processor goes to sleep, such that when a new feed cycle begins the system is always in the correct state.
+In addition to providing instructions, the kernel buffer is also responsible for realigning kernels when the core goes to sleep, such that when a new feed cycle begins the system is always in the correct state.
 
 
 \begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/processor_overview.png}
+    \includegraphics[width=\linewidth]{img/processor_overview_small.png}
     \caption{The four core units in the convolution process.}
     \label{fig:processor_core}
 \end{figure}
@@ -249,23 +255,5 @@ In addition to providing instructions, the kernel buffer is also responsible for
     \includegraphics[width=10cm]{img/frontier2.png}
     \caption{The image from which the frontier in the previous figure is taken.}
     \label{fig:frontier2}
-\end{figure}
-
-\begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/daisy_overview.png}
-    \caption{The data path for our processor, named Daisy after the way it daisy chains many control signals.}
-    \label{fig:Convolution}
-\end{figure}
-
-\begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/input_handler.png}
-    \caption{Illustration of the input handler.}
-    \label{fig:Convolution}
-\end{figure}
-
-\begin{figure}[h!]
-    \includegraphics[width=\linewidth]{img/processor.png}
-    \caption{Illustration of the processor.}
-    \label{fig:Convolution}
 \end{figure}
 

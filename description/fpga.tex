@@ -208,6 +208,7 @@ For our conceptual design, this is easy, however in the actual implementation we
 This means a write key is not really given to the register, but to a multiplexer deciding which register should currently be read.
 Additionally we use a secondary write key since the mux tree has two stages, but we will not elaborate further on this since it adds unescessary detail.
 
+
 \subsubsection{The Accumulator}
 As each pixel register in the conveyor corresponds to a row in the sweep, each accumulation unit corresponds to an output pixel.
 For a 3x3 kernel each sweep consists of 9 rows, which provides 7 output rows since the top and bottom row of each sweep misses some of its neighbours.

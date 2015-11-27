@@ -1,6 +1,6 @@
 \section{Digital Video} \label{sec:DigitalVideo}
 Through the times video has been encoded in a variety of formats, each with its advantages and drawbacks.
-In our project, we need to find a balance between quality, size and performance that maximizes our throughput without sacrificing too much image quality.
+In this project, a balance between quality, size and performance must be found, such that the throughput is maximized without sacrificing too much image quality.
 
 A common encoding for images is to encode the pixels in a two-dimensional array in a row-major order, in other words as an array of scanlines.
 
@@ -19,8 +19,8 @@ A common choice of components is red, green and blue, giving rise to the RGB col
 
 Furthermore, it is possible to store each component as a separate pixel or to interlace the different components in the same image so that all the information required to determine the colour of a pixel resides in one place.
 
-As data stored by computers is discrete and of limited size, we have a limited number of values to use when describing the amount of each component present in a given colour.
-The number of values that can be represented is referred to as the \textit{depth} of the image, commonly given in the number of bits used to represent a single colour.
+As data stored by computers is discrete and of limited size, the number of values available when describing the amount of each component present in a given colour is limited.
+The number of values that can be represented is referred to as the \textit{depth} of the image, commonly given in the number of bits used to represent a single value.
 
 \subsubsection{Indexed}
 Another way to store the colour information is to select a set of colours and assign each colour a number.
@@ -29,7 +29,7 @@ With an index colour representation, the most commonly used colours can be selec
 
 \subsection{Bit Rates}
 An important measure in determining the efficiency of a given video format is the bit rate; the rate at which bits needs to be provided in order to display the video.
-For uncompressed video, we need to know the frame rate in addition to the image resolution and colour representation to be able to determine the bit rate of the video.
+For uncompressed video, knowledge of the frame rate in addition to the image resolution and colour representation is necessary to be able to determine the bit rate of the video.
 
 Table \ref{tab:BitRates} displays the bit rate required at some common resolutions, depths/index sizes and frame rates.
 \begin{table}[h]

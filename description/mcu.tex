@@ -1,4 +1,5 @@
 \section{MCU}
+\label{sec:mcu}
 
 An EFM32GG is used as the MCU for the system.
 It provides 128kB RAM, 1024kB internal flash memory and a range of modules including EBI, USART, GPIO and DMA.
@@ -57,7 +58,7 @@ If the MCU is unable to read a configuration file and thus unable to flash the F
 
 \subsection{Kernels}
 Being able to change the convolution kernels while the system is running is considered an important functionality. To support this, the MCU is able to read convolution kernels from MicrodSD or the internal flash memory. 
-In order to make the process of changing kernels for the system easy, the kernel files has a simple file structure. The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits us to a maximum size of 15x15 kernels. The rest of the bytes in the files are the elements of the kernel.
+In order to make the process of changing kernels for the system easy, the kernel files has a simple file structure. The kernel files consists of 8-bit values. The first byte tells the size of the kernel. For a 3x3 kernel the size will be 9. This limits the system to a maximum size of 15x15 kernels. The rest of the bytes in the files are the elements of the kernel.
 
 \subsection{EBI}
 The FPGA and the MCU is connected through an EBI bus.
@@ -121,7 +122,7 @@ The system provides four buttons for the user interface:
 	\item OK
 \end{itemize}
 
-\subsubsection{Startup and Reset}
+\subsubsection{Start-up and Reset}
 When the MCU is first started up or reset, it reconfigures the FPGA with a default binary file. After configuration of the FPGA, the MCU configures the processor with default values for the convolution kernel, map operation and reduce operation. The processor's image input is then configured to the default input, which can be the camera input or HDMI input.
 
 \subsubsection{Main Menu}
@@ -136,5 +137,7 @@ When pressing the BACK or the OK button, the MCU configures the processor image 
 \end{itemize}
 
 The UP and DOWN buttons are used to select an option. The OK button bring up a new menu screen listing possible options for the chosen selection. When selecting configure kernel or configure FPGA, a list of the availiable files are presented. Choosing any of the other main menu options will bring up a list of predefined choices. Selecting any of these choices will make the MCU reconfigure the processor with the new values, and go back to showing the camera image stream.
+
+Figure \ref{fig:gui_concept} shows a concept image of the Main Menu.
 
 

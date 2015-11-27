@@ -1,6 +1,6 @@
-\section{Video Input}
+\section{Video Input} \label{section_video}
 This section describes the effort that was put into getting camera input for the system (functional requirement FR3).
-Throughout the working period the approach to this was changed multiple times as we learned more about the hardware we were working with.
+Throughout the project period the approach to this was changed multiple times as more information about the hardware was discovered.
 
 \input{description/camera}
 \input{description/sd}
@@ -15,7 +15,7 @@ Throughout the working period the approach to this was changed multiple times as
 
 Because the group had no experience with video input,
 there was a lot of uncertainty of how to transfer video from the camera to the processor.
-What we decided we wanted to do was to have both video camera and data from SD card as possible sources,
+It was decided to make both video camera and data from SD card possible sources,
 with the possibility to switch between them by using the buttons on the board.
 Figure \ref{fig:VideoPath} shows an overview of the possible paths a video stream could take from the camera,
 and some options that were explored are briefly outlined below:
@@ -26,7 +26,7 @@ and some options that were explored are briefly outlined below:
         Wiring the camera connector to the MCU, having software on the MCU control the camera and receive the video stream before forwarding it to the FPGA.
     \item[PiCamera Connected to the Board, Controlled by the FPGA]
         \hfill\\
-        Wiring the camera connector directly to the FPGA, having an FPGA submodule control the camera and receive the video stream.
+        Wiring the camera connector directly to the FPGA, having an FPGA sub-module control the camera and receive the video stream.
     \item[PiCamera Connected to a Raspberry Pi, Transfer Over With Bus]
         \hfill\\
         Having the Raspberry Pi control the camera using the provided libraries.
@@ -53,12 +53,12 @@ and some options that were explored are briefly outlined below:
 
 The Raspberry Pi controls the PiCamera by sending signals over a two-wire serial bus (I2C).
 In order to make use of the PiCamera, it is necessary to reimplement the control system.
-Since there is little documentation online, this must be reverse-engineered.
-An attempt was made to use a logic analyzer to "listen in" on the communication between the Raspberry Pi and PiCamera.
+Since there is little documentation on-line, this must be reverse-engineered.
+An attempt was made to use a logic analyser to "listen in" on the communication between the Raspberry Pi and PiCamera.
 A screenshot of this can be seen in Figure \ref{fig:PiCamI2C}.
 
 \subsection{Using the Raspberry Pi To Control the Camera}
 Another possibility is to drop using the PiCamera connected to the board,
 and instead use the Raspberry Pi with its provided software to control the camera.
-The video data can then be transfered from the Pi to Camvolution using one of the possible outputs of the Pi, including parallel GPIO, SPI or HDMI.
+The video data can then be transferred from the Pi to Camvolution using one of the possible outputs of the Pi, including parallel GPIO, SPI or HDMI.
 

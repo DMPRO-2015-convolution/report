@@ -1,20 +1,20 @@
 \subsection{Design Faults}
-In this first revision of the PCB, we made a few design faults that we had to make small hacks to fix.
+In this first revision of the PCB, a few design faults were made, and some small hacks had to be made to compensate.
 
 \subsubsection{Voltage Regulator}
 The first flaw encountered was the voltage regulator that was connected to ground, but through a 100$\Omega$ resistor and a capacitor.
-This forced the voltage output up to 4.15V and may have bricked our FPGA that has a voltage maximum at 3.95V.
-The reason for this flaw was a failure to read the full specs of the datasheet.
+This forced the voltage output up to 4.15V and may have bricked the FPGA that has a voltage maximum at 3.95V.
+The reason for this flaw was a failure to read the full specifications in the data sheet.
 
 \subsubsection{SD Card Connector}
-After mounting the SD Card connector we found that all the pinouts on the SD card were inverted.
-The easiest solution was to the turn the SD Card connector 180 degrees and mount part of it outside the board.
+After mounting the SD Card connector we found that all the pin-outs on the SD card were inverted.
+The easiest solution was to the turn the SD Card connector $180^{\circ}$ and mount part of it outside the board.
 
 \subsubsection{MCU Clock}
 There was a fault in the design of the 48MHz external clock pads for the MCU. This was due to failure of wiring the pads to the right pins on the external crystal.
-To fix this we bought a new type of crystal that had a smaller surface, and only two pins.
-This flaw could have been avoided if we had printed out the PCB on a A4 sheet, and tested the component fit on the PCB.
-Unfortunately we did not have the components at the time of ordering the PCB.
+To fix this a crystal with a smaller surface and only two pins was bought.
+This flaw could have been avoided had the PCB been printed on an A4 sheet, and the component sizes verified using real components.
+Unfortunately, the components were not available at the time of ordering the PCB.
 
 \subsubsection{Decoupling Capacitors}
 We used an 0603 footprint for all capacitors and resistors.
@@ -22,25 +22,17 @@ We then had to change to a bigger 0805 or 1208 footprint when mounting a capacit
 A capacitor at 10$\mu$F does not exist in an 0603 footprint.
 In the heat of the last few days, the PCB team forgot about this, and therefore the board does not have 100$\mu$F decoupling capacitors on the PCB.
 
-\subsubsection{HDMI Connector}
-At the time of routing the HDMI connectors to the FPGA, we had no plan to use the HDMI as input for video.
-Still, we made an extra HDMI connector in case one should fail.
-
 \paragraph{G\_CLOCK Problems on Input}
 Because of later problems with the PiCamera we had to look for other input solutions.
 The HDMI input clock needs to be connected to G\_CLOCK pins on the FPGA.
-Unfortunately, we had only connected TDMS 0/1/2 to G\_CLOCK.
-Because this wiring is impossible to change afterwards, we opened an HDMI cable and switched the cable's internal pins to make it work.
-This error only exist when using HDMI as input, and therefore we were not aware of this at the early time of PCB design.
+Unfortunately, only TDMS 0, TMDS 1 and TMDS 2 had been connected to G\_CLOCK.
+Because this wiring is impossible to change afterwards, an HDMI cable was opened and the cable's cable's internal pins were switched to make it work.
+Only HDMI input requires the clock to be mapped to a G\_CLOCK pin,
+thus this was not discovered during the testing that had been done before the PCB had been ordered.
 
 \paragraph{Data Communication Between Devices}
-HDMI also has an I2C interface, that it uses to communicate its display data.
+HDMI also has an I2C interface that it uses to communicate its display data \cite{wikiddc}.
 This includes supported devices, monitor parameters, etc.
 This is not required for HDMI video transfer to actually work, but on most computers the HDMI will not output anything unless you send in display data or force output.
-To make this job easier we could have added some routing to the I2C pins on the HDMI connector. \cite{wikiddc}
-
-\subsubsection{Comments on Design Faults}
-The amount of design faults on this board is not that many, and the few we had was not that difficult to make workarounds for.
-If we could make a second revision of the board, we would fix the design faults.
-We would also add more LEDs, to make it easier for debugging, and support a USB interface to the computer.
+To make this job easier, routing could have been added to the I2C pins on the HDMI connector.
 

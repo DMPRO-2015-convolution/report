@@ -6,7 +6,7 @@ Some tests were performed on the physical hardware, while others were pure softw
 \subsection{FPGA}
 The SRAM and EBI managers were tested using VHDL test benches before being implemented on the FPGA.
 
-For the processor core, Chisel test benches were used, as testing is quite well supported by the language itself.
+For the processor core, Chisel test benches were used, as testing is quite well supported by the language itself. The processor core was also tested using VHDL test benches.
 
 \subsubsection{EBI Throughput} \label{subsec:EbiThroughput}
 During the project, the throughput over EBI between a EFM MCU and a Spartan-6 FPGA was tested by sending a sequence of increasing numbers which were verified on the FPGA.

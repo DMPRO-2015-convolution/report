@@ -208,32 +208,32 @@ For our conceptual design, this is easy, however in the actual implementation we
 This means a write key is not really given to the register, but to a multiplexer deciding which register should currently be read.
 Additionally we use a secondary write key since the mux tree has two stages, but we will not elaborate further on this since it adds unescessary detail.
 
-
-\subsubsection{The Accumulator}
+\subsubsection{Accumulator}
 As each pixel register in the conveyor corresponds to a row in the sweep, each accumulation unit corresponds to an output pixel.
 For a 3x3 kernel each sweep consists of 9 rows, which provides 7 output rows since the top and bottom row of each sweep misses some of its neighbours.
-Each accumulation unit corresponds to one output row, and we thus have 7 accumulation units.
+Each accumulation unit corresponds to one output row, and we thus have 7 accumulation units.\\
 Conversely, for a 5x5 convolution kernel we would use 25 input rows, and lose two rows in each end from missing neighbours, resulting in 21 output rows, and 21 accumulation units.
 From the table in the conveyor section, we see that each accumulation unit can map all the necessary pixels by correctly timing which row to read from.
-In the case of the first accumulator, it should read from row 3 at time $T0, T1 and T2$, row 2 at time $T3, T4 and T5$, and row 1 at time $T6, T7 and T8$, as shown in grey.
-At $T8$ all necessary pixel data is read, and the accumulated result is driven and a new cycle begins.
-The second table in the conveyor section shows the same pattern for the accumulator corresponding to output row 2, only staggered by one cycle.
-Not only does this mean that each accumulator can access the data it needs from a single output wire per row, it also means that each accumulator needs the kernel value previously held by the
-accumulator corresponding to the output row above it, which means kernel values can be passed along just like read and write keys instead of being kept in a central repository.
-A special flush key is sent to the row of accumulation units, causing them to reset their contents after collecting a full pixel.
+In the case of the first accumulator, it should read from row 3 at time $T0, T1$ and $T2$, row 2 at time $T3, T4$ and $T5$, and row 1 at time $T6, T7$ and $T8$, as shown in grey.
+At $T8$ all necessary pixel data is read, and the accumulated result is output and a new cycle begins.
+The second table in the conveyor section shows the same pattern for the accumulator corresponding to output row 2, only delayed by one cycle.
+This delay means that every accumulator can access the data it needs by simply timing when it reads output from the rows.
+Additionally, since each accumulator is delayed one cycle relative to its neighbour, the access patter for kernel values is similarily delayed.
+This kernel access pattern means every accumulator needs the kernel used by its predecessor last cycle, meaning that rather than keeping kernels in a central repository we can keep them in a shift register with each element very close to an accumulator.
+Rather than keeping track of their progress, each accumulator passes a special flush key akin to how registers use read and write keys. Upon recieving a flush key an accumulation unit resets its content and its finished data is written on the output wire.
 
 \subsubsection{The Control unit}
 The control unit is responsible for issuing keys to the rows at periodic intervals such that reads, writes, flushing and selecting accumulator output is correctly synchronized.
-In addition to synchronizing the accumulators and conveyor, the control unit puts the core to sleep when no data is available, and is responsible for sending the correct signals when in programming mode.
-The issuing of keys is done by a simple state machine, all the logic is calculated when synthesizing since it is dependant on kernel size alone, which lets the fairly complex key issuing to be represented in a very simple state machine.
+In addition to synchronizing the accumulators and conveyor, the control unit puts the core to sleep when no data is available, and is responsible for sending signals indicating that the accumulators should read instruction data.
+The issuing of keys is done by a simple state machine, for which the logic can be calculated at synthesiz time, since it is dependant on kernel size alone. 
 
-\subsubsection{The kernel buffer}
+\subsubsection{Kernel buffer}
 The kernel buffer is responsible for collecting kernel data at programming time, and to supply the correct kernel at the correct time to the mapping unit.
-In \ref{fig:convolution_processor} we show the kernel buffer holding all the kernels in a separate buffer, but as described in the accumulator section this buffer is actually a chained set of registers very close to the accumulation units.
+In figure \ref{fig:convolution_processor} we show the kernel buffer holding all the kernels in a separate buffer, but as described in the accumulator section this buffer is actually a chained set of registers where each register is close to one of the accumulation units.
 When in programming mode, the kernel buffer gets instructions from the pixel stream rather than a separate channel.
 First, instructions are sent, which are then sent as kernels to the mappers instead of using a separate instruction channel.
-By piggybacking instructions on the kernel chain, we need to wait for the instructions to fully propagate, but this is an acceptable delay since programming is done only once per run.
-In addition to providing instructions, the kernel buffer is also responsible for realigning kernels when the core goes to sleep, such that when a new feed cycle begins the system is always in the correct state.
+When piggybacking instructions on the kernel chain, we need to wait for the instructions to fully propagate, but this is an acceptable delay since programming is done only once per run.
+In addition to providing instructions, the kernel buffer is also responsible for realigning kernels when the core goes to sleep, such that when a new feed cycle begins the system is in the state that the control state machine expects.
 
 
 \begin{figure}[h!]

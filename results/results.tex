@@ -41,12 +41,26 @@ This can also be seen in Figure \ref{fig:SyncDelay} as a yellow regions between 
 Notice that this does not happen in the vertical direction as the image is sent through the processor in a row-major order.
 
 Visible in Figure \ref{fig:Overflow} are vertical lines not present in the input.
-These lines are caused by the processor not being able to deliver all pixels required without the buffers.
-At other resolutions, this may not be as visible as horizontal synchronisation period is not a multiple of the time between each missing pixel from the processor.
+The lines are caused by the processor being designed to run some rows twice since a sweep of 9 input rows only produces 7 output rows.
+In Figure \ref{fig:soft_sim} a chisel test shows how the output looks when input and output is handled correctly in software.
 
 Also missing from the slimmed down version of the processor is the possibility of setting convolution kernel and operators on run-time.
 Instead, several versions of the bit file was stored to the SD card for testing.
 Buttons on the MCU were set up to load the next bit file when pushed.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=10cm]{img/daisy1.jpg}
+    \caption[Software simulated output]{When input is fed correctly in a chisel software test no artifacts show up.}
+    \label{fig:soft_sim}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=10cm]{img/daisy1.jpg}
+    \caption[Software simulation input]{The input for \ref{fig:soft_sim}}
+    \label{fig:soft_sim_input}
+\end{figure}
 
 \subsection{Overflow}
 Another artefact in the design is especially visible when gradients are displayed, as demonstrated in Figure \ref{fig:Overflow}.

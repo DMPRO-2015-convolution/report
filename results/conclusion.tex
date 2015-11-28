@@ -1,12 +1,13 @@
 \section{Conclusion}
 The final processor performs a simplified form of convolution on a live video stream.
-This does not quite satisfy the first goal,
+This does not quite satisfy the first functional requirement,
 but works as a proof of concept and shows that real convolution is possible given more time.
 The fact that the processor was shown to be working in software simulation makes this even more likely.
 
 The computer accepts input over HDMI from any device, including a camera, and can deliver output to a display over HDMI.
 In addition,
-it loads the configuration from an SD card and can load other configurations by the push of a button.
+it loads the FPGA configuration from an SD card and can load other configurations by the push of a button.
 
 The hardware utilisation numbers means even a small FPGA can make a huge difference when accelerating convolution,
 which suggests an FPGA can make a big difference when doing application specific computations.
+

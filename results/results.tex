@@ -62,7 +62,7 @@ This can also be seen in Figure \ref{fig:SyncDelay} as a yellow regions between 
 Notice that this does not happen in the vertical direction as the image is sent through the processor in a row-major order.
 
 Visible in Figure \ref{fig:Overflow} are vertical lines not present in the input.
-The lines are caused by the processor being designed to run some rows twice since a sweep of 9 input rows only produces 7 output rows.
+The lines are caused by the processor being designed to run some rows twice since a sweep of nine input rows only produces seven output rows.
 As the input handler is not included, the rows are never repeated and thus these pixels are missing.
 In addition, the missing pixels appears as vertical lines as the processor core expects columns and not rows.
 

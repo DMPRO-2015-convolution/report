@@ -88,7 +88,7 @@ By parameterising the processor it can be viewed as any other module with the in
         &   Image data out          & Image input width     & The processed image data on row format\\
         &   Image data valid        & 1                     & Current output data is valid
     \end{tabular}
-    \caption{The interface of the processor, specified by its parameters.}
+    \caption{The interface of the processor, specified by its parameters}
     \label{tbl:ConvolutionEngineIO}
 \end{table}
 
@@ -122,7 +122,7 @@ The processor does the following tasks:
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/convolution_engine.png}
-    \caption{The top level schematic of the processor.}
+    \caption{The top level schematic of the processor}
     \label{fig:conv_engine}
 \end{figure}
 
@@ -131,7 +131,7 @@ This section provides a description of the heart of the architecture of Camvolut
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/processor_small.png}
-    \caption{The four main components of the core.}
+    \caption{The four main components of the core}
     \label{fig:convolution_processor}
 \end{figure}
 
@@ -246,26 +246,26 @@ In addition to providing instructions, the kernel buffer is also responsible for
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/processor_overview_small.png}
-    \caption{The four core units in the convolution process.}
+    \caption{The four core units in the convolution process}
     \label{fig:processor_core}
 \end{figure}
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/daisy_processing.pdf}
-    \caption[Buffering and feeding of sweeps.]{A full sweep has been buffered, and is being fed to the processor. Meanwhile, a new sweep is being buffered.}
+    \caption[Buffering and feeding of sweeps]{A full sweep has been buffered, and is being fed to the processor. Meanwhile, a new sweep is being buffered.}
     \label{fig:sweep_feed}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=\linewidth]{img/frontier1_small.png}
-    \caption[The frontier.]{The frontier. The three rightmost pixels are shown with their full neighbourhoods, which overlap with their neighbours.}
+    \caption[The frontier]{The frontier. The three rightmost pixels are shown with their full neighbourhoods, which overlap with their neighbours.}
     \label{fig:frontier1}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=\linewidth]{img/frontier2_small.png}
-    \caption{The image from which the frontier in Figure \ref{fig:frontier1} is taken.}
+    \caption{The image from which the frontier in Figure \ref{fig:frontier1} is taken}
     \label{fig:frontier2}
 \end{figure}

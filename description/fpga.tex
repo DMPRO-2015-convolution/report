@@ -3,7 +3,7 @@ The FPGA must handle an incoming video stream and the configuration data arrivin
 
 In Figure \ref{fig:FpgaOverview}, the top level modules on the FPGA are depicted.
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics{img/FpgaOverview}
     \caption{FPGA Overview.}
@@ -33,7 +33,7 @@ Similarly, data read from the memory must be resized back to 24 bits before bein
 \subsection{HDMI}
 Before the data from memory arrives is used by the HDMI module, it passes through a FIFO queue which has two functions:
 \begin{itemize}
-    \item synchronise the data to the clock domain of the HDMI.
+    \item Synchronise the data to the clock domain of the HDMI.
     \item Act as a buffer in case the memory is too slow.
 \end{itemize}
 

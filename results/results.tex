@@ -1,6 +1,5 @@
 \section{Results}
-
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=14cm]{img/camvolution_running.jpg}
     \caption[The implemented system running]{
@@ -13,6 +12,28 @@
 In this section, the results of the groups work is presented.
 All the individual components worked when tested independently and a demonstration bit file assembled with a slimmed down version of the convolution processor successfully outputted processed data, bypassing both EBI and SRAM completely.
 This is presented in more detail below.
+
+\subsection{Convolution in Software with Chisel}
+Before the Camvolution system was implemented in hardware,
+the convolution engine was tested and found to correctly perform convolution in Chisel software tests.
+
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{7cm}
+        \centering
+        \includegraphics[width=6.5cm]{img/daisysmallorig.jpg}
+        \caption{Original image}
+    \end{subfigure}
+    \begin{subfigure}{7cm}
+        \centering
+        \includegraphics[width=6.5cm]{img/daisysmall.jpg}
+        \caption{After convolution}
+    \end{subfigure}
+    \caption[Software simulated convolution]{
+        Convolution performed in software simulation with Chisel
+    }
+    \label{fig:soft_sim}
+\end{figure}
 
 \subsection{HDMI Timing}
 When sending HDMI data directly from input to output without delaying the signal, the control signal from the input HDMI signals can be used as output control signals.
@@ -32,7 +53,7 @@ When processing the data, the data is delayed and arrives too late compared to t
 \end{figure}
 
 \subsection{Slimmed Down Processor}
-The processor implemented in the final design does not do true convolution as the chisel design gave no output on the display when used to configure the FPGA.
+The processor implemented in the final design does not do true convolution as the Chisel design gave no output on the display when used to configure the FPGA.
 Due to time constraints, the bug was never found, but a simpler version of the processor, without the input and output handlers, was found to be working.
 
 As the input and output handlers take care of reordering the input data before performing the convolution, the data is fed through the processor in an incorrect order.
@@ -42,25 +63,11 @@ Notice that this does not happen in the vertical direction as the image is sent 
 
 Visible in Figure \ref{fig:Overflow} are vertical lines not present in the input.
 The lines are caused by the processor being designed to run some rows twice since a sweep of 9 input rows only produces 7 output rows.
-In Figure \ref{fig:soft_sim} a chisel test shows how the output looks when input and output is handled correctly in software.
+Figure \ref{fig:soft_sim} a shows how the output looks when input and output is handled correctly in software.
 
 Also missing from the slimmed down version of the processor is the possibility of setting convolution kernel and operators on run-time.
 Instead, several versions of the bit file was stored to the SD card for testing.
 Buttons on the MCU were set up to load the next bit file when pushed.
-
-\begin{figure}
-    \centering
-    \includegraphics[width=10cm]{img/daisy1.jpg}
-    \caption[Software simulated output]{When input is fed correctly in a chisel software test no artifacts show up.}
-    \label{fig:soft_sim}
-\end{figure}
-
-\begin{figure}
-    \centering
-    \includegraphics[width=10cm]{img/daisyorig.jpg}
-    \caption[Software simulation input]{The input for \ref{fig:soft_sim}}
-    \label{fig:soft_sim_input}
-\end{figure}
 
 \subsection{Overflow}
 Another artefact in the design is especially visible when gradients are displayed, as demonstrated in Figure \ref{fig:Overflow}.
@@ -96,9 +103,6 @@ By swapping the corresponding output channels instead of the input channel, a pi
 \end{figure}
 
 \subsection{Scalability}
-% TODO 
-% TODO What convolution kernel matrix sizes can be handled, what image resolutions and depths... TODO: Add more text.
-
 As stated in Section \ref{sec:processor}, the processor has several parameters, some of which are hard coded into the final design.
 These parameters can be adjusted, but many are limited by the available hardware.
 
@@ -106,21 +110,18 @@ In the final implementation the kernel values, map operands and reduce operands 
 This does not scale well with multiple configurations, as a small change in any of these parameters would need its own configuration file.
 The time it takes for the MCU to program the FPGA with a new configuration file is about \unit[3]{seconds}.
 
-In the final implementation HDMI frame synchronization signals are being passed from input to output without going through the processor.
+In the final implementation HDMI frame synchronisation signals are being passed from input to output without going through the processor.
 This means thatthe resolution of the image output is dependent on the input.
 
 The size of the kernel matrices are hard coded both in the final design and in the final implementation.
 To use larger kernel matrix sizes, it is possible to generate new configuration files capable of processing these.
 
-According to the reports produced by Xilinx ISE during building of the FPGA bit file, the design for 3x3 convolution utilised around \unit[16]{\%} of the total number of available slices.
+According to the reports produced by Xilinx ISE during building of the FPGA bit file, the design for 3x3 convolution utilised around 16\% of the total number of available slices.
 
 Since each component in the core of the processor only relies on its neighbours the processor can tackle large kernels without sacrificing clock speed.
 The limiting factor is fast memory since data has to be buffered in order to be delivered as sweep slices.
 The modularity of the processor allows it to be duplicated, letting as many cores as feasible work in parallel since convolution has no data dependency issues.
 On our available hardware block ram and input bandwidth was the limiting factor, however on different hardware we believe instantiating many cores with different parameters should be a simple task.
-
-%    TODO:
- %   The same report states the processor can be clocked at a maximum frequency of \emph{<insert frequency>}. This was however tested in practice as the processor was expected to deliver data quickly enough at lower frequencies.
 
 \subsection{Video Throughput}
 The highest correctly working resolution was found to be 1366x768.

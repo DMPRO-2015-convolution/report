@@ -1,33 +1,32 @@
 \section{Further Work}
 
 Unfortunately, this project has a limited timeframe.
-Had we had more time, we would have pprioritised working on the following:
+Had we had more time, we would have prioritised working on the following:
 
 \subsection{Camera}
-
 In order to achieve camera input as originally intended, we would go back to some of the other camera modules we looked at, and find a more suitable module.
 It would probably to be a good idea to try a module with less features that is simpler to control.
 
 \subsection{PCB}
-
-We would have fixed the HDMI routing errors in the PCB.
+We would have fixed the errors on the PCB related to HDMI signals and the SD connector.
 
 We would also add more LEDs, to make it easier to debug.
 In addition it would be nice to support a USB interface to the MCU for development and debugging.
 
 \subsection{MCU}
-
 The EBI described in Section \ref{sec:mcu}, was not implemented at the time of the deadline.
-When this is implemented, it will no longer be necessary to reset the FPGA configuration every time the processor should be configured. 
+When this is implemented, it will no longer be necessary to reset the FPGA configuration every time the processor should be configured.
 
 Because of the HDMI working properly as an input source, and further work on implementing a camera module, streaming video from the SD card would have a low priority.
 
-If the MCU only task is to configure the FPGA and the processor, the amount of communication between them is minimal and a serial interface could have been used instead of the EBI bus. This would have siginficantly reduced the amount of connections between the MCU and the FPGA on the PCB.
+If the MCU only task is to configure the FPGA and the processor, the amount of communication between them is minimal and a serial interface could have been used instead of the EBI bus.
+This would have siginficantly reduced the amount of connections between the MCU and the FPGA on the PCB.
 
-This is not a large problem and it would be preferrable to keep the wide EBI bus when implementing the graphical user interface functionality. This way the MCU is able to bypass the processor and write the graphical user inteface directly to the video memory.
+This is not a large problem and it would be preferrable to keep the wide EBI bus when implementing the graphical user interface functionality.
+This way the MCU is able to bypass the processor and write the graphical user inteface directly to the video memory.
 
 \subsection{FPGA}
-
+Most importantly the Convolution feature of the system should be made to work as intended.
 As mentioned, 2D convolution worked in Chisel test benches, but not when implemented on the FPGA.
 We were not able to get to the bottom of why this was by the deadline, but given more time this should be possible.
 

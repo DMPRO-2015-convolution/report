@@ -110,7 +110,7 @@ Figure \ref{fig:conv_engine} shows the top level schematic of the processor with
     \item[Control] \hfill\\
         The control unit is responsible for keeping track of the input and output buffers, waking the processor once an input buffer is ready and making sure the output buffer is empty before a new feeding cycle is started.
         The control unit is also responsible for programming the processor after a reset.
-    \item[Processor] \hfill\\
+    \item[Core] \hfill\\
         The heart of the convolution design, where the actual convolution happens
 \end{description}
 
@@ -139,7 +139,7 @@ From the outside, the core is a module working on sweep slices as shown in Figur
 A good analogy for how the image is processed is how a window cleaner washes a window.
 If we let the dirty window be the original picture, and the clean image be the processed image, the process of convolution is akin to sweeping a squeegee over the window horizontally.
 In this analogy, a very small part of the window is under the squeegee at any time.
-Similarily, the core works on a small part of the image at any time, only large enough to contain enough pixels to calculate a single slice of output pixels, called the \textit{sweep frontier}, as shown in figures \ref{fig:frontier1} and \ref{fig:frontier2}.
+Similarily, the core works on a small part of the image at any time, only large enough to contain enough pixels to calculate a single slice of output pixels, called the \textit{sweep frontier}, as shown in Figure \ref{fig:frontier1} and Figure \ref{fig:frontier2}.
 To illustrate how data is fed each row in the sweep can be viewed as a stack.
 Each stack is filled with a row from the input image, and once all rows are full they take turns popping one of their elements such that the core recieves sweep slices.
 Figure \ref{fig:convolution_processor} shows an overview of the core which contains four modules:
@@ -166,12 +166,15 @@ The conveyor belt shows three rows, each row keeping a column slice from the swe
 The conveyor maintains the sweep frontier, and feeds pixel data to the accumulators.
 It consists of a grid of pixel registers, each row holding a sweep slice.
 Since each pixel in a slice corresponds to a different row, every pixel register in a row has a one to one correspondence to one of the rows of the sweep currently feeding the core.
+
 To reiterate on this, a row in the conveyor corresponds to one of the slices in the input buffer, not a row in the input image.
+
 Data management on the conveyor is done by sending keys which are are issued from the control unit, and passed from register to register within a row.
 At any time, there is on each row two keys held by different registers: a read key and a write key.
 When holding a write key the register is write enabled and should read data from the row above it, while a read key tells the register that its content should be driven its content to an interconnect which the accumulator and the row below it can read from.
+
 Input to the conveyor is available to the entire top row, so in order to ensure that only the corresponding pixel register reads the data, the control module has to issue a key to the row at the right time.
-To illustrate, Tables \ref{tbl:timing1} and \ref{tbl:timing2} show when each row has access to a read key for a 3x3 kernel:
+To illustrate, Table \ref{tbl:timing1} and Table \ref{tbl:timing2} show when each row has access to a read key for a 3x3 kernel.
 \begin{table}[h]
     \begin{tabular}{l*{16}{c}r}
     Time (cycle)        & $T_{0}$ & $T_{1}$ & $T_{2}$ & $T_{2}$ & $T_{4}$  & $T_{5}$ & $T_{6}$ & $T_{7}$ & $T_{8}$ & $T_{9}$ & $T_{10}$ & $T_{11}$ & $T_{12}$ & $T_{13}$ & $T_{14}$\\
@@ -197,27 +200,35 @@ To illustrate, Tables \ref{tbl:timing1} and \ref{tbl:timing2} show when each row
 \end{table}
 \\ \\
 The second leftmost output pixel follows the same pattern, only shifted left by one cycle.
+
 A register is given a read key not only to make its content available to the accumulators, but also so that the row below may have its content written to it in order to propagate data downwards.
 Each register should read the register directly above, so the write keys must be issued such that a register only has write enabled when the register above it is currently driving the interconnect.
+
 For the conceptual design, this is easy, however in the actual implementation data is moved using register balanced multiplexer trees rather than simply driving a bus.
 This means a write key is not really given to the register, but to a multiplexer deciding which register should currently be read.
+
 Additionally a secondary write key is issued since the register balanced multiplexer tree has two stages, but this will not be elaborated further upon in order to not clutter the report with implementation details.
 
 \subsubsection{Accumulator}
 As each pixel register in the conveyor corresponds to a row in the sweep, each accumulation unit corresponds to an output pixel.
 For a 3x3 kernel each sweep consists of nine rows, which provides seven output rows since the top and bottom row of each sweep misses some of its neighbours.
-Each accumulation unit corresponds to one output row, requiring seven accumulation units in total.\\
+Each accumulation unit corresponds to one output row, requiring seven accumulation units in total.
+
 Conversely, for a 5x5 convolution kernel would use 25 input rows, and lose two rows in each end from missing neighbours, resulting in 21 output rows, and 21 accumulation units.
+
 Table \ref{tbl:timing1} shows that each accumulation unit can map all the necessary pixels by correctly timing which row to read from.
 In the case of the first accumulator, it reads from row 3 at time $T0, T1$ and $T2$, row 2 at time $T3, T4$ and $T5$, and row 1 at time $T6, T7$ and $T8$, as shown in grey.
 At $T8$ all necessary pixel data has been read, and the accumulated result is output and a new cycle begins.
+
 The second table in the conveyor section shows the same pattern for the accumulator corresponding to output row 2, only delayed by one cycle.
 This delay means that every accumulator can access the data it needs by simply timing when it reads output from the rows.
 Additionally, since each accumulator is delayed one cycle relative to its neighbour, the access patter for kernel values is similarily delayed.
+
 This kernel access pattern means every accumulator needs the kernel used by its predecessor last cycle, meaning that rather than keeping kernels in a central repository they can keep in a shift register with each element very close to an accumulator.
+
 Rather than keeping track of their progress, each accumulator passes a special flush key akin to how registers use read and write keys. Upon recieving a flush key an accumulation unit resets its content and its finished data is written on the output wire.
 
-\subsubsection{The Control Unit}
+\subsubsection{Control Unit}
 The control unit is responsible for issuing keys to the rows at periodic intervals such that reads, writes, flushing and selecting accumulator output is correctly synchronised.
 In addition to synchronising the accumulators and conveyor, the control unit puts the core to sleep when no data is available, and is responsible for sending signals indicating that the accumulators should read instruction data.
 The issuing of keys is done by a simple state machine, for which the logic can be calculated at synthesis time, since it is dependant on kernel size alone. 
@@ -225,9 +236,11 @@ The issuing of keys is done by a simple state machine, for which the logic can b
 \subsubsection{Kernel Buffer}
 The kernel buffer is responsible for collecting kernel data at programming time, and to supply the correct kernel at the correct time to the mapping unit.
 Figure \ref{fig:convolution_processor} shows the kernel buffer holding all the kernels in a separate buffer, but as described in the Accumulator Section this buffer is actually a chained set of registers where each register is close to one of the accumulation units.
+
 When in programming mode, the kernel buffer gets instructions from the pixel stream rather than a separate channel.
 First, instructions are sent, which are then sent as kernels to the mappers instead of using a separate instruction channel.
 When piggybacking instructions on the kernel chain, it is nescessary to wait for the instructions to fully propagate, but this is an acceptable delay since programming is done only once per run.
+
 In addition to providing instructions, the kernel buffer is also responsible for realigning kernels when the core goes to sleep, such that when a new feed cycle begins the system is in the state that the control state machine expects.
 
 

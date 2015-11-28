@@ -8,7 +8,7 @@ First of all the dimensions could have been increased, that is, the width of the
 On the EBI bus the address pins and the chip select signals could be used for data, which yields a 38-bit wide data bus, but at the same time loses addressing and DMA functionality.
 Second, the clock rate could have been increased.
 This is not easy to do on the MCU as it already uses its maximum specified clock frequency.
-The processor implementation can always be pipelined more until it reaches the limit of what the FPGA can manage.
+The processor implementation was assumed not to be a limitation, as it always can be pipelined more until it reaches the limit of what the FPGA can manage.
 
 A third, less obvious option, is to compress the data.
 We could have employed both lossy and lossless encodings to reduce the size of the data and thus increase the effective throughput.

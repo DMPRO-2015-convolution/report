@@ -88,7 +88,7 @@ A small selection of possible kernel matrices and the results when applied to th
     \label{tab:KernelMatrices}
 \end{table}
 
-As the matrices in Table \ref{tab:KernelMatrices} are good examples of, the kernel matrices used for image processing is usually small compared to the images, and often of a constant size.
+As the matrices in Table \ref{tab:KernelMatrices} are good examples of, the kernel matrices used for image processing are usually small compared to the images, and often of a constant size.
 This means each output pixel is a function of the same pixel in the original image and its neighbourhood.
 
 \subsection{Generalised Convolution}
@@ -96,8 +96,8 @@ The convolution described above can be separated into two stages: first multipli
 The multiplication stage simply maps a set of input values to a set of output values by using the kernel matrix values as factors.
 These products are then reduced into a single value by summation.
 
-By recognising that the process consists of mapping and reduction,
-it then becomes possible to substitute other mapping and reducing operations.
+By recognising that the process consists of a map and a reduce operation,
+it becomes possible to substitute the operations with other map and reduce operations.
 A generalised convolution operation is therefore fully defined by two input matrices and two operations.
 
 In the realm of image processing, this paves the way for new filters, such as the median, minimum and maximum filters.

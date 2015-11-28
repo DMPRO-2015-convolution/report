@@ -19,7 +19,7 @@ When this is implemented, it will no longer be necessary to reset the FPGA confi
 
 Because of the HDMI working properly as an input source, and further work on implementing a camera module, streaming video from the SD card would have a low priority.
 
-If the MCU only task is to configure the FPGA and the processor, the amount of communication between them is minimal and a serial interface could have been used instead of the EBI bus.
+If the MCU's only task is to configure the FPGA and the processor, the amount of communication between them is minimal and a serial interface could have been used instead of the EBI bus.
 This would have siginficantly reduced the amount of connections between the MCU and the FPGA on the PCB.
 
 This is not a large problem and it would be preferrable to keep the wide EBI bus when implementing the graphical user interface functionality.

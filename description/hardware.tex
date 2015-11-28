@@ -8,6 +8,8 @@ to reduce the distance and time to transfer data between components.
 Header pins are present for most components for debugging and in case something should be wrongly wired inside the board.
 Figure \ref{fig:BoardLayout} shows an overview of the board with various components labelled.
 
+The main features of the board are listed below.
+
 \begin{itemize}
     \item Xilinx Spartan-6 FPGA
     \item Silicon Labs EFM32GG MCU
@@ -82,7 +84,7 @@ See Table \ref{tab:HeaderOut} for location of pins.
 \subsection{SRAM}
 \label{subsec:sram}
 The FPGA is connected to two SRAM chips, one on bank 1 and another on bank 2.
-The chips support a data width of 16 bits and have an access time of \unit[10]{ns} \cite{sramdatasheet}, which gives a maximum throughput of $(\unit[10]{ns})^{-1} = \unit[1,6]{Gbps}$ to each chip.
+The chips support a data width of 16 bits and have an access time of \unit[10]{ns} \cite{sramdatasheet}, which gives a maximum throughput of $\unit[16]{bit} * (\unit[10]{ns})^{-1} = \unit[1,6]{Gbps}$ to each chip.
 This is more than sufficient for this projects' application as can be seen in Table \ref{tab:BitRates}.
 
 To make debugging easier, all wires connecting the FPGA and SRAM chips have been placed on headers.

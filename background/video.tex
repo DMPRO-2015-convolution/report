@@ -1,6 +1,7 @@
 \section{Digital Video} \label{sec:DigitalVideo}
 Video can be encoded in a variety of formats, each with its advantages and drawbacks.
-In this project, a balance between quality, size and performance must be found, such that the throughput is maximised without sacrificing too much image quality.
+In this project, a balance between quality, size and performance must be found,
+such that the required throughput can be minimised without sacrificing too much image quality.
 
 A common encoding for images is to encode the pixels in a two-dimensional array in a row-major order, in other words as an array of scanlines.
 
@@ -28,7 +29,7 @@ This is especially useful when reducing the size of an image by reducing the num
 With an index colour representation, the most commonly used colours can be selected and assigned numbers, thus reducing the error introduced by forcing the colours into a smaller space.
 
 \subsection{Bit Rates}
-An important measure in determining the efficiency of a given video format is the bit rate; the rate at which bits needs to be provided in order to display the video.
+An important measure in determining the efficiency of a given video format is the bit rate, the rate at which bits needs to be provided in order to display the video.
 For uncompressed video, knowledge of the frame rate in addition to the image resolution and colour representation is necessary to be able to determine the bit rate of the video.
 
 Table \ref{tab:BitRates} displays the bit rate required at some common resolutions, depths/index sizes and frame rates.

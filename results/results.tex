@@ -63,7 +63,8 @@ Notice that this does not happen in the vertical direction as the image is sent 
 
 Visible in Figure \ref{fig:Overflow} are vertical lines not present in the input.
 The lines are caused by the processor being designed to run some rows twice since a sweep of 9 input rows only produces 7 output rows.
-Figure \ref{fig:soft_sim} a shows how the output looks when input and output is handled correctly in software.
+As the input handler is not included, the rows are never repeated and thus these pixels are missing.
+In addition, the missing pixels appears as vertical lines as the processor core expects columns and not rows.
 
 Also missing from the slimmed down version of the processor is the possibility of setting convolution kernel and operators on run-time.
 Instead, several versions of the bit file was stored to the SD card for testing.
@@ -88,11 +89,15 @@ These values wrap around and is offset by the maximum value, causing an otherwis
 \end{figure}
 
 \subsection{HDMI Channel Path}
-After the first test of HDMI output from HDMI input, the HDMI input pins for R and B were swapped in the FPGA constraints to produce a picture with correct colour values.
-The underlying problem were the HDMI output channels being swapped in the constraints. 
+During the first test of HDMI output from HDMI input,
+the HDMI input pins for R and B were swapped in the FPGA constraints to produce a picture with correct colour values.
 This led to the HDMI channel path for R and B through the FPGA to be remapped twice as shown in Figure \ref{fig:hdmiChannelPath}.
+
 The image will have the correct colours at the output, but since VSYNC and HSYNC signals are only sent over channel B, information used to synchronise the image is lost.
-By swapping the corresponding output channels instead of the input channel, a picture with correct colours as well as VSYNC and HSYNC signals appeared on the display.
+
+This caused our attempts to generate the correct output signals to fail,
+but by swapping the corresponding output channels instead of the input channel,
+a picture with correct colours, as well as VSYNC and HSYNC signals, appeared on the display.
 
 \begin{figure}[h!]
     \includegraphics[width=\linewidth]{img/hdmi_channel_path.pdf}
@@ -111,7 +116,7 @@ This does not scale well with multiple configurations, as a small change in any 
 The time it takes for the MCU to program the FPGA with a new configuration file is about \unit[3]{seconds}.
 
 In the final implementation HDMI frame synchronisation signals are being passed from input to output without going through the processor.
-This means thatthe resolution of the image output is dependent on the input.
+This means that the resolution of the image output is dependent on the input.
 
 The size of the kernel matrices are hard coded both in the final design and in the final implementation.
 To use larger kernel matrix sizes, it is possible to generate new configuration files capable of processing these.
@@ -120,6 +125,7 @@ According to the reports produced by Xilinx ISE during building of the FPGA bit 
 
 Since each component in the core of the processor only relies on its neighbours the processor can tackle large kernels without sacrificing clock speed.
 The limiting factor is fast memory since data has to be buffered in order to be delivered as sweep slices.
+
 The modularity of the processor allows it to be duplicated, letting as many cores as feasible work in parallel since convolution has no data dependency issues.
 On our available hardware block ram and input bandwidth was the limiting factor, however on different hardware we believe instantiating many cores with different parameters should be a simple task.
 

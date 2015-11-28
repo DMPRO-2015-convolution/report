@@ -6,7 +6,8 @@ Some tests were performed on the physical hardware, while others were pure softw
 \subsection{FPGA}
 The SRAM and EBI managers were tested using VHDL test benches before being implemented on the FPGA.
 
-For the processor core, Chisel test benches were used, as testing is quite well supported by the language itself. The processor core was also tested using VHDL test benches.
+For the processor core, Chisel test benches were used, as testing is quite well supported by the language itself.
+The processor core was tested using VHDL test benches near the end of the procjet, but the tests failed with invalid values being reported by the simulation tool.
 
 \subsubsection{EBI Throughput} \label{subsec:EbiThroughput}
 During the project, the throughput over EBI between a EFM MCU and a Spartan-6 FPGA was tested by sending a sequence of increasing numbers which were verified on the FPGA.
@@ -36,7 +37,7 @@ Nevertheless, this would not make a difference even if the wires were swapped as
 The chips were confirmed to be working by configuring the FPGA with an image that performed the following steps:
 \begin{enumerate}
     \item Iterate through all memory addresses and write the lower 16 bits of the address XOR some random values (in our case, 0xDEAD and 0xBEEF for SRAM1 and SRAM2 respectively).
-    \item Start over at the lowest address, read the data and compare to the expected value.
+    \item Start over at the lowest address, read the data and compare with the expected value.
     \item Light the LED with a light characteristic dependent on the result:
         \begin{itemize}
             \item Fixed on success.

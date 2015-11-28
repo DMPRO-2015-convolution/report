@@ -6,7 +6,7 @@ The cable can carry audio, Ethernet and other information in addition to the vid
 Transition-Minimised Differential Signaling (TMDS) is a standard used for transmitting video data over HDMI.
 HDMI uses it at the physical layer.
 Four channels of serial data establish the HDMI video transmission.
-It has three channels for the RBG colour information and one for the pixel data rate clock.
+It has three channels for the RGB colour information and one for the pixel data rate clock.
 Each pixel has a 24-bit colour depth, with each colour being 8 bits each.
 These are separately convertered into 10-bit symbols before being serialised and transmitted onto the TMDS data channels.
 It is this 10:1 serialisation ratio that makes the bit rate 10x faster than the actual pixel rate.
@@ -39,6 +39,5 @@ Then the 10-bit word is decoded into one of three possible formats:
 \end{itemize}
 
 \subsubsection{TMDS Transmitter}
-The TMDS transmitter design can be seen in Figure \ref{fig:TMDSTransmitter}.
-Each colour, VSYNC, HSYNC and VDE is sent to the TMDS encoders making each colour into a 10-bit word respectively. This 10-bit word is then made into a serial data stream before converting it to TMDS signals to be transmitted on the HDMI cable.
+Each colour, VSYNC, HSYNC and VDE is sent through a TMDS encoder, which turns each colour into a 10-bit word respectively. This 10-bit word is then made into a serial data stream before converting it to TMDS signals to be transmitted on the HDMI cable.
 
